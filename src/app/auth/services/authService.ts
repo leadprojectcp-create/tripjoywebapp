@@ -1,0 +1,260 @@
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword,
+  UserCredential,
+  User
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../../services/firebase';
+import { getErrorMessage, logError } from '../../utils/errorHandler';
+
+// 사용자 인터페이스
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  birthDate: string; // 타임스탬프로 저장
+  gender: string; // "남성" | "여성"
+  location: string; // 국가명
+
+  referralCode?: string;
+  referredBy?: string | null;
+  signupMethod: 'email' | 'kakao' | 'google' | 'apple';
+  loginType: string; // "email" | "google" | "kakao" | "apple"
+  photoUrl?: string;
+  
+  // 포인트 시스템
+  points: number;
+  usage_count: number;
+  
+  // 언어 및 토큰
+  language: string;
+  fcmToken?: string;
+  
+  // 동의 관련 (맵 형태로 묶음)
+  consents: {
+    termsOfService: boolean;
+    personalInfo: boolean;
+    locationInfo: boolean;
+    marketing: boolean;
+    thirdParty: boolean;
+  };
+  
+  // 타임스탬프들
+  createdAt: string;
+  updatedAt: string;
+  lastUpdated: string;
+  lastLoginAt: string;
+  tokenUpdatedAt?: string;
+}
+
+
+
+// 이메일 회원가입
+export const signUpWithEmail = async (email: string, password: string, userInfo: any): Promise<UserData> => {
+  try {
+    // 입력 데이터 검증
+    if (!email || !password || !userInfo) {
+      throw new Error('필수 정보가 누락되었습니다.');
+    }
+
+    if (password.length < 6) {
+      throw new Error('비밀번호는 6자 이상이어야 합니다.');
+    }
+
+    // Firebase가 초기화되지 않은 경우 에러
+    console.log('🔍 Firebase auth 상태:', !!auth);
+    console.log('🔍 Firebase db 상태:', !!db);
+    if (!auth || !db) {
+      console.error('❌ Firebase가 초기화되지 않았습니다.');
+      console.error('auth:', auth);
+      console.error('db:', db);
+      throw new Error('Firebase가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    }
+
+    // 실제 Firebase Auth로 사용자 계정 생성
+    const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // 한국 시간대 기준 타임스탬프 포맷팅 함수
+    const formatKoreanTimestamp = (date: Date): string => {
+      const koreaTime = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+      
+      const year = koreaTime.getFullYear();
+      const month = koreaTime.getMonth() + 1;
+      const day = koreaTime.getDate();
+      const hours = koreaTime.getHours();
+      const minutes = koreaTime.getMinutes();
+      const seconds = koreaTime.getSeconds();
+      
+      const period = hours < 12 ? '오전' : '오후';
+      const displayHours = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
+      
+      return `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분 ${seconds}초 UTC+9`;
+    };
+
+    // 생년월일을 타임스탬프로 변환
+    const birthDate = new Date(
+      parseInt(userInfo.birthYear), 
+      parseInt(userInfo.birthMonth) - 1, 
+      parseInt(userInfo.birthDay)
+    );
+    
+    const currentTime = new Date();
+    
+    // 국가코드에 따른 언어 설정 (지원하는 7개 언어만)
+    const getLanguageByCountryCode = (countryCode: string): string => {
+      switch (countryCode) {
+        case '+82': return 'ko';  // 한국
+        case '+1': return 'en';   // 미국
+        case '+84': return 'vi';  // 베트남
+        case '+86': return 'zh';  // 중국
+        case '+81': return 'ja';  // 일본
+        case '+66': return 'th';  // 태국
+        case '+63': return 'fil'; // 필리핀
+        default: return 'en';     // 기본값: 영어
+      }
+    };
+
+    // 전화번호 국가코드를 ISO 국가코드로 변환 (지원하는 7개 언어만)
+    const getISOCountryCode = (countryCode: string): string => {
+      switch (countryCode) {
+        case '+82': return 'ko';  // 한국
+        case '+1': return 'en';   // 미국
+        case '+84': return 'vi';  // 베트남
+        case '+86': return 'zh';  // 중국
+        case '+81': return 'ja';  // 일본
+        case '+66': return 'th';  // 태국
+        case '+63': return 'fil'; // 필리핀
+        default: return 'en';     // 기본값: 영어
+      }
+    };
+
+
+
+    // Firestore에 사용자 정보 저장
+    const userData: UserData = {
+      id: user.uid,
+      name: userInfo.name,
+      email: user.email!,
+      phoneNumber: userInfo.countryCode + userInfo.phoneNumber, // 국가코드 + 전화번호
+      birthDate: formatKoreanTimestamp(birthDate),
+      gender: userInfo.gender === 'male' ? '남성' : '여성',
+      location: getISOCountryCode(userInfo.countryCode), // ISO 국가코드로 저장
+
+      referralCode: userInfo.referralCode || '',
+      referredBy: null,
+      signupMethod: 'email',
+      loginType: 'email',
+      photoUrl: '',
+      
+      // 포인트 시스템 기본값
+      points: 3000, // 가입 시 기본 포인트
+      usage_count: 0,
+      
+      // 언어 및 토큰 (선택한 국가에 따라 언어 설정)
+      language: getLanguageByCountryCode(userInfo.countryCode),
+      fcmToken: '',
+      
+      // 동의 관련 (맵 형태로 저장)
+      consents: {
+        termsOfService: userInfo.consents.termsOfService,
+        personalInfo: userInfo.consents.personalInfo,
+        locationInfo: userInfo.consents.locationInfo,
+        marketing: userInfo.consents.marketing,
+        thirdParty: userInfo.consents.thirdParty
+      },
+      
+      // 타임스탬프들
+      createdAt: formatKoreanTimestamp(currentTime),
+      updatedAt: formatKoreanTimestamp(currentTime),
+      lastUpdated: formatKoreanTimestamp(currentTime),
+      lastLoginAt: formatKoreanTimestamp(currentTime),
+      tokenUpdatedAt: formatKoreanTimestamp(currentTime)
+    };
+
+    await setDoc(doc(db, 'users_test', user.uid), userData);
+    
+    // Firebase 회원가입 완료 후 localStorage 업데이트
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tripjoy_user', JSON.stringify(userData));
+    }
+    
+    return userData;
+  } catch (error) {
+    logError(error, 'signUpWithEmail');
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+// 이메일 로그인
+export const signInWithEmail = async (email: string, password: string): Promise<User | UserData> => {
+  try {
+    // 입력 데이터 검증
+    if (!email || !password) {
+      throw new Error('이메일과 비밀번호를 입력해주세요.');
+    }
+
+    // Firebase가 초기화되지 않은 경우 에러
+    if (!auth) {
+      throw new Error('Firebase가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    }
+
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    logError(error, 'signInWithEmail');
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+// 사용자 정보 가져오기
+export const getUserData = async (userId: string): Promise<UserData | null> => {
+  try {
+    // Firebase가 초기화되지 않은 경우 에러
+    if (!db) {
+      throw new Error('Firebase가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    }
+    
+    const userDoc = await getDoc(doc(db, 'users_test', userId));
+    if (userDoc.exists()) {
+      return userDoc.data() as UserData;
+    }
+    return null;
+  } catch (error) {
+    console.error('사용자 정보 가져오기 실패:', error);
+    throw error;
+  }
+};
+
+// 현재 로그인한 사용자 가져오기
+export const getCurrentUser = (): User | null => {
+  if (typeof window === 'undefined') return null;
+  
+  // Firebase Auth 사용자 확인
+  if (auth && auth.currentUser) {
+    return auth.currentUser;
+  }
+  
+  return null;
+};
+
+// 로그아웃
+export const signOut = async (): Promise<void> => {
+  try {
+    if (auth && auth.currentUser) {
+      await auth.signOut();
+    }
+    
+    // localStorage 정리
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('tripjoy_user');
+    }
+    
+    console.log('✅ 로그아웃 성공');
+  } catch (error) {
+    logError(error, 'signOut');
+    throw new Error(getErrorMessage(error));
+  }
+};

@@ -1,0 +1,256 @@
+/* Google Maps Location Picker Styles */
+
+.location-picker {
+  width: 100%;
+}
+
+/* 검색 입력 필드 */
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #666;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.location-input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.location-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.location-input:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.clear-location-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.clear-location-btn:hover {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* 버튼 스타일 */
+.map-toggle-btn {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.map-toggle-btn:hover {
+  background: #0056b3;
+}
+
+.remove-location-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.remove-location-btn:hover {
+  background: #c82333;
+}
+
+/* 선택된 위치 정보 */
+.selected-location-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.location-icon {
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.location-text {
+  flex: 1;
+}
+
+.location-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.location-address {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+.google-map {
+  width: 100%;
+  height: 300px;
+  border: none;
+}
+
+.map-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background: #f8f9fa;
+  color: #666;
+  font-size: 14px;
+}
+
+.map-loading .loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.map-hint {
+  padding: 10px 16px;
+  background: #f8f9fa;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Google Places Autocomplete 드롭다운 스타일 */
+.pac-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 1px solid #e9ecef;
+  margin-top: 4px;
+  z-index: 9999 !important; /* 다른 요소들 위에 표시 */
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+}
+
+.pac-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f3f5;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.pac-item:hover {
+  background-color: #f8f9fa;
+}
+
+.pac-item:last-child {
+  border-bottom: none;
+}
+
+.pac-item-selected,
+.pac-item:focus {
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+.pac-matched {
+  font-weight: 700;
+  color: inherit;
+}
+
+/* 검색창에 포커스가 있을 때 */
+.location-input:focus + .pac-container {
+  border-color: #007bff;
+}
+
+/* 로딩 상태 */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .google-map,
+  .map-loading {
+    height: 250px;
+  }
+  
+  .map-header h3 {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input-wrapper {
+    margin-bottom: 10px;
+  }
+  
+  .location-input {
+    font-size: 16px; /* iOS zoom 방지 */
+  }
+  
+  .google-map,
+  .map-loading {
+    height: 200px;
+  }
+}

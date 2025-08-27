@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "code": "NYC",
+      "names": {
+        "ko": "뉴욕",
+        "en": "New York",
+        "vi": "New York",
+        "zh": "纽约",
+        "ja": "ニューヨーク",
+        "th": "นิวยอร์ก",
+        "fil": "New York"
+      }
+    },
+    {
+      "code": "LAX",
+      "names": {
+        "ko": "로스앤젤레스",
+        "en": "Los Angeles",
+        "vi": "Los Angeles",
+        "zh": "洛杉矶",
+        "ja": "ロサンゼルス",
+        "th": "ลอสแอนเจลิส",
+        "fil": "Los Angeles"
+      }
+    },
+    {
+      "code": "CHI",
+      "names": {
+        "ko": "시카고",
+        "en": "Chicago",
+        "vi": "Chicago",
+        "zh": "芝加哥",
+        "ja": "シカゴ",
+        "th": "ชิคาโก",
+        "fil": "Chicago"
+      }
+    },
+    {
+      "code": "MIA",
+      "names": {
+        "ko": "마이애미",
+        "en": "Miami",
+        "vi": "Miami",
+        "zh": "迈阿密",
+        "ja": "マイアミ",
+        "th": "ไมอามี",
+        "fil": "Miami"
+      }
+    },
+    {
+      "code": "SF",
+      "names": {
+        "ko": "샌프란시스코",
+        "en": "San Francisco",
+        "vi": "San Francisco",
+        "zh": "旧金山",
+        "ja": "サンフランシスコ",
+        "th": "ซานฟรานซิสโก",
+        "fil": "San Francisco"
+      }
+    },
+    {
+      "code": "LV",
+      "names": {
+        "ko": "라스베가스",
+        "en": "Las Vegas",
+        "vi": "Las Vegas",
+        "zh": "拉斯维加斯",
+        "ja": "ラスベガス",
+        "th": "ลาสเวกัส",
+        "fil": "Las Vegas"
+      }
+    }
+  ]
+}

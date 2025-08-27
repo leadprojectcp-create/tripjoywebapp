@@ -1,0 +1,194 @@
+.country-city-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.selector-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 라벨 제거됨 - 더 이상 사용하지 않음 */
+
+/* 커스텀 드롭다운 컨테이너 */
+.custom-dropdown {
+  position: relative;
+}
+
+/* 드롭다운 트리거 버튼 */
+.dropdown-trigger {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  min-height: 56px;
+  height: 56px;
+}
+
+.dropdown-trigger:hover {
+  border-color: #007bff;
+}
+
+.dropdown-trigger:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.dropdown-trigger:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #ddd;
+}
+
+.dropdown-trigger.open {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* 드롭다운 텍스트 */
+.dropdown-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 국가와 국기 표시 */
+.country-with-flag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.2;
+}
+
+/* 전체 옵션 스타일 */
+.all-option {
+  line-height: 1.2;
+}
+
+/* 플레이스홀더 텍스트 */
+.placeholder-text {
+  color: #999;
+}
+
+/* 드롭다운 화살표 */
+.dropdown-arrow {
+  flex-shrink: 0;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+  color: #666;
+}
+
+.dropdown-trigger.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-trigger:disabled .dropdown-arrow {
+  color: #ccc;
+}
+
+/* 드롭다운 메뉴 */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* 드롭다운 메뉴 아이템 */
+.dropdown-item {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: #333;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-radius: 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item:active {
+  background-color: #e9ecef;
+}
+
+.dropdown-item.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.dropdown-item.selected:hover {
+  background-color: #0056b3;
+}
+
+/* 첫 번째와 마지막 아이템 모서리 처리 */
+.dropdown-item:first-child {
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
+}
+
+.dropdown-item:last-child {
+  border-bottom-left-radius: 11px;
+  border-bottom-right-radius: 11px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .country-city-selector {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .selector-group {
+    flex: none;
+  }
+  
+  /* 모바일에서 드롭다운 메뉴 더 넓게 */
+  .dropdown-menu {
+    max-height: 180px;
+  }
+  
+  /* 모바일에서 터치하기 쉽게 패딩 증가 */
+  .dropdown-item {
+    padding: 14px 16px;
+    font-size: 16px;
+    min-height: 50px;
+  }
+  
+  .dropdown-trigger {
+    padding: 14px 16px;
+    font-size: 16px;
+    min-height: 58px;
+    height: 58px;
+  }
+}

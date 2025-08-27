@@ -1,0 +1,327 @@
+{
+  "createPost": {
+    "ko": "게시물 작성",
+    "en": "Create Post",
+    "vi": "Tạo bài viết",
+    "zh": "创建帖子",
+    "ja": "投稿作成",
+    "th": "สร้างโพสต์",
+    "fil": "Gumawa ng Post"
+  },
+  "uploadImages": {
+    "ko": "사진 업로드",
+    "en": "Upload Images",
+    "vi": "Tải lên hình ảnh",
+    "zh": "上传图片",
+    "ja": "画像アップロード",
+    "th": "อัปโหลดรูปภาพ",
+    "fil": "Mag-upload ng Larawan"
+  },
+  "addImage": {
+    "ko": "사진 추가",
+    "en": "Add Image",
+    "vi": "Thêm hình ảnh",
+    "zh": "添加图片",
+    "ja": "画像追加",
+    "th": "เพิ่มรูปภาพ",
+    "fil": "Magdagdag ng Larawan"
+  },
+  "postContent": {
+    "ko": "게시물 작성",
+    "en": "Post Content",
+    "vi": "Nội dung bài viết",
+    "zh": "帖子内容",
+    "ja": "投稿内容",
+    "th": "เนื้อหาโพสต์",
+    "fil": "Nilalaman ng Post"
+  },
+  "postTitle": {
+    "ko": "제목",
+    "en": "Title",
+    "vi": "Tiêu đề",
+    "zh": "标题",
+    "ja": "タイトル",
+    "th": "หัวข้อ",
+    "fil": "Pamagat"
+  },
+  "titlePlaceholder": {
+    "ko": "게시물 제목을 입력하세요",
+    "en": "Enter post title",
+    "vi": "Nhập tiêu đề bài viết",
+    "zh": "请输入帖子标题",
+    "ja": "投稿のタイトルを入力してください",
+    "th": "กรอกหัวข้อโพสต์",
+    "fil": "Ilagay ang pamagat ng post"
+  },
+  "postDescription": {
+    "ko": "내용",
+    "en": "Description",
+    "vi": "Mô tả",
+    "zh": "描述",
+    "ja": "説明",
+    "th": "คำอธิบาย",
+    "fil": "Paglalarawan"
+  },
+  "contentPlaceholder": {
+    "ko": "게시물 내용을 작성하세요",
+    "en": "Write post content",
+    "vi": "Viết nội dung bài viết",
+    "zh": "编写帖子内容",
+    "ja": "投稿の内容を書いてください",
+    "th": "เขียนเนื้อหาโพสต์",
+    "fil": "Isulat ang nilalaman ng post"
+  },
+  "locationInfo": {
+    "ko": "위치 정보",
+    "en": "Location Information",
+    "vi": "Thông tin vị trí",
+    "zh": "位置信息",
+    "ja": "位置情報",
+    "th": "ข้อมูลตำแหน่ง",
+    "fil": "Impormasyon ng Lokasyon"
+  },
+  "location": {
+    "ko": "위치",
+    "en": "Location",
+    "vi": "Vị trí",
+    "zh": "位置",
+    "ja": "場所",
+    "th": "ตำแหน่ง",
+    "fil": "Lokasyon"
+  },
+  "locationPlaceholder": {
+    "ko": "장소를 검색하세요 (예: 스타벅스, 명동역)",
+    "en": "Search for a place (e.g., Starbucks, Myeongdong Station)",
+    "vi": "Tìm kiếm địa điểm (ví dụ: Starbucks, Ga Myeongdong)",
+    "zh": "搜索地点（例如：星巴克、明洞站）",
+    "ja": "場所を検索してください（例：スターバックス、明洞駅）",
+    "th": "ค้นหาสถานที่ (เช่น: Starbucks, สถานีเมียงดง)",
+    "fil": "Maghanap ng lugar (hal: Starbucks, Myeongdong Station)"
+  },
+  "searchLocationHint": {
+    "ko": "Google에서 장소를 검색하고 선택하세요",
+    "en": "Search and select a place from Google",
+    "vi": "Tìm kiếm và chọn địa điểm từ Google",
+    "zh": "从Google搜索并选择地点",
+    "ja": "Googleで場所を検索して選択してください",
+    "th": "ค้นหาและเลือกสถานที่จาก Google",
+    "fil": "Maghanap at pumili ng lugar mula sa Google"
+  },
+  "loadingMapsHint": {
+    "ko": "Google 지도를 로딩 중...",
+    "en": "Loading Google Maps...",
+    "vi": "Đang tải Google Maps...",
+    "zh": "正在加载Google地图...",
+    "ja": "Googleマップを読み込み中...",
+    "th": "กำลังโหลด Google Maps...",
+    "fil": "Naglo-load ng Google Maps..."
+  },
+  "showMap": {
+    "ko": "지도 보기",
+    "en": "Show Map",
+    "vi": "Hiển thị bản đồ",
+    "zh": "显示地图",
+    "ja": "地図を表示",
+    "th": "แสดงแผนที่",
+    "fil": "Ipakita ang Mapa"
+  },
+  "hideMap": {
+    "ko": "지도 숨기기",
+    "en": "Hide Map",
+    "vi": "Ẩn bản đồ",
+    "zh": "隐藏地图",
+    "ja": "地図を隠す",
+    "th": "ซ่อนแผนที่",
+    "fil": "Itago ang Mapa"
+  },
+  "selectLocationOnMap": {
+    "ko": "지도에서 위치 선택",
+    "en": "Select Location on Map",
+    "vi": "Chọn vị trí trên bản đồ",
+    "zh": "在地图上选择位置",
+    "ja": "地図上で位置を選択",
+    "th": "เลือกตำแหน่งบนแผนที่",
+    "fil": "Piliin ang Lokasyon sa Mapa"
+  },
+  "clickMapToSelectLocation": {
+    "ko": "지도를 클릭하여 위치를 선택하세요",
+    "en": "Click on the map to select a location",
+    "vi": "Nhấp vào bản đồ để chọn vị trí",
+    "zh": "点击地图选择位置",
+    "ja": "地図をクリックして位置を選択してください",
+    "th": "คลิกบนแผนที่เพื่อเลือกตำแหน่ง",
+    "fil": "I-click ang mapa para pumili ng lokasyon"
+  },
+  "hashtags": {
+    "ko": "해시태그",
+    "en": "Hashtags",
+    "vi": "Hashtag",
+    "zh": "标签",
+    "ja": "ハッシュタグ",
+    "th": "แฮชแท็ก",
+    "fil": "Hashtag"
+  },
+  "hashtagsLabel": {
+    "ko": "해시태그",
+    "en": "Hashtags",
+    "vi": "Hashtag",
+    "zh": "标签",
+    "ja": "ハッシュタグ",
+    "th": "แฮชแท็ก",
+    "fil": "Hashtag"
+  },
+  "hashtagsPlaceholder": {
+    "ko": "#여행 #맛집 #추천 (띄어쓰기로 구분)",
+    "en": "#travel #food #recommendation (separated by spaces)",
+    "vi": "#dulich #amthuc #goiy (cách nhau bằng dấu cách)",
+    "zh": "#旅行 #美食 #推荐 (用空格分隔)",
+    "ja": "#旅行 #グルメ #おすすめ (スペースで区切り)",
+    "th": "#เที่ยว #อาหาร #แนะนำ (คั่นด้วยช่องว่าง)",
+    "fil": "#travel #pagkain #rekomendasyon (hiwalay ng space)"
+  },
+  "hashtagsHint": {
+    "ko": "해시태그를 통해 더 많은 사람들이 게시물을 발견할 수 있습니다",
+    "en": "Hashtags help more people discover your post",
+    "vi": "Hashtag giúp nhiều người khám phá bài viết của bạn hơn",
+    "zh": "标签帮助更多人发现您的帖子",
+    "ja": "ハッシュタグでより多くの人に投稿を見つけてもらえます",
+    "th": "แฮชแท็กช่วยให้คนอื่นค้นพบโพสต์ของคุณได้มากขึ้น",
+    "fil": "Ang mga hashtag ay tumutulong sa mas maraming tao na mahanap ang inyong post"
+  },
+  "uploadPost": {
+    "ko": "게시물 업로드",
+    "en": "Upload Post",
+    "vi": "Tải lên bài viết",
+    "zh": "上传帖子",
+    "ja": "投稿アップロード",
+    "th": "อัปโหลดโพสต์",
+    "fil": "Mag-upload ng Post"
+  },
+
+  "contentRequired": {
+    "ko": "내용을 입력해주세요",
+    "en": "Please enter content",
+    "vi": "Vui lòng nhập nội dung",
+    "zh": "请输入内容",
+    "ja": "内容を入力してください",
+    "th": "กรุณากรอกเนื้อหา",
+    "fil": "Mangyaring maglagay ng nilalaman"
+  },
+  "imageRequired": {
+    "ko": "최소 1장의 사진을 업로드해주세요",
+    "en": "Please upload at least 1 image",
+    "vi": "Vui lòng tải lên ít nhất 1 hình ảnh",
+    "zh": "请至少上传1张图片",
+    "ja": "最低1枚の画像をアップロードしてください",
+    "th": "กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป",
+    "fil": "Mangyaring mag-upload ng hindi bababa sa 1 larawan"
+  },
+  "uploadSuccess": {
+    "ko": "게시물이 성공적으로 업로드되었습니다!",
+    "en": "Post uploaded successfully!",
+    "vi": "Bài viết đã được tải lên thành công!",
+    "zh": "帖子上传成功！",
+    "ja": "投稿が正常にアップロードされました！",
+    "th": "อัปโหลดโพสต์สำเร็จ!",
+    "fil": "Matagumpay na na-upload ang post!"
+  },
+  "locationDescriptionLabel": {
+    "ko": "장소 설명",
+    "en": "Place Description",
+    "vi": "Mô tả địa điểm",
+    "zh": "地点描述",
+    "ja": "場所の説明",
+    "th": "คำอธิบายสถานที่",
+    "fil": "Paglalarawan ng Lugar"
+  },
+  "locationDescriptionPlaceholder": {
+    "ko": "이 장소에 대한 설명을 작성해보세요 (예: 분위기, 특징, 추천 이유 등)",
+    "en": "Describe this place (e.g., atmosphere, features, why you recommend it)",
+    "vi": "Mô tả về địa điểm này (ví dụ: không khí, đặc điểm, lý do bạn giới thiệu)",
+    "zh": "描述这个地方（例如：氛围、特色、推荐理由等）",
+    "ja": "この場所について説明してください（例：雰囲気、特徴、おすすめする理由など）",
+    "th": "อธิบายเกี่ยวกับสถานที่นี้ (เช่น บรรยากาศ, จุดเด่น, เหตุผลที่แนะนำ)",
+    "fil": "Ilarawan ang lugar na ito (hal: kapaligiran, mga tampok, dahilan ng pagrekumenda)"
+  },
+  "locationDescriptionHint": {
+    "ko": "다른 사용자들에게 이 장소에 대한 유용한 정보를 공유해보세요",
+    "en": "Share useful information about this place with other users",
+    "vi": "Chia sẻ thông tin hữu ích về địa điểm này với người dùng khác",
+    "zh": "与其他用户分享关于这个地方的有用信息",
+    "ja": "他のユーザーにこの場所の有用な情報をシェアしましょう",
+    "th": "แบ่งปันข้อมูลที่มีประโยชน์เกี่ยวกับสถานที่นี้กับผู้ใช้อื่น",
+    "fil": "Magbahagi ng kapaki-pakinabang na impormasyon tungkol sa lugar na ito sa ibang mga user"
+  },
+  "selectCountry": {
+    "ko": "국가 선택",
+    "en": "Select Country",
+    "vi": "Chọn quốc gia",
+    "zh": "选择国家",
+    "ja": "国を選択",
+    "th": "เลือกประเทศ",
+    "fil": "Pumili ng Bansa"
+  },
+  "selectCity": {
+    "ko": "도시 선택",
+    "en": "Select City",
+    "vi": "Chọn thành phố",
+    "zh": "选择城市",
+    "ja": "都市を選択",
+    "th": "เลือกเมือง",
+    "fil": "Pumili ng Lungsod"
+  },
+  "selectCountryPlaceholder": {
+    "ko": "국가 선택",
+    "en": "Select country",
+    "vi": "Chọn quốc gia",
+    "zh": "选择国家",
+    "ja": "国を選択",
+    "th": "เลือกประเทศ",
+    "fil": "Piliin ang bansa"
+  },
+  "selectCityPlaceholder": {
+    "ko": "도시 선택",
+    "en": "Select city",
+    "vi": "Chọn thành phố",
+    "zh": "选择城市",
+    "ja": "都市を選択",
+    "th": "เลือกเมือง",
+    "fil": "Piliin ang lungsod"
+  },
+  "selectCountryFirst": {
+    "ko": "먼저 국가를 선택하세요",
+    "en": "Select a country first",
+    "vi": "Chọn quốc gia trước",
+    "zh": "请先选择国家",
+    "ja": "まず国を選択してください",
+    "th": "เลือกประเทศก่อน",
+    "fil": "Piliin muna ang bansa"
+  },
+  "loading": {
+    "ko": "로딩 중...",
+    "en": "Loading...",
+    "vi": "Đang tải...",
+    "zh": "加载中...",
+    "ja": "読み込み中...",
+    "th": "กำลังโหลด...",
+    "fil": "Naglo-load..."
+  },
+  "allCountries": {
+    "ko": "전체",
+    "en": "All Countries",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  },
+  "allCities": {
+    "ko": "전체",
+    "en": "All Cities",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  }
+}

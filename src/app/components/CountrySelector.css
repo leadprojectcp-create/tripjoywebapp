@@ -1,0 +1,224 @@
+.country-selector {
+  position: relative;
+  width: 100%;
+}
+
+.country-selector-button {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+}
+
+.country-selector-button:hover {
+  border-color: #007bff;
+  background: white;
+}
+
+.country-selector-button.open {
+  border-color: #007bff;
+  background: white;
+}
+
+.country-selector-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.country-selector.error .country-selector-button {
+  border-color: #ff4757;
+}
+
+.selected-country {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.country-flag {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.country-name {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.placeholder {
+  font-size: 16px;
+  color: #999;
+}
+
+.dropdown-arrow {
+  color: #666;
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.country-selector-button.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.country-dropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  overflow: hidden;
+  animation: dropdownSlideIn 0.2s ease-out;
+  max-height: 400px;
+  width: 100%;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-container {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.country-search {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.country-search:focus {
+  border-color: #007bff;
+  background: white;
+}
+
+.country-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.country-option:hover {
+  background: #f8f9fa;
+}
+
+.country-option.selected {
+  background: #e3f2fd;
+  color: #007bff;
+}
+
+.country-option:last-child {
+  border-bottom: none;
+}
+
+.country-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.country-option .country-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.country-option.selected .country-name {
+  color: #007bff;
+}
+
+.country-native-name {
+  font-size: 12px;
+  color: #666;
+  font-weight: 400;
+}
+
+.country-option.selected .country-native-name {
+  color: #0056b3;
+}
+
+.no-results {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 스크롤바 스타일링 */
+.country-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.country-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.country-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.country-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .country-dropdown {
+    max-height: 300px;
+  }
+  
+  .country-list {
+    max-height: 180px;
+  }
+  
+  .country-option {
+    padding: 10px 12px;
+  }
+  
+  .country-flag {
+    font-size: 18px;
+  }
+  
+  .country-option .country-name {
+    font-size: 13px;
+  }
+  
+  .country-native-name {
+    font-size: 11px;
+  }
+}

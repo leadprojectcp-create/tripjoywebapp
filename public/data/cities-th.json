@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "code": "BKK",
+      "names": {
+        "ko": "방콕",
+        "en": "Bangkok",
+        "vi": "Bangkok",
+        "zh": "曼谷",
+        "ja": "バンコク",
+        "th": "กรุงเทพมหานคร",
+        "fil": "Bangkok"
+      }
+    },
+    {
+      "code": "CNX",
+      "names": {
+        "ko": "치앙마이",
+        "en": "Chiang Mai",
+        "vi": "Chiang Mai",
+        "zh": "清迈",
+        "ja": "チェンマイ",
+        "th": "เชียงใหม่",
+        "fil": "Chiang Mai"
+      }
+    },
+    {
+      "code": "HKT",
+      "names": {
+        "ko": "푸켓",
+        "en": "Phuket",
+        "vi": "Phuket",
+        "zh": "普吉岛",
+        "ja": "プーケット",
+        "th": "ภูเก็ต",
+        "fil": "Phuket"
+      }
+    },
+    {
+      "code": "KOS",
+      "names": {
+        "ko": "코사무이",
+        "en": "Koh Samui",
+        "vi": "Koh Samui",
+        "zh": "苏梅岛",
+        "ja": "サムイ島",
+        "th": "เกาะสมุย",
+        "fil": "Koh Samui"
+      }
+    },
+    {
+      "code": "PTY",
+      "names": {
+        "ko": "파타야",
+        "en": "Pattaya",
+        "vi": "Pattaya",
+        "zh": "芭提雅",
+        "ja": "パタヤ",
+        "th": "พัทยา",
+        "fil": "Pattaya"
+      }
+    },
+    {
+      "code": "CRI",
+      "names": {
+        "ko": "치앙라이",
+        "en": "Chiang Rai",
+        "vi": "Chiang Rai",
+        "zh": "清莱",
+        "ja": "チェンライ",
+        "th": "เชียงราย",
+        "fil": "Chiang Rai"
+      }
+    }
+  ]
+}

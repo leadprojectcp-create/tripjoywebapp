@@ -1,0 +1,83 @@
+{
+  "termsTitle": {
+    "ko": "약관 동의",
+    "en": "Terms Agreement",
+    "vi": "Đồng ý điều khoản",
+    "zh": "条款同意",
+    "ja": "利用規約同意",
+    "th": "ข้อตกลงเงื่อนไข",
+    "fil": "Kasunduan sa mga Tuntunin"
+  },
+  "termsSubtitle": {
+    "ko": "서비스 이용을 위해 다음 약관에 동의해주세요",
+    "en": "Please agree to the following terms to use the service",
+    "vi": "Vui lòng đồng ý với các điều khoản sau để sử dụng dịch vụ",
+    "zh": "请同意以下条款以使用服务",
+    "ja": "サービス利用のため、以下の利用規約に同意してください",
+    "th": "กรุณายอมรับเงื่อนไขต่อไปนี้เพื่อใช้บริการ",
+    "fil": "Mangyaring sumang-ayon sa mga sumusunod na tuntunin upang magamit ang serbisyo"
+  },
+  "agreeAll": {
+    "ko": "모두 동의하기",
+    "en": "Agree to All",
+    "vi": "Đồng ý tất cả",
+    "zh": "同意所有条款",
+    "ja": "すべてに同意する",
+    "th": "ยอมรับทั้งหมด",
+    "fil": "Sumang-ayon sa Lahat"
+  },
+  "serviceTerms": {
+    "ko": "[필수] 서비스 이용약관",
+    "en": "[Required] Service Terms",
+    "vi": "[Bắt buộc] Điều khoản dịch vụ",
+    "zh": "[必需] 服务条款",
+    "ja": "[必須] サービス利用規約",
+    "th": "[จำเป็น] เงื่อนไขการใช้บริการ",
+    "fil": "[Kailangan] Mga Tuntunin ng Serbisyo"
+  },
+  "privacyPolicy": {
+    "ko": "[필수] 개인정보수집/이용동의",
+    "en": "[Required] Privacy Policy Agreement",
+    "vi": "[Bắt buộc] Đồng ý chính sách bảo mật",
+    "zh": "[必需] 隐私政策同意",
+    "ja": "[必須] 個人情報収集・利用同意",
+    "th": "[จำเป็น] ข้อตกลงนโยบายความเป็นส่วนตัว",
+    "fil": "[Kailangan] Kasunduan sa Privacy Policy"
+  },
+  "thirdPartyTerms": {
+    "ko": "[필수] 개인정보 제3자 정보제공 동의",
+    "en": "[Required] Third Party Information Sharing Agreement",
+    "vi": "[Bắt buộc] Đồng ý chia sẻ thông tin bên thứ ba",
+    "zh": "[必需] 第三方信息共享同意",
+    "ja": "[必須] 個人情報第三者提供同意",
+    "th": "[จำเป็น] ข้อตกลงการแบ่งปันข้อมูลบุคคลที่สาม",
+    "fil": "[Kailangan] Kasunduan sa Pagbabahagi ng Impormasyon sa Third Party"
+  },
+  "locationTerms": {
+    "ko": "[필수] 위치기반 서비스 이용약관 동의",
+    "en": "[Required] Location-based Service Agreement",
+    "vi": "[Bắt buộc] Đồng ý dịch vụ định vị",
+    "zh": "[必需] 位置服务条款同意",
+    "ja": "[必須] 位置情報サービス利用規約同意",
+    "th": "[จำเป็น] ข้อตกลงบริการตามตำแหน่ง",
+    "fil": "[Kailangan] Kasunduan sa Location-based na Serbisyo"
+  },
+  "marketingTerms": {
+    "ko": "[선택] 마케팅 활용 동의",
+    "en": "[Optional] Marketing Consent",
+    "vi": "[Tùy chọn] Đồng ý tiếp thị",
+    "zh": "[可选] 营销同意",
+    "ja": "[選択] マーケティング活用同意",
+    "th": "[ทางเลือก] ความยินยอมการตลาด",
+    "fil": "[Opsyonal] Pagpapahintulot sa Marketing"
+  },
+  "agreeButton": {
+    "ko": "동의합니다",
+    "en": "I Agree",
+    "vi": "Tôi đồng ý",
+    "zh": "我同意",
+    "ja": "同意します",
+    "th": "ฉันยอมรับ",
+    "fil": "Sumasang-ayon ako"
+  }
+}

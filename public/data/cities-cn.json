@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "code": "BJS",
+      "names": {
+        "ko": "베이징",
+        "en": "Beijing",
+        "vi": "Bắc Kinh",
+        "zh": "北京",
+        "ja": "北京",
+        "th": "ปักกิ่ง",
+        "fil": "Beijing"
+      }
+    },
+    {
+      "code": "SHA",
+      "names": {
+        "ko": "상하이",
+        "en": "Shanghai",
+        "vi": "Thượng Hải",
+        "zh": "上海",
+        "ja": "上海",
+        "th": "เซี่ยงไฮ้",
+        "fil": "Shanghai"
+      }
+    },
+    {
+      "code": "GZH",
+      "names": {
+        "ko": "광저우",
+        "en": "Guangzhou",
+        "vi": "Quảng Châu",
+        "zh": "广州",
+        "ja": "広州",
+        "th": "กว่างโจว",
+        "fil": "Guangzhou"
+      }
+    },
+    {
+      "code": "SZH",
+      "names": {
+        "ko": "선전",
+        "en": "Shenzhen",
+        "vi": "Thâm Quyến",
+        "zh": "深圳",
+        "ja": "深圳",
+        "th": "เซินเจิ้น",
+        "fil": "Shenzhen"
+      }
+    },
+    {
+      "code": "HGZ",
+      "names": {
+        "ko": "항저우",
+        "en": "Hangzhou",
+        "vi": "Hàng Châu",
+        "zh": "杭州",
+        "ja": "杭州",
+        "th": "หางโจว",
+        "fil": "Hangzhou"
+      }
+    },
+    {
+      "code": "CDU",
+      "names": {
+        "ko": "청두",
+        "en": "Chengdu",
+        "vi": "Thành Đô",
+        "zh": "成都",
+        "ja": "成都",
+        "th": "เฉิงตู",
+        "fil": "Chengdu"
+      }
+    }
+  ]
+}

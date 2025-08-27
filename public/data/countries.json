@@ -1,0 +1,95 @@
+{
+  "countries": [
+    {
+      "code": "KR",
+      "name": "ko",
+      "names": {
+        "ko": "한국",
+        "en": "South Korea",
+        "vi": "Hàn Quốc",
+        "zh": "韩国",
+        "ja": "韓国",
+        "th": "เกาหลีใต้",
+        "fil": "South Korea"
+      }
+    },
+    {
+      "code": "US",
+      "name": "en",
+      "names": {
+        "ko": "미국",
+        "en": "United States",
+        "vi": "Hoa Kỳ",
+        "zh": "美国",
+        "ja": "アメリカ",
+        "th": "สหรัฐอเมริกา",
+        "fil": "United States"
+      }
+    },
+    {
+      "code": "VN",
+      "name": "vi",
+      "names": {
+        "ko": "베트남",
+        "en": "Vietnam",
+        "vi": "Việt Nam",
+        "zh": "越南",
+        "ja": "ベトナム",
+        "th": "เวียดนาม",
+        "fil": "Vietnam"
+      }
+    },
+    {
+      "code": "CN",
+      "name": "zh",
+      "names": {
+        "ko": "중국",
+        "en": "China",
+        "vi": "Trung Quốc",
+        "zh": "中国",
+        "ja": "中国",
+        "th": "จีน",
+        "fil": "China"
+      }
+    },
+    {
+      "code": "JP",
+      "name": "ja",
+      "names": {
+        "ko": "일본",
+        "en": "Japan",
+        "vi": "Nhật Bản",
+        "zh": "日本",
+        "ja": "日本",
+        "th": "ญี่ปุ่น",
+        "fil": "Japan"
+      }
+    },
+    {
+      "code": "TH",
+      "name": "th",
+      "names": {
+        "ko": "태국",
+        "en": "Thailand",
+        "vi": "Thái Lan",
+        "zh": "泰国",
+        "ja": "タイ",
+        "th": "ไทย",
+        "fil": "Thailand"
+      }
+    },
+    {
+      "code": "PH",
+      "name": "fil",
+      "names": {
+        "ko": "필리핀",
+        "en": "Philippines",
+        "vi": "Philippines",
+        "zh": "菲律宾",
+        "ja": "フィリピン",
+        "th": "ฟิลิปปินส์",
+        "fil": "Philippines"
+      }
+    }
+  ]
+}

@@ -1,0 +1,465 @@
+{
+  "whereToGo": {
+    "ko": "어디로 떠나세요?",
+    "en": "Where are you going?",
+    "vi": "Bạn sẽ đi đâu?",
+    "zh": "你要去哪里？",
+    "ja": "どこに行きますか？",
+    "th": "คุณจะไปที่ไหน?",
+    "fil": "Saan ka pupunta?"
+  },
+  "popularAreas": {
+    "ko": "인기 지역",
+    "en": "Popular Areas",
+    "vi": "Khu vực phổ biến",
+    "zh": "热门地区",
+    "ja": "人気エリア",
+    "th": "พื้นที่ยอดนิยม",
+    "fil": "Mga Sikat na Lugar"
+  },
+  "createFirstPost": {
+    "ko": "첫 번째 게시물을 작성해보세요!",
+    "en": "Create your first post!",
+    "vi": "Tạo bài đăng đầu tiên của bạn!",
+    "zh": "创建你的第一篇帖子！",
+    "ja": "最初の投稿を作成してみてください！",
+    "th": "สร้างโพสต์แรกของคุณ!",
+    "fil": "Lumikha ng inyong unang post!"
+  },
+  "justNow": {
+    "ko": "방금 전",
+    "en": "Just now",
+    "vi": "Vừa xong",
+    "zh": "刚刚",
+    "ja": "たった今",
+    "th": "เมื่อกี้นี้",
+    "fil": "Kanina lang"
+  },
+  "today": {
+    "ko": "오늘",
+    "en": "Today",
+    "vi": "Hôm nay",
+    "zh": "今天",
+    "ja": "今日",
+    "th": "วันนี้",
+    "fil": "Ngayong araw"
+  },
+  "oneDayAgo": {
+    "ko": "1일 전",
+    "en": "1 day ago",
+    "vi": "1 ngày trước",
+    "zh": "1天前",
+    "ja": "1日前",
+    "th": "1 วันที่แล้ว",
+    "fil": "1 araw na nakaraan"
+  },
+  "daysAgoSuffix": {
+    "ko": "일 전",
+    "en": " days ago",
+    "vi": " ngày trước",
+    "zh": "天前",
+    "ja": "日前",
+    "th": " วันที่แล้ว",
+    "fil": " araw na nakaraan"
+  },
+  "weeksAgoSuffix": {
+    "ko": "주 전",
+    "en": " weeks ago",
+    "vi": " tuần trước",
+    "zh": "周前",
+    "ja": "週間前",
+    "th": " สัปดาห์ที่แล้ว",
+    "fil": " linggo na nakaraan"
+  },
+  "male": {
+    "ko": "남성",
+    "en": "Male",
+    "vi": "Nam",
+    "zh": "男性",
+    "ja": "男性",
+    "th": "ชาย",
+    "fil": "Lalaki"
+  },
+  "female": {
+    "ko": "여성",
+    "en": "Female",
+    "vi": "Nữ",
+    "zh": "女性",
+    "ja": "女性",
+    "th": "หญิง",
+    "fil": "Babae"
+  },
+  "ageUnit": {
+    "ko": "세",
+    "en": " years old",
+    "vi": " tuổi",
+    "zh": "岁",
+    "ja": "歳",
+    "th": " ปี",
+    "fil": " taong gulang"
+  },
+  "filteredPosts": {
+    "ko": "선택된 지역의 게시물",
+    "en": "Posts from Selected Location",
+    "vi": "Bài đăng từ vị trí đã chọn",
+    "zh": "来自选定位置的帖子",
+    "ja": "選択された場所からの投稿",
+    "th": "โพสต์จากสถานที่ที่เลือก",
+    "fil": "Mga post mula sa napiling lokasyon"
+  },
+  "recentPosts": {
+    "ko": "최근 게시물",
+    "en": "Recent Posts", 
+    "vi": "Bài đăng gần đây",
+    "zh": "最新帖子",
+    "ja": "最近の投稿",
+    "th": "โพสต์ล่าสุด",
+    "fil": "Mga kamakailang post"
+  },
+  "allCountries": {
+    "ko": "전체 국가",
+    "en": "All Countries",
+    "vi": "Tất cả quốc gia",
+    "zh": "所有国家",
+    "ja": "すべての国",
+    "th": "ประเทศทั้งหมด",
+    "fil": "Lahat ng Bansa"
+  },
+  "allCities": {
+    "ko": "전체 도시",
+    "en": "All Cities",
+    "vi": "Tất cả thành phố",
+    "zh": "所有城市",
+    "ja": "すべての都市",
+    "th": "เมืองทั้งหมด",
+    "fil": "Lahat ng Lungsod"
+  },
+  "selectCountryFirst": {
+    "ko": "먼저 국가를 선택하세요",
+    "en": "Please select a country first",
+    "vi": "Vui lòng chọn quốc gia trước",
+    "zh": "请先选择国家",
+    "ja": "まず国を選択してください",
+    "th": "เลือกประเทศก่อน",
+    "fil": "Piliin muna ang bansa"
+  },
+  "loading": {
+    "ko": "로딩 중...",
+    "en": "Loading...",
+    "vi": "Đang tải...",
+    "zh": "加载中...",
+    "ja": "読み込み中...",
+    "th": "กำลังโหลด...",
+    "fil": "Naglo-load..."
+  },
+  "share": {
+    "ko": "공유",
+    "en": "Share",
+    "vi": "Chia sẻ",
+    "zh": "分享",
+    "ja": "シェア",
+    "th": "แชร์",
+    "fil": "Share"
+  },
+  "copyLink": {
+    "ko": "링크 복사",
+    "en": "Copy Link",
+    "vi": "Sao chép liên kết",
+    "zh": "复制链接",
+    "ja": "リンクをコピー",
+    "th": "คัดลอกลิงก์",
+    "fil": "Kopyahin ang Link"
+  },
+  "linkCopied": {
+    "ko": "링크가 복사되었습니다!",
+    "en": "Link copied!",
+    "vi": "Đã sao chép liên kết!",
+    "zh": "链接已复制！",
+    "ja": "リンクがコピーされました！",
+    "th": "คัดลอกลิงก์แล้ว!",
+    "fil": "Nakopya ang link!"
+  },
+  "addComment": {
+    "ko": "댓글을 입력하세요...",
+    "en": "Add a comment...",
+    "vi": "Thêm bình luận...",
+    "zh": "添加评论...",
+    "ja": "コメントを追加...",
+    "th": "เพิ่มความคิดเห็น...",
+    "fil": "Magdagdag ng comment..."
+  },
+  "post": {
+    "ko": "게시",
+    "en": "Post",
+    "vi": "Đăng",
+    "zh": "发布",
+    "ja": "投稿",
+    "th": "โพสต์",
+    "fil": "Post"
+  },
+  "loadingPosts": {
+    "ko": "게시물을 불러오는 중...",
+    "en": "Loading posts...",
+    "vi": "Đang tải bài đăng...",
+    "zh": "正在加载帖子...",
+    "ja": "投稿を読み込み中...",
+    "th": "กำลังโหลดโพสต์...",
+    "fil": "Naglo-load ng mga post..."
+  },
+  "noPosts": {
+    "ko": "아직 게시물이 없습니다",
+    "en": "No posts yet",
+    "vi": "Chưa có bài đăng nào",
+    "zh": "还没有帖子",
+    "ja": "まだ投稿がありません",
+    "th": "ยังไม่มีโพสต์",
+    "fil": "Walang post pa"
+  },
+  "noPostsMessage": {
+    "ko": "첫 번째 게시물을 작성해보세요!",
+    "en": "Be the first to create a post!",
+    "vi": "Hãy là người đầu tiên tạo bài đăng!",
+    "zh": "成为第一个创建帖子的人！",
+    "ja": "最初の投稿を作成してみてください！",
+    "th": "เป็นคนแรกที่สร้างโพสต์!",
+    "fil": "Maging una sa paggawa ng post!"
+  },
+  "destinations": {
+    "danang": {
+      "ko": "다낭",
+      "en": "Da Nang",
+      "vi": "Đà Nẵng",
+      "zh": "岘港",
+      "ja": "ダナン",
+      "th": "ดานัง",
+      "fil": "Da Nang"
+    },
+    "hochiminh": {
+      "ko": "호치민",
+      "en": "Ho Chi Minh City",
+      "vi": "Hồ Chí Minh",
+      "zh": "胡志明市",
+      "ja": "ホーチミン",
+      "th": "โฮจิมินห์",
+      "fil": "Ho Chi Minh City"
+    },
+    "hanoi": {
+      "ko": "하노이",
+      "en": "Hanoi",
+      "vi": "Hà Nội",
+      "zh": "河内",
+      "ja": "ハノイ",
+      "th": "ฮานอย",
+      "fil": "Hanoi"
+    },
+    "dalat": {
+      "ko": "달랏",
+      "en": "Da Lat",
+      "vi": "Đà Lạt",
+      "zh": "大叻",
+      "ja": "ダラット",
+      "th": "ดาลัด",
+      "fil": "Da Lat"
+    },
+    "phuquoc": {
+      "ko": "푸꾸옥",
+      "en": "Phu Quoc",
+      "vi": "Phú Quốc",
+      "zh": "富国岛",
+      "ja": "フーコック",
+      "th": "ภูเก็ต",
+      "fil": "Phu Quoc"
+    },
+    "nhatrang": {
+      "ko": "나트랑",
+      "en": "Nha Trang",
+      "vi": "Nha Trang",
+      "zh": "芽庄",
+      "ja": "ニャチャン",
+      "th": "หาดใหญ่",
+      "fil": "Nha Trang"
+    },
+    "seoul": {
+      "ko": "서울",
+      "en": "Seoul",
+      "vi": "Seoul",
+      "zh": "首尔",
+      "ja": "ソウル",
+      "th": "โซล",
+      "fil": "Seoul"
+    },
+    "tokyo": {
+      "ko": "도쿄",
+      "en": "Tokyo",
+      "vi": "Tokyo",
+      "zh": "东京",
+      "ja": "東京",
+      "th": "โตเกียว",
+      "fil": "Tokyo"
+    },
+    "bangkok": {
+      "ko": "방콕",
+      "en": "Bangkok",
+      "vi": "Bangkok",
+      "zh": "曼谷",
+      "ja": "バンコク",
+      "th": "กรุงเทพฯ",
+      "fil": "Bangkok"
+    },
+    "manila": {
+      "ko": "마닐라",
+      "en": "Manila",
+      "vi": "Manila",
+      "zh": "马尼拉",
+      "ja": "マニラ",
+      "th": "มะนิลา",
+      "fil": "Maynila"
+    },
+    "newyork": {
+      "ko": "뉴욕",
+      "en": "New York",
+      "vi": "New York",
+      "zh": "纽约",
+      "ja": "ニューヨーク",
+      "th": "นิวยอร์ก",
+      "fil": "New York"
+    },
+    "shanghai": {
+      "ko": "상하이",
+      "en": "Shanghai",
+      "vi": "Thượng Hải",
+      "zh": "上海",
+      "ja": "上海",
+      "th": "เซี่ยงไฮ้",
+      "fil": "Shanghai"
+    },
+    "beijing": {
+      "ko": "베이징",
+      "en": "Beijing",
+      "vi": "Bắc Kinh",
+      "zh": "北京",
+      "ja": "北京",
+      "th": "ปักกิ่ง",
+      "fil": "Beijing"
+    }
+  },
+  "countries": {
+    "kr": {
+      "ko": "한국",
+      "en": "South Korea",
+      "vi": "Hàn Quốc",
+      "zh": "韩国",
+      "ja": "韓国",
+      "th": "เกาหลีใต้",
+      "fil": "Timog Korea"
+    },
+    "us": {
+      "ko": "미국",
+      "en": "United States",
+      "vi": "Hoa Kỳ",
+      "zh": "美国",
+      "ja": "アメリカ",
+      "th": "สหรัฐอเมริกา",
+      "fil": "Estados Unidos"
+    },
+    "vn": {
+      "ko": "베트남",
+      "en": "Vietnam",
+      "vi": "Việt Nam",
+      "zh": "越南",
+      "ja": "ベトナム",
+      "th": "เวียดนาม",
+      "fil": "Vietnam"
+    },
+    "vi": {
+      "ko": "베트남",
+      "en": "Vietnam",
+      "vi": "Việt Nam",
+      "zh": "越南",
+      "ja": "ベトナム",
+      "th": "เวียดนาม",
+      "fil": "Vietnam"
+    },
+    "cn": {
+      "ko": "중국",
+      "en": "China",
+      "vi": "Trung Quốc",
+      "zh": "中国",
+      "ja": "中国",
+      "th": "จีน",
+      "fil": "Tsina"
+    },
+    "jp": {
+      "ko": "일본",
+      "en": "Japan",
+      "vi": "Nhật Bản",
+      "zh": "日本",
+      "ja": "日本",
+      "th": "ญี่ปุ่น",
+      "fil": "Hapon"
+    },
+    "th": {
+      "ko": "태국",
+      "en": "Thailand",
+      "vi": "Thái Lan",
+      "zh": "泰国",
+      "ja": "タイ",
+      "th": "ประเทศไทย",
+      "fil": "Thailand"
+    },
+    "ph": {
+      "ko": "필리핀",
+      "en": "Philippines",
+      "vi": "Philippines",
+      "zh": "菲律宾",
+      "ja": "フィリピン",
+      "th": "ฟิลิปปินส์",
+      "fil": "Pilipinas"
+    },
+    "ko": {
+      "ko": "한국",
+      "en": "South Korea",
+      "vi": "Hàn Quốc",
+      "zh": "韩国",
+      "ja": "韓国",
+      "th": "เกาหลีใต้",
+      "fil": "Timog Korea"
+    },
+    "en": {
+      "ko": "미국",
+      "en": "United States",
+      "vi": "Hoa Kỳ",
+      "zh": "美国",
+      "ja": "アメリカ",
+      "th": "สหรัฐอเมริกา",
+      "fil": "Estados Unidos"
+    },
+    "zhcn": {
+      "ko": "중국",
+      "en": "China",
+      "vi": "Trung Quốc",
+      "zh": "中国",
+      "ja": "中国",
+      "th": "จีน",
+      "fil": "Tsina"
+    },
+    "ja": {
+      "ko": "일본",
+      "en": "Japan",
+      "vi": "Nhật Bản",
+      "zh": "日本",
+      "ja": "日本",
+      "th": "ญี่ปุ่น",
+      "fil": "Hapon"
+    },
+    "fil": {
+      "ko": "필리핀",
+      "en": "Philippines",
+      "vi": "Philippines",
+      "zh": "菲律宾",
+      "ja": "フィリピン",
+      "th": "ฟิลิปปินส์",
+      "fil": "Pilipinas"
+    }
+  }
+}

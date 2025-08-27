@@ -1,0 +1,418 @@
+{
+  "title": {
+    "ko": "프로필",
+    "en": "Profile",
+    "vi": "Hồ sơ",
+    "zh": "个人资料",
+    "ja": "プロフィール",
+    "th": "โปรไฟล์",
+    "fil": "Profile"
+  },
+  "userName": {
+    "ko": "사용자 이름",
+    "en": "User Name",
+    "vi": "Tên người dùng",
+    "zh": "用户名",
+    "ja": "ユーザー名",
+    "th": "ชื่อผู้ใช้",
+    "fil": "Pangalan ng User"
+  },
+  "country": {
+    "ko": "나라",
+    "en": "Country",
+    "vi": "Quốc gia",
+    "zh": "国家",
+    "ja": "国",
+    "th": "ประเทศ",
+    "fil": "Bansa"
+  },
+  "gender": {
+    "ko": "성별",
+    "en": "Gender",
+    "vi": "Giới tính",
+    "zh": "性别",
+    "ja": "性別",
+    "th": "เพศ",
+    "fil": "Kasarian"
+  },
+  "age": {
+    "ko": "나이",
+    "en": "Age",
+    "vi": "Tuổi",
+    "zh": "年龄",
+    "ja": "年齢",
+    "th": "อายุ",
+    "fil": "Edad"
+  },
+  "editProfile": {
+    "ko": "프로필 편집",
+    "en": "Edit Profile",
+    "vi": "Chỉnh sửa hồ sơ",
+    "zh": "编辑个人资料",
+    "ja": "プロフィール編集",
+    "th": "แก้ไขโปรไฟล์",
+    "fil": "I-edit ang Profile"
+  },
+  "introduction": {
+    "ko": "한줄소개",
+    "en": "One-line Introduction",
+    "vi": "Giới thiệu một dòng",
+    "zh": "一句话介绍",
+    "ja": "一言紹介",
+    "th": "แนะนำตัวหนึ่งบรรทัด",
+    "fil": "One-line na Pagpapakilala"
+  },
+  "introPlaceholder": {
+    "ko": "자신을 한 줄로 소개해보세요",
+    "en": "Introduce yourself in one line",
+    "vi": "Giới thiệu bản thân trong một dòng",
+    "zh": "用一句话介绍自己",
+    "ja": "一言で自己紹介してください",
+    "th": "แนะนำตัวเองในหนึ่งบรรทัด",
+    "fil": "Ipakilala ang sarili sa isang linya"
+  },
+  "interests": {
+    "ko": "관심지역",
+    "en": "Interests",
+    "vi": "Sở thích",
+    "zh": "感兴趣的地区",
+    "ja": "興味のある地域",
+    "th": "ความสนใจ",
+    "fil": "Mga Interes"
+  },
+  "career": {
+    "ko": "경력",
+    "en": "Career",
+    "vi": "Sự nghiệp",
+    "zh": "职业经历",
+    "ja": "経歴",
+    "th": "อาชีพ",
+    "fil": "Career"
+  },
+  "company": {
+    "ko": "회사명",
+    "en": "Company",
+    "vi": "Công ty",
+    "zh": "公司名称",
+    "ja": "会社名",
+    "th": "บริษัท",
+    "fil": "Kumpanya"
+  },
+  "years": {
+    "ko": "년",
+    "en": "years",
+    "vi": "năm",
+    "zh": "年",
+    "ja": "年",
+    "th": "ปี",
+    "fil": "taon"
+  },
+  "months": {
+    "ko": "개월",
+    "en": "months",
+    "vi": "tháng",
+    "zh": "个月",
+    "ja": "ヶ月",
+    "th": "เดือน",
+    "fil": "buwan"
+  },
+  "oneLineMemo": {
+    "ko": "한줄 메모",
+    "en": "One-line Memo",
+    "vi": "Ghi chú một dòng",
+    "zh": "一行备忘录",
+    "ja": "一言メモ",
+    "th": "บันทึกหนึ่งบรรทัด",
+    "fil": "One-line na Memo"
+  },
+  "fourLineMemo": {
+    "ko": "네가지 메모",
+    "en": "Four-line Memo",
+    "vi": "Ghi chú bốn dòng",
+    "zh": "四行备忘录",
+    "ja": "四行メモ",
+    "th": "บันทึกสี่บรรทัด",
+    "fil": "Four-line na Memo"
+  },
+  "myPosts": {
+    "ko": "내가 쓴 포스트",
+    "en": "My Posts",
+    "vi": "Bài viết của tôi",
+    "zh": "我的帖子",
+    "ja": "私の投稿",
+    "th": "โพสต์ของฉัน",
+    "fil": "Aking mga Post"
+  },
+  "likes": {
+    "ko": "좋아요",
+    "en": "likes",
+    "vi": "thích",
+    "zh": "点赞",
+    "ja": "いいね",
+    "th": "ไลค์",
+    "fil": "likes"
+  },
+  "comments": {
+    "ko": "댓글",
+    "en": "comments",
+    "vi": "bình luận",
+    "zh": "评论",
+    "ja": "コメント",
+    "th": "ความคิดเห็น",
+    "fil": "comments"
+  },
+  "edit": {
+    "ko": "편집",
+    "en": "Edit",
+    "vi": "Chỉnh sửa",
+    "zh": "编辑",
+    "ja": "編集",
+    "th": "แก้ไข",
+    "fil": "I-edit"
+  },
+  "save": {
+    "ko": "저장",
+    "en": "Save",
+    "vi": "Lưu",
+    "zh": "保存",
+    "ja": "保存",
+    "th": "บันทึก",
+    "fil": "I-save"
+  },
+  "cancel": {
+    "ko": "취소",
+    "en": "Cancel",
+    "vi": "Hủy",
+    "zh": "取消",
+    "ja": "キャンセル",
+    "th": "ยกเลิก",
+    "fil": "Cancel"
+  },
+  "addIntroPlaceholder": {
+    "ko": "한줄소개를 추가해보세요",
+    "en": "Add a one-line introduction",
+    "vi": "Thêm giới thiệu một dòng",
+    "zh": "添加一句话介绍",
+    "ja": "一言紹介を追加してください",
+    "th": "เพิ่มแนะนำตัวหนึ่งบรรทัด",
+    "fil": "Magdagdag ng one-line na pagpapakilala"
+  },
+  "followers": {
+    "ko": "팔로워",
+    "en": "Followers",
+    "vi": "Người theo dõi",
+    "zh": "关注者",
+    "ja": "フォロワー",
+    "th": "ผู้ติดตาม",
+    "fil": "Followers"
+  },
+  "following": {
+    "ko": "팔로잉",
+    "en": "Following",
+    "vi": "Đang theo dõi",
+    "zh": "正在关注",
+    "ja": "フォロー中",
+    "th": "กำลังติดตาม",
+    "fil": "Following"
+  },
+  "posts": {
+    "ko": "게시물",
+    "en": "Posts",
+    "vi": "Bài viết",
+    "zh": "帖子",
+    "ja": "投稿",
+    "th": "โพสต์",
+    "fil": "Mga Post"
+  },
+  "receivedBookings": {
+    "ko": "받은예약",
+    "en": "Received Bookings",
+    "vi": "Đặt chỗ nhận được",
+    "zh": "收到的预订",
+    "ja": "受けた予約",
+    "th": "การจองที่ได้รับ",
+    "fil": "Natanggap na Bookings"
+  },
+  "myBookings": {
+    "ko": "내가한 예약",
+    "en": "My Bookings",
+    "vi": "Đặt chỗ của tôi",
+    "zh": "我的预订",
+    "ja": "私の予約",
+    "th": "การจองของฉัน",
+    "fil": "Aking mga Booking"
+  },
+  "follow": {
+    "ko": "팔로우",
+    "en": "Follow",
+    "vi": "Theo dõi",
+    "zh": "关注",
+    "ja": "フォロー",
+    "th": "ติดตาม",
+    "fil": "Follow"
+  },
+  "chat": {
+    "ko": "채팅하기",
+    "en": "Chat",
+    "vi": "Trò chuyện",
+    "zh": "聊天",
+    "ja": "チャット",
+    "th": "แชท",
+    "fil": "Chat"
+  },
+  "companionRequest": {
+    "ko": "동행신청",
+    "en": "Companion Request",
+    "vi": "Yêu cầu đồng hành",
+    "zh": "同行申请",
+    "ja": "同行申請",
+    "th": "ขอเป็นเพื่อนเดินทาง",
+    "fil": "Kahilingang Kasama"
+  },
+  "uploadPost": {
+    "ko": "게시물 업로드",
+    "en": "Upload Post",
+    "vi": "Tải lên bài viết",
+    "zh": "上传帖子",
+    "ja": "投稿アップロード",
+    "th": "อัปโหลดโพสต์",
+    "fil": "Mag-upload ng Post"
+  },
+  "loading": {
+    "ko": "로딩 중...",
+    "en": "Loading...",
+    "vi": "Đang tải...",
+    "zh": "加载中...",
+    "ja": "読み込み中...",
+    "th": "กำลังโหลด...",
+    "fil": "Naglo-load..."
+  },
+  "enterNamePlaceholder": {
+    "ko": "이름을 입력하세요",
+    "en": "Enter your name",
+    "vi": "Nhập tên của bạn",
+    "zh": "请输入您的姓名",
+    "ja": "名前を入力してください",
+    "th": "กรุณากรอกชื่อของคุณ",
+    "fil": "Ilagay ang inyong pangalan"
+  },
+  "setNamePlaceholder": {
+    "ko": "이름을 설정해주세요",
+    "en": "Please set your name",
+    "vi": "Vui lòng đặt tên của bạn",
+    "zh": "请设置您的姓名",
+    "ja": "名前を設定してください",
+    "th": "กรุณาตั้งชื่อของคุณ",
+    "fil": "Mangyaring itakda ang inyong pangalan"
+  },
+  "userPosts": {
+    "ko": "님의 포스트",
+    "en": "'s Posts",
+    "vi": " của bài viết",
+    "zh": "的帖子",
+    "ja": "さんの投稿",
+    "th": " โพสต์ของ",
+    "fil": " na mga Post"
+  },
+  "registrationDate": {
+    "ko": "등록일자",
+    "en": "Registration Date",
+    "vi": "Ngày đăng ký",
+    "zh": "注册日期",
+    "ja": "登録日",
+    "th": "วันที่ลงทะเบียน",
+    "fil": "Petsa ng Pagkakaparehistro"
+  },
+  "ageUnit": {
+    "ko": "세",
+    "en": " years old",
+    "vi": " tuổi",
+    "zh": "岁",
+    "ja": "歳",
+    "th": " ปี",
+    "fil": " taong gulang"
+  },
+  "male": {
+    "ko": "남성",
+    "en": "Male",
+    "vi": "Nam",
+    "zh": "男",
+    "ja": "男性",
+    "th": "ชาย",
+    "fil": "Lalaki"
+  },
+  "female": {
+    "ko": "여성",
+    "en": "Female",
+    "vi": "Nữ",
+    "zh": "女",
+    "ja": "女性",
+    "th": "หญิง",
+    "fil": "Babae"
+  },
+  "countries": {
+    "ko": {
+      "ko": "한국",
+      "en": "미국",
+      "vi": "베트남",
+      "zh": "중국",
+      "ja": "일본",
+      "th": "태국",
+      "fil": "필리핀"
+    },
+    "en": {
+      "ko": "South Korea",
+      "en": "United States",
+      "vi": "Vietnam",
+      "zh": "China",
+      "ja": "Japan",
+      "th": "Thailand",
+      "fil": "Philippines"
+    },
+    "vi": {
+      "ko": "Hàn Quốc",
+      "en": "Hoa Kỳ",
+      "vi": "Việt Nam",
+      "zh": "Trung Quốc",
+      "ja": "Nhật Bản",
+      "th": "Thái Lan",
+      "fil": "Philippines"
+    },
+    "zh": {
+      "ko": "韩国",
+      "en": "美国",
+      "vi": "越南",
+      "zh": "中国",
+      "ja": "日本",
+      "th": "泰国",
+      "fil": "菲律宾"
+    },
+    "ja": {
+      "ko": "韓国",
+      "en": "アメリカ",
+      "vi": "ベトナム",
+      "zh": "中国",
+      "ja": "日本",
+      "th": "タイ",
+      "fil": "フィリピン"
+    },
+    "th": {
+      "ko": "เกาหลีใต้",
+      "en": "สหรัฐอเมริกา",
+      "vi": "เวียดนาม",
+      "zh": "จีน",
+      "ja": "ญี่ปุ่น",
+      "th": "ไทย",
+      "fil": "ฟิลิปปินส์"
+    },
+    "fil": {
+      "ko": "South Korea",
+      "en": "United States",
+      "vi": "Vietnam",
+      "zh": "China",
+      "ja": "Japan",
+      "th": "Thailand",
+      "fil": "Philippines"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "code": "MNL",
+      "names": {
+        "ko": "마닐라",
+        "en": "Manila",
+        "vi": "Manila",
+        "zh": "马尼拉",
+        "ja": "マニラ",
+        "th": "มะนิลา",
+        "fil": "Manila"
+      }
+    },
+    {
+      "code": "CEB",
+      "names": {
+        "ko": "세부",
+        "en": "Cebu",
+        "vi": "Cebu",
+        "zh": "宿务",
+        "ja": "セブ",
+        "th": "เซบู",
+        "fil": "Cebu"
+      }
+    },
+    {
+      "code": "DVO",
+      "names": {
+        "ko": "다바오",
+        "en": "Davao",
+        "vi": "Davao",
+        "zh": "达沃",
+        "ja": "ダバオ",
+        "th": "ดาเวา",
+        "fil": "Davao"
+      }
+    },
+    {
+      "code": "BCD",
+      "names": {
+        "ko": "바콜로드",
+        "en": "Bacolod",
+        "vi": "Bacolod",
+        "zh": "巴科洛德",
+        "ja": "バコロド",
+        "th": "บาโคลอด",
+        "fil": "Bacolod"
+      }
+    },
+    {
+      "code": "ILO",
+      "names": {
+        "ko": "일로일로",
+        "en": "Iloilo",
+        "vi": "Iloilo",
+        "zh": "伊洛伊洛",
+        "ja": "イロイロ",
+        "th": "อีโลอีโล",
+        "fil": "Iloilo"
+      }
+    },
+    {
+      "code": "BOH",
+      "names": {
+        "ko": "보홀",
+        "en": "Bohol",
+        "vi": "Bohol",
+        "zh": "薄荷岛",
+        "ja": "ボホール",
+        "th": "โบฮอล",
+        "fil": "Bohol"
+      }
+    }
+  ]
+}

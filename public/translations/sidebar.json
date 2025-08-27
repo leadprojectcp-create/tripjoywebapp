@@ -1,0 +1,101 @@
+{
+  "home": {
+    "ko": "홈",
+    "en": "Home",
+    "vi": "Trang chủ",
+    "zh": "首页",
+    "ja": "ホーム",
+    "th": "หน้าแรก",
+    "fil": "Home"
+  },
+  "search": {
+    "ko": "검색",
+    "en": "Search",
+    "vi": "Tìm kiếm",
+    "zh": "搜索",
+    "ja": "検索",
+    "th": "ค้นหา",
+    "fil": "Maghanap"
+  },
+  "curator": {
+    "ko": "큐레이터",
+    "en": "Curator",
+    "vi": "Người quản lý",
+    "zh": "策展人",
+    "ja": "キュレーター",
+    "th": "ผู้ดูแล",
+    "fil": "Curator"
+  },
+  "message": {
+    "ko": "메세지",
+    "en": "Message",
+    "vi": "Tin nhắn",
+    "zh": "消息",
+    "ja": "メッセージ",
+    "th": "ข้อความ",
+    "fil": "Mensahe"
+  },
+  "profile": {
+    "ko": "프로필",
+    "en": "Profile",
+    "vi": "Hồ sơ",
+    "zh": "个人资料",
+    "ja": "プロフィール",
+    "th": "โปรไฟล์",
+    "fil": "Profile"
+  },
+  "like": {
+    "ko": "좋아요",
+    "en": "Like",
+    "vi": "Thích",
+    "zh": "点赞",
+    "ja": "いいね",
+    "th": "ไลค์",
+    "fil": "Like"
+  },
+  "bookmark": {
+    "ko": "스크랩",
+    "en": "Bookmark",
+    "vi": "Đánh dấu",
+    "zh": "收藏",
+    "ja": "ブックマーク",
+    "th": "บุ๊คมาร์ค",
+    "fil": "Bookmark"
+  },
+  "uploadPost": {
+    "ko": "게시물 업로드",
+    "en": "Upload Post",
+    "vi": "Tải lên bài viết",
+    "zh": "上传帖子",
+    "ja": "投稿アップロード",
+    "th": "อัปโหลดโพสต์",
+    "fil": "Mag-upload ng Post"
+  },
+  "receivedCompanions": {
+    "ko": "받은 동행",
+    "en": "Received Companions", 
+    "vi": "Lời mời đã nhận",
+    "zh": "收到的邀请",
+    "ja": "受信した同行",
+    "th": "คำเชิญที่ได้รับ",
+    "fil": "Natanggap na Kasama"
+  },
+  "requestedCompanions": {
+    "ko": "신청한 동행",
+    "en": "Requested Companions",
+    "vi": "Lời mời đã gửi", 
+    "zh": "发送的邀请",
+    "ja": "申請した同行",
+    "th": "คำเชิญที่ส่ง",
+    "fil": "Hiniling na Kasama"
+  },
+  "logout": {
+    "ko": "로그아웃",
+    "en": "Logout",
+    "vi": "Đăng xuất",
+    "zh": "退出登录",
+    "ja": "ログアウト",
+    "th": "ออกจากระบบ",
+    "fil": "Logout"
+  }
+}

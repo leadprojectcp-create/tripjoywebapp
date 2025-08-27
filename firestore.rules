@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🔹 누구나 읽기 가능한 컬렉션들
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /weather/{weatherId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /board/{boardId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /countries/{countryId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /faq/{faqId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /menu_feedback/{feedbackId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /singo/{singoId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // 🔹 tripfriends_users 컬렉션에서 특정 전화번호 검색 허용
+    match /tripfriends_users/{userId} {
+      allow read: if true;  // 로그인 없이도 개별 문서 조회 가능
+      
+      // tripfriends_users의 서브컬렉션 reviews에 대한 규칙 추가
+      match /reviews/{reviewId} {
+        allow read: if true;  // 리뷰도 로그인 없이 읽기 가능
+        allow write: if request.auth != null;  // 쓰기는 인증된 사용자만
+      }
+    }
+    
+    // 🔹 tripfriends_users 전체 목록을 가져가는 list
+    match /tripfriends_users {
+      allow list: if true;
+    }
+    
+    // 🔹 users_test 컬렉션 - 사용자는 자신의 데이터만 읽고 쓸 수 있음
+    match /users_test/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 🔹 posts 컬렉션 - 게시물 관련 규칙
+    match /posts/{postId} {
+      // 읽기: 공개된 게시물(isVisible: true)은 누구나 볼 수 있음
+      allow read: if resource.data.isVisible == true;
+      
+      // 생성: 인증된 사용자만 게시물 생성 가능, userId는 본인 것만
+      allow create: if request.auth != null 
+                    && request.auth.uid == request.resource.data.userId
+                    && request.resource.data.keys().hasAll(['userId', 'content', 'createdAt', 'isVisible'])
+                    && request.resource.data.isVisible is bool
+                    && request.resource.data.userId is string
+                    && request.resource.data.content is string;
+      
+      // 수정: 본인 게시물만 수정 가능, 중요 필드는 변경 불가
+      allow update: if request.auth != null 
+                    && request.auth.uid == resource.data.userId
+                    && request.auth.uid == request.resource.data.userId  // userId 변경 불가
+                    && resource.data.createdAt == request.resource.data.createdAt;  // 생성일 변경 불가
+      
+      // 삭제: 본인 게시물만 삭제 가능
+      allow delete: if request.auth != null 
+                    && request.auth.uid == resource.data.userId;
+                    
+      // 🔹 posts의 서브컬렉션들 (댓글, 좋아요 등)
+      match /comments/{commentId} {
+        // 댓글 읽기: 부모 게시물이 공개된 경우만
+        allow read: if get(/databases/$(database)/documents/posts/$(postId)).data.isVisible == true;
+        
+        // 댓글 작성: 인증된 사용자만, 부모 게시물이 공개된 경우만
+        allow create: if request.auth != null 
+                      && get(/databases/$(database)/documents/posts/$(postId)).data.isVisible == true
+                      && request.auth.uid == request.resource.data.userId;
+        
+        // 댓글 수정/삭제: 본인 댓글만
+        allow update, delete: if request.auth != null 
+                              && request.auth.uid == resource.data.userId;
+      }
+      
+      match /likes/{likeId} {
+        // 좋아요 읽기: 부모 게시물이 공개된 경우만
+        allow read: if get(/databases/$(database)/documents/posts/$(postId)).data.isVisible == true;
+        
+        // 좋아요 추가/제거: 인증된 사용자만, 본인 좋아요만
+        allow create, delete: if request.auth != null 
+                              && request.auth.uid == likeId
+                              && get(/databases/$(database)/documents/posts/$(postId)).data.isVisible == true;
+      }
+    }
+    
+    // 🔹 나머지 모든 문서는 인증된 사용자만 접근 가능
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

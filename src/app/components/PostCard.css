@@ -1,0 +1,668 @@
+/* PostCard 전용 스타일 */
+
+/* 메인 카드 컨테이너 */
+.content-card {
+  border-radius: 16px;
+  padding: 0;
+  width: 740px;
+}
+
+/* 카드 헤더 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+/* 사용자 정보 */
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+/* 사용자 아바타 */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* profile 페이지에서 사용되는 post-avatar 스타일들 */
+.post-avatar-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+}
+
+/* 사용자 상세 정보 */
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+/* 카드 이미지 - 기본 스타일 */
+.card-image {
+  width: 100%; /* 반응형 너비 - 카드 너비에 맞춤 */
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  position: relative;
+  border-radius: 12px;
+  margin: 0; /* 왼쪽 정렬 - auto 제거 */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 단일 이미지 스타일 - 정방형 (1:1 비율) */
+.card-image.single-image {
+  aspect-ratio: 1 / 1; /* 정방형 */
+  width: 100%; /* 카드 너비에 맞춤 */
+  max-width: 450px; /* 최대 너비 450px로 제한 */
+  margin: 0; /* 왼쪽 정렬 */
+  border-radius: 12px;
+  background: #f0f0f0;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image.single-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 이미지 슬라이더 스타일 - 3:4 비율 */
+.card-image.image-slider {
+  display: flex;
+  gap: 12px; 
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: white;
+  border-radius: 12px;
+  width: 100%; /* 전체 너비 사용 */
+  height: auto !important; 
+  min-height: auto !important; 
+  max-height: none !important; 
+  aspect-ratio: unset !important; 
+  justify-content: flex-start; 
+  align-items: flex-start;
+  margin: 0; /* 왼쪽 정렬 */
+}
+
+.card-image.image-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.card-image.image-slider .image-item {
+  flex: 0 0 auto;
+  width: 35%; /* 반응형 - 컨테이너의 35% */
+  min-width: 100px; /* 최소 100px */
+  aspect-ratio: 3 / 4 !important; /* 3:4 비율 강제 */
+  border-radius: 8px;
+  display: block;
+  background: #f0f0f0;
+  object-fit: cover;
+  height: auto; /* 높이 자동 */
+  overflow: hidden;
+  scroll-snap-align: center;
+  margin-right: 12px;
+}
+
+.card-image.image-slider .image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-image.image-slider .image-item:last-child {
+  margin-right: 0;
+}
+
+/* 다중 이미지 컨테이너 - 그리드 레이아웃 */
+.card-image.multiple-images {
+  max-width: none;
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  width: 740px;
+  height: 400px;
+}
+
+/* 2장 이미지 레이아웃 */
+.card-image.multiple-images.two-images {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.card-image.multiple-images.two-images .image-item {
+  min-width: 364px;
+  max-width: 364px;
+}
+
+/* 이미지 슬라이더 컨테이너 */
+.image-slider-container {
+  position: relative;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: block;
+  height: auto;
+}
+
+/* 다중 이미지 그리드용 이미지 아이템 */
+.card-image.multiple-images .image-item {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 기본 이미지 아이템 스타일 (슬라이더 외 용도) */
+.image-item {
+  border-radius: 8px;
+  display: block;
+  background: #f0f0f0;
+  object-fit: cover;
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* image-placeholder는 아래쪽에 완전한 버전으로 통합됨 */
+
+/* 카드 푸터 */
+.card-footer {
+  padding: 16px 0;
+  position: relative;
+}
+
+/* 액션 버튼들 */
+.engagement-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #333;
+}
+
+.action-btn.active,
+.action-btn.liked {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+  color: #1976d2;
+}
+
+.action-btn.liked {
+  background-color: #ffebee;
+  border-color: #f44336;
+  color: #d32f2f;
+}
+
+.action-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.action-count {
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 16px;
+  text-align: center;
+}
+
+.action-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 공유 메뉴 */
+.share-menu {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 160px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.share-option {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-option:hover {
+  background-color: #f8f9fa;
+}
+
+/* 댓글 섹션 */
+.comments-section {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+.comment-input {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.comment-input-field {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.comment-input-field:focus {
+  border-color: #2196f3;
+}
+
+.comment-submit-btn {
+  padding: 8px 16px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.comment-submit-btn:hover {
+  background: #1976d2;
+}
+
+.comments-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.comment-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.comment-author {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.comment-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.place-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #666;
+}
+
+.hashtags {
+  font-size: 14px;
+  color: #1877f2;
+  line-height: 1.4;
+}
+
+.header-place-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 사용자 위치 정보 */
+.user-location {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 위치 아이콘 */
+.location-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* 게시물 내용 */
+.post-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* 텍스트가 없을 때 날짜를 오른쪽 정렬 */
+.post-content.date-only {
+  justify-content: flex-end;
+}
+
+/* 게시물 텍스트 */
+.post-text {
+  color: #333;
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* 날짜 배지 */
+.date-badge {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 이미지 슬라이더 화살표 - PostCard 전용 */
+.content-card .slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.content-card .slider-arrow:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  opacity: 1;
+}
+
+.content-card .slider-arrow.left {
+  left: -20px;
+  z-index: 2000;
+}
+
+.content-card .slider-arrow.right {
+  right: -20px;
+  z-index: 2000;
+}
+
+.content-card .slider-arrow.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content-card .card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.content-card .image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* .image-placeholder 통합 버전 - 기존 것과 병합 */
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: #adb5bd; /* 기존 색상 유지 */
+  border-radius: 8px;
+}
+
+.card-image.single-image .image-placeholder {
+  font-size: 72px;
+  border-radius: 12px;
+}
+
+/* 중복 스타일 제거됨 - 위쪽에 이미 정의되어 있음 */
+
+/* 로딩 상태 스타일 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #666;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.no-posts {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-posts h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.no-posts p {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ===== 반응형 미디어 쿼리 ===== */
+
+/* 1200px 이하 - 우측 사이드바 숨겨질 때 */
+@media (max-width: 1200px) {
+  /* 기본적으로 740px 유지 */
+  .content-card {
+    width: 740px;
+  }
+}
+
+/* 768px 이하 - 태블릿 */
+@media (max-width: 768px) {
+  .content-card {
+    width: 740px; /* 태블릿에서도 740px 유지 */
+  }
+  
+  .card-image {
+    font-size: 64px; /* placeholder 크기만 조정 */
+  }
+  
+  .card-image.single-image {
+    aspect-ratio: 1 / 1; /* 정방형 유지 */
+    max-width: 450px; /* 최대 크기 유지 */
+  }
+}
+
+/* 480px 이하 - 모바일 */
+@media (max-width: 480px) {
+  /* 화살표 완전 숨김 */
+  .content-card .slider-arrow {
+    display: none !important;
+  }
+  
+  /* 이미지 슬라이더 간격 조정 */
+  .card-image.image-slider {
+    gap: 8px;
+    margin: 0 !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+  }
+  
+  /* .image-item 스타일은 위쪽 .card-image.image-slider .image-item으로 통합됨 */
+  
+  .content-card,
+  .profile-post-card,
+  .dashboard-post-card {
+    width: 100% !important; /* 모바일에서는 전체 너비 사용 */
+  }
+  
+  .card-image {
+    font-size: 48px; /* placeholder 크기 조정 */
+  }
+  
+  .card-image.single-image {
+    aspect-ratio: 1 !important; /* 정방형 유지 */
+    width: 100% !important; /* 전체 너비 사용 */
+    max-width: none !important; /* 최대 너비 제한 해제 */
+    margin: 0 !important; /* 왼쪽 정렬 유지 */
+  }
+  
+  .card-image.image-slider .image-item {
+    width: 30%; /* 모바일에서는 컨테이너의 30% */
+    min-width: 80px; /* 모바일 최소 너비 */
+    max-width: 120px; /* 모바일 최대 너비 */
+    aspect-ratio: 3 / 4; /* 3:4 비율 유지 */
+  }
+  
+  .card-header, .card-footer {
+    padding: 12px 0;
+  }
+  
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .action-icon {
+    font-size: 14px;
+  }
+  
+  .engagement-actions {
+    gap: 8px;
+  }
+  
+  .share-menu {
+    right: -8px;
+    min-width: 140px;
+  }
+  
+  .place-name {
+    font-size: 14px;
+  }
+  
+  .hashtags {
+    font-size: 13px;
+  }
+}

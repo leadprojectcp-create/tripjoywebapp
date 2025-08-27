@@ -1,0 +1,176 @@
+.email-signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.email-signup-container {
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  min-height: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: pageSlideIn 0.3s ease-out;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.email-signup-header {
+  padding: 20px 20px 0 20px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.email-signup-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.email-signup-form {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.email-input-group {
+  width: 100%;
+}
+
+.email-input-full {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.email-input-full:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+}
+
+.email-input-full.error {
+  border-color: #ff4757;
+}
+
+.password-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.password-input-group:focus-within {
+  border-color: #007bff;
+  background: white;
+}
+
+.password-input {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+}
+
+.password-input.error {
+  border-color: #ff4757;
+}
+
+.password-toggle {
+  padding: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #333;
+}
+
+.next-button {
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #ff4757;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.next-button:hover {
+  background: #ff3742;
+}
+
+.next-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #ff4757;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .email-signup-modal {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    min-height: 500px;
+  }
+  
+  .email-signup-form {
+    padding: 16px;
+  }
+  
+  .email-input-full {
+    font-size: 16px;
+  }
+}

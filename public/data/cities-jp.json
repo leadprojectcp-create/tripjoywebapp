@@ -1,0 +1,88 @@
+{
+  "cities": [
+    {
+      "code": "TYO",
+      "names": {
+        "ko": "도쿄",
+        "en": "Tokyo",
+        "vi": "Tokyo",
+        "zh": "东京",
+        "ja": "東京",
+        "th": "โตเกียว",
+        "fil": "Tokyo"
+      }
+    },
+    {
+      "code": "OSA",
+      "names": {
+        "ko": "오사카",
+        "en": "Osaka",
+        "vi": "Osaka",
+        "zh": "大阪",
+        "ja": "大阪",
+        "th": "โอซาก้า",
+        "fil": "Osaka"
+      }
+    },
+    {
+      "code": "KYO",
+      "names": {
+        "ko": "교토",
+        "en": "Kyoto",
+        "vi": "Kyoto",
+        "zh": "京都",
+        "ja": "京都",
+        "th": "เกียวโต",
+        "fil": "Kyoto"
+      }
+    },
+    {
+      "code": "YOK",
+      "names": {
+        "ko": "요코하마",
+        "en": "Yokohama",
+        "vi": "Yokohama",
+        "zh": "横滨",
+        "ja": "横浜",
+        "th": "โยโกฮาม่า",
+        "fil": "Yokohama"
+      }
+    },
+    {
+      "code": "NAG",
+      "names": {
+        "ko": "나고야",
+        "en": "Nagoya",
+        "vi": "Nagoya",
+        "zh": "名古屋",
+        "ja": "名古屋",
+        "th": "นาโกย่า",
+        "fil": "Nagoya"
+      }
+    },
+    {
+      "code": "SAP",
+      "names": {
+        "ko": "삿포로",
+        "en": "Sapporo",
+        "vi": "Sapporo",
+        "zh": "札幌",
+        "ja": "札幌",
+        "th": "ซัปโปโร",
+        "fil": "Sapporo"
+      }
+    },
+    {
+      "code": "FUK",
+      "names": {
+        "ko": "후쿠오카",
+        "en": "Fukuoka",
+        "vi": "Fukuoka",
+        "zh": "福冈",
+        "ja": "福岡",
+        "th": "ฟูกูโอกะ",
+        "fil": "Fukuoka"
+      }
+    }
+  ]
+}

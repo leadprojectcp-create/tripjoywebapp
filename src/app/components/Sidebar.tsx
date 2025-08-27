@@ -1,0 +1,273 @@
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useTranslationContext } from "../contexts/TranslationContext";
+import { useAuthContext } from "../contexts/AuthContext";
+import "./Sidebar.css";
+
+// SVG 아이콘 컴포넌트들
+const HomeIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/home-active.svg" 
+        alt="Home Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/home.svg" 
+      alt="Home" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+
+
+const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/curator-active.svg" 
+        alt="Curator Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/curator.svg" 
+      alt="Curator" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const MessageIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/message-active.svg" 
+        alt="Message Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/message.svg" 
+      alt="Message" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/profile-active.svg" 
+        alt="Profile Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/profile.svg" 
+      alt="Profile" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const LikeIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/like-active.svg" 
+        alt="Like Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/like.svg" 
+      alt="Like" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const BookmarkIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/bookmark-active.svg" 
+        alt="Bookmark Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/bookmark.svg" 
+      alt="Bookmark" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const PostIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/sidebar-icons/post-active.svg" 
+        alt="Post Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/sidebar-icons/post.svg" 
+      alt="Post" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const LogoutIcon = () => (
+  <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
+  </svg>
+);
+
+export const Sidebar = (): React.JSX.Element => {
+  const { t } = useTranslationContext();
+  const { logout, isAuthenticated } = useAuthContext();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // 현재 경로에 따라 active 상태 결정
+  const isActive = (path: string) => {
+    if (path === '/' && (pathname === '/' || pathname === '/')) {
+      return true;
+    }
+    return pathname === path;
+  };
+
+  // 게시물 업로드 페이지로 이동
+  const handlePostUpload = () => {
+    router.push('/post-upload');
+  };
+
+  return (
+    <div className="sidebar">
+      <nav className="nav-menu">
+        <Link href="/" className={`nav-item ${isActive('/') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <HomeIcon isActive={isActive('/')} />
+          </div>
+          <span>{t('home')}</span>
+        </Link>
+        
+        <Link href="/curators" className={`nav-item ${isActive('/curators') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <CuratorIcon isActive={isActive('/curators')} />
+          </div>
+          <span>{t('curator')}</span>
+        </Link>
+        
+        <div className="nav-item" onClick={handlePostUpload} style={{ cursor: 'pointer' }}>
+          <div className="nav-icon">
+            <PostIcon isActive={isActive('/post-upload')} />
+          </div>
+          <span>{t('uploadPost')}</span>
+        </div>
+        
+        <Link href="/received-companions" className={`nav-item ${isActive('/received-companions') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <BookmarkIcon isActive={isActive('/received-companions')} />
+          </div>
+          <span>{t('receivedCompanions')}</span>
+        </Link>
+        
+        <Link href="/requested-companions" className={`nav-item ${isActive('/requested-companions') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <PostIcon isActive={isActive('/requested-companions')} />
+          </div>
+          <span>{t('requestedCompanions')}</span>
+        </Link>
+        
+        <div className="nav-item">
+          <div className="nav-icon">
+            <MessageIcon isActive={false} />
+          </div>
+          <span>{t('message')}</span>
+        </div>
+        
+        <Link href="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <ProfileIcon isActive={isActive('/profile')} />
+          </div>
+          <span>{t('profile')}</span>
+        </Link>
+        
+        <div className="nav-item">
+          <div className="nav-icon">
+            <LikeIcon isActive={false} />
+          </div>
+          <span>{t('like')}</span>
+        </div>
+        
+        <div className="nav-item">
+          <div className="nav-icon">
+            <BookmarkIcon isActive={false} />
+          </div>
+          <span>{t('bookmark')}</span>
+        </div>
+      </nav>
+      
+      {/* 로그아웃 버튼 (로그인된 경우에만 표시) */}
+      {isAuthenticated && (
+        <div className="logout-section">
+          <div className="nav-item logout-item" onClick={logout}>
+            <div className="nav-icon">
+              <LogoutIcon />
+            </div>
+            <span>{t('logout')}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,234 @@
+/* 받은 동행 페이지 스타일 */
+
+.received-companions-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.body-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.received-companions-main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 80px 20px 20px 20px;
+  background-color: #ffffff;
+  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
+  margin-right: 400px; /* 오른쪽 사이드바 너비 + 여백 */
+}
+
+.received-companions-content {
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0;
+}
+
+.received-companions-header {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.received-companions-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.received-companions-header p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* 탭 메뉴 스타일 */
+.companion-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+  color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.05);
+}
+
+.tab-button.active {
+  color: #2196f3;
+  border-bottom-color: #2196f3;
+  font-weight: 600;
+}
+
+/* 동행 그리드 */
+.companions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 40px;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.loading-spinner {
+  font-size: 24px;
+  margin-bottom: 16px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.error-container {
+  text-align: left;
+  padding: 60px 20px;
+  color: #d32f2f;
+}
+
+.error-container p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.no-companions {
+  text-align: left;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.no-companions h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.no-companions p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 반응형 디자인 */
+
+/* 1200px 이하 - 우측 사이드바 숨겨질 때 */
+@media (max-width: 1200px) {
+  .received-companions-main-content {
+    margin-right: 0;
+  }
+  
+  .companions-grid {
+    gap: 10px;
+  }
+}
+
+/* 768px 이하 - 태블릿 */
+@media (max-width: 768px) {
+  .body-content {
+    flex-direction: column;
+  }
+  
+  .received-companions-main-content {
+    padding: 80px 16px 16px 16px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .received-companions-content {
+    padding: 16px 0;
+  }
+  
+  .received-companions-header {
+    margin-bottom: 30px;
+  }
+  
+  .received-companions-header h1 {
+    font-size: 24px;
+  }
+  
+  .received-companions-header p {
+    font-size: 14px;
+  }
+  
+  .companion-tabs {
+    margin-bottom: 24px;
+  }
+  
+  .tab-button {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .companions-grid {
+    justify-content: flex-start;
+    gap: 0px;
+  }
+}
+
+/* 480px 이하 - 모바일 */
+@media (max-width: 480px) {
+  .received-companions-main-content {
+    padding: 80px 12px 12px 12px;
+  }
+  
+  .received-companions-content {
+    padding: 12px 0;
+  }
+  
+  .received-companions-header {
+    margin-bottom: 24px;
+  }
+  
+  .received-companions-header h1 {
+    font-size: 20px;
+  }
+  
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .companions-grid {
+    gap: 0px;
+  }
+  
+  .loading-container,
+  .error-container,
+  .no-companions {
+    padding: 40px 16px;
+  }
+}

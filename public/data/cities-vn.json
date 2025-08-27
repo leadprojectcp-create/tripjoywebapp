@@ -1,0 +1,76 @@
+{
+  "cities": [
+    {
+      "code": "HCM",
+      "names": {
+        "ko": "호치민",
+        "en": "Ho Chi Minh City",
+        "vi": "TP. Hồ Chí Minh",
+        "zh": "胡志明市",
+        "ja": "ホーチミン市",
+        "th": "นครโฮจิมินห์",
+        "fil": "Ho Chi Minh City"
+      }
+    },
+    {
+      "code": "HAN",
+      "names": {
+        "ko": "하노이",
+        "en": "Hanoi",
+        "vi": "Hà Nội",
+        "zh": "河内",
+        "ja": "ハノイ",
+        "th": "ฮานอย",
+        "fil": "Hanoi"
+      }
+    },
+    {
+      "code": "DAD",
+      "names": {
+        "ko": "다낭",
+        "en": "Da Nang",
+        "vi": "Đà Nẵng",
+        "zh": "岘港",
+        "ja": "ダナン",
+        "th": "ดานัง",
+        "fil": "Da Nang"
+      }
+    },
+    {
+      "code": "DLT",
+      "names": {
+        "ko": "달랏",
+        "en": "Da Lat",
+        "vi": "Đà Lạt",
+        "zh": "大叻",
+        "ja": "ダラット",
+        "th": "ดาลัด",
+        "fil": "Da Lat"
+      }
+    },
+    {
+      "code": "NTR",
+      "names": {
+        "ko": "나트랑",
+        "en": "Nha Trang", 
+        "vi": "Nha Trang",
+        "zh": "芽庄",
+        "ja": "ニャチャン",
+        "th": "หาดญาจาง",
+        "fil": "Nha Trang"
+      }
+    },
+    {
+      "code": "PQC",
+      "names": {
+        "ko": "푸꾸옥",
+        "en": "Phu Quoc",
+        "vi": "Phú Quốc",
+        "zh": "富国岛",
+        "ja": "フーコック",
+        "th": "ภูเก็ต",
+        "fil": "Phu Quoc"
+      }
+    }
+  ]
+}

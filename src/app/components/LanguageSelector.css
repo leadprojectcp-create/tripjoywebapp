@@ -1,0 +1,133 @@
+.language-selector {
+  position: relative;
+  margin: 20px 10px;
+  margin-top: auto;
+}
+
+/* AppBar에서 사용될 때 마진 조정 */
+.app-bar .language-selector {
+  margin: 0;
+}
+
+.language-dropdown {
+  position: relative;
+}
+
+.language-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s;
+  width: 140px;
+  min-width: 140px;
+}
+
+.language-button:hover {
+  background-color: #f8f9fa;
+}
+
+.flag {
+  font-size: 16px;
+}
+
+.language-name {
+  flex: 1;
+  text-align: left;
+}
+
+.arrow {
+  font-size: 12px;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+/* 위로 올라가는 드롭다운용 화살표 (사이드바) */
+.arrow.up.rotated {
+  transform: rotate(180deg);
+}
+
+/* 아래로 내려가는 드롭다운용 화살표 (앱바) */
+.arrow.down.rotated {
+  transform: rotate(180deg);
+}
+
+.language-options {
+  position: absolute;
+  left: 0;
+  width: 140px;
+  min-width: 140px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+}
+
+/* 기본: 위로 올라가는 드롭다운 (사이드바용) */
+.language-options.up {
+  bottom: 100%;
+  transform: translateY(10px);
+  margin-bottom: 8px;
+}
+
+.language-options.up.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 아래로 내려가는 드롭다운 (앱바용) */
+.language-options.down {
+  top: 100%;
+  transform: translateY(-10px);
+  margin-top: 8px;
+}
+
+.language-options.down.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.language-option:hover {
+  background-color: #f8f9fa;
+}
+
+.language-option.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.language-option:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.language-option:last-child {
+  border-radius: 0 0 6px 6px;
+}

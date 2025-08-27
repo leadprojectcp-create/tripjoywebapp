@@ -1,0 +1,100 @@
+{
+  "cities": [
+    {
+      "code": "SEL",
+      "names": {
+        "ko": "서울",
+        "en": "Seoul",
+        "vi": "Seoul",
+        "zh": "首尔",
+        "ja": "ソウル",
+        "th": "โซล",
+        "fil": "Seoul"
+      }
+    },
+    {
+      "code": "BSN", 
+      "names": {
+        "ko": "부산",
+        "en": "Busan",
+        "vi": "Busan",
+        "zh": "釜山",
+        "ja": "釜山",
+        "th": "ปูซาน",
+        "fil": "Busan"
+      }
+    },
+    {
+      "code": "DGU",
+      "names": {
+        "ko": "대구",
+        "en": "Daegu",
+        "vi": "Daegu",
+        "zh": "大邱",
+        "ja": "大邱",
+        "th": "แทกู",
+        "fil": "Daegu"
+      }
+    },
+    {
+      "code": "ICN",
+      "names": {
+        "ko": "인천",
+        "en": "Incheon",
+        "vi": "Incheon",
+        "zh": "仁川",
+        "ja": "仁川",
+        "th": "อินชอน",
+        "fil": "Incheon"
+      }
+    },
+    {
+      "code": "GWJ",
+      "names": {
+        "ko": "광주",
+        "en": "Gwangju",
+        "vi": "Gwangju",
+        "zh": "光州",
+        "ja": "光州",
+        "th": "ควางจู",
+        "fil": "Gwangju"
+      }
+    },
+    {
+      "code": "DJN",
+      "names": {
+        "ko": "대전",
+        "en": "Daejeon",
+        "vi": "Daejeon", 
+        "zh": "大田",
+        "ja": "大田",
+        "th": "แทจอน",
+        "fil": "Daejeon"
+      }
+    },
+    {
+      "code": "USN",
+      "names": {
+        "ko": "울산",
+        "en": "Ulsan",
+        "vi": "Ulsan",
+        "zh": "蔚山",
+        "ja": "蔚山",
+        "th": "อุลซาน",
+        "fil": "Ulsan"
+      }
+    },
+    {
+      "code": "JJU",
+      "names": {
+        "ko": "제주",
+        "en": "Jeju",
+        "vi": "Jeju",
+        "zh": "济州",
+        "ja": "済州",
+        "th": "เจจู",
+        "fil": "Jeju"
+      }
+    }
+  ]
+}

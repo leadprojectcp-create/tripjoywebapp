@@ -1,0 +1,182 @@
+{
+  "userInfoTitle": {
+    "ko": "회원정보 입력",
+    "en": "User Information",
+    "vi": "Nhập thông tin người dùng",
+    "zh": "用户信息输入",
+    "ja": "会員情報入力",
+    "th": "ใส่ข้อมูลผู้ใช้",
+    "fil": "Maglagay ng Impormasyon ng User"
+  },
+  "name": {
+    "ko": "이름",
+    "en": "Name",
+    "vi": "Tên",
+    "zh": "姓名",
+    "ja": "名前",
+    "th": "ชื่อ",
+    "fil": "Pangalan"
+  },
+  "namePlaceholder": {
+    "ko": "이름을 입력하세요",
+    "en": "Enter your name",
+    "vi": "Nhập tên của bạn",
+    "zh": "请输入姓名",
+    "ja": "お名前を入力してください",
+    "th": "ใส่ชื่อของคุณ",
+    "fil": "Ilagay ang inyong pangalan"
+  },
+  "emailPlaceholder": {
+    "ko": "이메일을 입력하세요",
+    "en": "Enter your email",
+    "vi": "Nhập email của bạn",
+    "zh": "请输入邮箱",
+    "ja": "Eメールを入力してください",
+    "th": "ใส่อีเมลของคุณ",
+    "fil": "Ilagay ang inyong email"
+  },
+  "passwordPlaceholder": {
+    "ko": "비밀번호를 입력하세요",
+    "en": "Enter your password",
+    "vi": "Nhập mật khẩu của bạn",
+    "zh": "请输入密码",
+    "ja": "パスワードを入力してください",
+    "th": "ใส่รหัสผ่านของคุณ",
+    "fil": "Ilagay ang inyong password"
+  },
+  "email": {
+    "ko": "이메일",
+    "en": "Email",
+    "vi": "Email",
+    "zh": "邮箱",
+    "ja": "メール",
+    "th": "อีเมล",
+    "fil": "Email"
+  },
+  "password": {
+    "ko": "비밀번호",
+    "en": "Password",
+    "vi": "Mật khẩu",
+    "zh": "密码",
+    "ja": "パスワード",
+    "th": "รหัสผ่าน",
+    "fil": "Password"
+  },
+  "phoneNumber": {
+    "ko": "휴대폰 번호",
+    "en": "Phone Number",
+    "vi": "Số điện thoại",
+    "zh": "手机号码",
+    "ja": "電話番号",
+    "th": "หมายเลขโทรศัพท์",
+    "fil": "Numero ng Telepono"
+  },
+  "phoneNumberPlaceholder": {
+    "ko": "- 없이 입력",
+    "en": "Enter without dashes",
+    "vi": "Nhập không có dấu gạch ngang",
+    "zh": "不含连字符输入",
+    "ja": "ハイフンなしで入力",
+    "th": "ใส่โดยไม่มีขีด",
+    "fil": "Ilagay nang walang mga gitling"
+  },
+  "birthDate": {
+    "ko": "생년월일",
+    "en": "Date of Birth",
+    "vi": "Ngày sinh",
+    "zh": "出生日期",
+    "ja": "生年月日",
+    "th": "วันเกิด",
+    "fil": "Petsa ng Kapanganakan"
+  },
+  "gender": {
+    "ko": "성별선택",
+    "en": "Gender",
+    "vi": "Chọn giới tính",
+    "zh": "性别选择",
+    "ja": "性別選択",
+    "th": "เลือกเพศ",
+    "fil": "Pumili ng Kasarian"
+  },
+  "male": {
+    "ko": "남성",
+    "en": "Male",
+    "vi": "Nam",
+    "zh": "男性",
+    "ja": "男性",
+    "th": "ชาย",
+    "fil": "Lalaki"
+  },
+  "female": {
+    "ko": "여성",
+    "en": "Female",
+    "vi": "Nữ",
+    "zh": "女性",
+    "ja": "女性",
+    "th": "หญิง",
+    "fil": "Babae"
+  },
+  "country": {
+    "ko": "국가",
+    "en": "Country",
+    "vi": "Quốc gia",
+    "zh": "国家",
+    "ja": "国",
+    "th": "ประเทศ",
+    "fil": "Bansa"
+  },
+  "countryPlaceholder": {
+    "ko": "국가를 선택해주세요",
+    "en": "Select your country",
+    "vi": "Chọn quốc gia của bạn",
+    "zh": "请选择您的国家",
+    "ja": "国を選択してください",
+    "th": "เลือกประเทศของคุณ",
+    "fil": "Pumili ng inyong bansa"
+  },
+  "referralCode": {
+    "ko": "추천인 코드",
+    "en": "Referral Code",
+    "vi": "Mã giới thiệu",
+    "zh": "推荐码",
+    "ja": "紹介コード",
+    "th": "รหัสแนะนำ",
+    "fil": "Referral Code"
+  },
+  "referralCodePlaceholder": {
+    "ko": "추천인 코드를 입력해주세요",
+    "en": "Enter referral code",
+    "vi": "Nhập mã giới thiệu",
+    "zh": "请输入推荐码",
+    "ja": "紹介コードを入力してください",
+    "th": "ใส่รหัสแนะนำ",
+    "fil": "Ilagay ang referral code"
+  },
+  "verify": {
+    "ko": "확인",
+    "en": "Verify",
+    "vi": "Xác minh",
+    "zh": "验证",
+    "ja": "確認",
+    "th": "ยืนยัน",
+    "fil": "I-verify"
+  },
+  "complete": {
+    "ko": "완료",
+    "en": "Complete",
+    "vi": "Hoàn thành",
+    "zh": "完成",
+    "ja": "完了",
+    "th": "เสร็จสิ้น",
+    "fil": "Tapos na"
+  },
+  "loadingCountries": {
+    "ko": "국가 정보를 불러오는 중...",
+    "en": "Loading countries...",
+    "vi": "Đang tải thông tin quốc gia...",
+    "zh": "正在加载国家信息...",
+    "ja": "国情報を読み込み中...",
+    "th": "กำลังโหลดข้อมูลประเทศ...",
+    "fil": "Naglo-load ng mga bansa..."
+  }
+}

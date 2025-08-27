@@ -1,0 +1,94 @@
+.app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 1000;
+}
+
+.app-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-bar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* AppBar에서 사용되는 LanguageSelector 스타일 조정 */
+.app-bar .language-selector {
+  margin: 0;
+  margin-top: 0;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  background-color: #f5f5f5;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logo-container:hover {
+  opacity: 0.8;
+}
+
+.logo-image {
+  object-fit: contain;
+}
+
+
+
+/* 페이지 컨텐츠가 AppBar에 가려지지 않도록 여백 추가 */
+.page-with-appbar {
+  padding-top: 60px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-bar {
+    padding: 0 16px;
+  }
+  
+  .logo-image {
+    width: 80px;
+    height: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-bar {
+    padding: 0 12px;
+  }
+  
+  .app-bar-left {
+    gap: 12px;
+  }
+}
