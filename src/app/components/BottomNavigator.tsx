@@ -12,7 +12,7 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/home-active.svg" 
+        src="/icons/home_active.svg" 
         alt="Home Active" 
         width={28} 
         height={28}
@@ -22,7 +22,7 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/home.svg" 
+      src="/icons/home.svg" 
       alt="Home" 
       width={28} 
       height={28}
@@ -34,7 +34,7 @@ const SearchIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/search-active.svg" 
+        src="/icons/home_active.svg" 
         alt="Search Active" 
         width={28} 
         height={28}
@@ -44,7 +44,7 @@ const SearchIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/search.svg" 
+      src="/icons/home.svg" 
       alt="Search" 
         width={28} 
         height={28}
@@ -56,7 +56,7 @@ const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/curator-active.svg" 
+        src="/icons/curator_active.svg" 
         alt="Curator Active" 
         width={28} 
         height={28}
@@ -66,7 +66,7 @@ const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/curator.svg" 
+      src="/icons/curator.svg" 
       alt="Curator" 
               width={28} 
         height={28}
@@ -78,7 +78,7 @@ const MessageIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/message-active.svg" 
+        src="/icons/message_active.svg" 
         alt="Message Active" 
         width={28} 
         height={28}
@@ -88,7 +88,7 @@ const MessageIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/message.svg" 
+      src="/icons/message.svg" 
       alt="Message" 
               width={28} 
         height={28}
@@ -100,7 +100,7 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/profile-active.svg" 
+        src="/icons/profile_active.svg" 
         alt="Profile Active" 
         width={28} 
         height={28}
@@ -110,7 +110,7 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/profile.svg" 
+      src="/icons/profile.svg" 
       alt="Profile" 
               width={28} 
         height={28}

@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
+import { useAuthContext } from '../contexts/AuthContext';
+import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../services/interactionService';
 import './PostCard.css';
 
 interface PostCardProps {
@@ -16,20 +19,35 @@ interface PostCardProps {
   };
   showUserInfo?: boolean; // user-info 표시 여부
   cardClassName?: string; // 각 페이지별 고유 클래스명
+  onInteractionChange?: (postId: string, type: 'like' | 'bookmark', isActive: boolean) => void; // 상호작용 변경 콜백
+  showSettings?: boolean; // 설정 메뉴 표시 여부
+  onEdit?: (postId: string) => void; // 수정 콜백
+  onDelete?: (postId: string) => void; // 삭제 콜백
 }
 
 export const PostCard: React.FC<PostCardProps> = ({ 
   post, 
   userInfo = { name: '사용자', location: '위치 미상' },
   showUserInfo = true,
-  cardClassName = 'content-card' // 기본값은 기존 클래스명
+  cardClassName = 'content-card', // 기본값은 기존 클래스명
+  onInteractionChange,
+  showSettings = false,
+  onEdit,
+  onDelete
 }) => {
   const { t, currentLanguage } = useTranslationContext();
+  const { user } = useAuthContext();
+  const router = useRouter();
   const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
   const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likes || 0);
-  const [showComments, setShowComments] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likeCount || 0);
+  const [bookmarksCount, setBookmarksCount] = useState(post.bookmarkCount || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const sliderRef = useRef<HTMLDivElement | null>(null);
 
   // 국가코드를 현재 언어의 국가명으로 변환하는 함수
@@ -171,24 +189,118 @@ export const PostCard: React.FC<PostCardProps> = ({
     checkScrollPosition();
   }, [checkScrollPosition, imageUrls.thumbnails.length]); // 배열 길이만 체크하여 안정성 확보
 
+  // 좋아요와 북마크 상태 초기화
+  useEffect(() => {
+    const initializeInteractionStatus = async () => {
+      if (!user || !post.id) return;
+      
+      try {
+        const [likedStatus, bookmarkedStatus] = await Promise.all([
+          checkLikeStatus(post.id, user.uid),
+          checkBookmarkStatus(post.id, user.uid)
+        ]);
+        
+        setIsLiked(likedStatus);
+        setIsBookmarked(bookmarkedStatus);
+      } catch (error) {
+        console.error('상호작용 상태 초기화 실패:', error);
+      }
+    };
+
+    initializeInteractionStatus();
+  }, [user, post.id]);
+
   // 좋아요 토글 핸들러
   const handleLikeToggle = useCallback(async () => {
-    setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    if (!user || !post.id || isLoading) return;
     
-    // TODO: 실제 API 호출
-    console.log('좋아요 토글:', !isLiked, 'postId:', post.id);
-  }, [isLiked, likesCount, post.id]);
+    setIsLoading(true);
+    
+    // 낙관적 업데이트 (UI 반응성을 위해)
+    const optimisticIsLiked = !isLiked;
+    setIsLiked(optimisticIsLiked);
+    
+    try {
+      const result = await toggleLike(post.id, user.uid);
+      // 서버 응답으로 최종 상태 업데이트 (서버가 진실의 원천)
+      setIsLiked(result.isLiked);
+      setLikesCount(result.newCount);
+      
+      // 콜백 호출 (상위 컴포넌트에 상태 변경 알림)
+      if (onInteractionChange && post.id) {
+        onInteractionChange(post.id, 'like', result.isLiked);
+      }
+    } catch (error) {
+      console.error('좋아요 토글 실패:', error);
+      // 에러 발생 시 원래 상태로 복원
+      setIsLiked(isLiked);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, post.id, isLoading, isLiked]);
 
-  // 댓글 토글 핸들러
-  const handleCommentsToggle = useCallback(() => {
-    setShowComments(!showComments);
-  }, [showComments]);
+  // 북마크 토글 핸들러
+  const handleBookmarkToggle = useCallback(async () => {
+    if (!user || !post.id || isLoading) return;
+    
+    setIsLoading(true);
+    
+    // 낙관적 업데이트 (UI 반응성을 위해)
+    const optimisticIsBookmarked = !isBookmarked;
+    setIsBookmarked(optimisticIsBookmarked);
+    
+    try {
+      const result = await toggleBookmark(post.id, user.uid);
+      // 서버 응답으로 최종 상태 업데이트 (서버가 진실의 원천)
+      setIsBookmarked(result.isBookmarked);
+      setBookmarksCount(result.newCount);
+      
+      // 콜백 호출 (상위 컴포넌트에 상태 변경 알림)
+      if (onInteractionChange && post.id) {
+        onInteractionChange(post.id, 'bookmark', result.isBookmarked);
+      }
+    } catch (error) {
+      console.error('북마크 토글 실패:', error);
+      // 에러 발생 시 원래 상태로 복원
+      setIsBookmarked(isBookmarked);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, post.id, isLoading, isBookmarked]);
 
   // 공유 메뉴 토글 핸들러
   const handleShareToggle = useCallback(() => {
     setShowShareMenu(!showShareMenu);
   }, [showShareMenu]);
+
+  // 이미지 클릭 핸들러 (팝업 열기)
+  const handleImageClick = useCallback((imageIndex: number) => {
+    // 유효한 인덱스인지 확인
+    if (imageUrls.medium && imageIndex >= 0 && imageIndex < imageUrls.medium.length) {
+      setSelectedImageIndex(imageIndex);
+      setShowImageModal(true);
+    }
+  }, [imageUrls.medium]);
+
+  // 이미지 모달 닫기
+  const handleCloseImageModal = useCallback(() => {
+    setShowImageModal(false);
+  }, []);
+
+  // 프로필 클릭 핸들러 (프로필 페이지로 이동)
+  const handleProfileClick = useCallback(() => {
+    if (post.userId) {
+      router.push(`/profile?userId=${post.userId}`);
+    }
+  }, [post.userId, router]);
+
+  // 채팅 시작 핸들러
+  const handleChatClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // 프로필 클릭 이벤트 방지
+    if (post.userId && user?.uid && post.userId !== user.uid) {
+      router.push(`/chat?userId=${post.userId}`);
+    }
+  }, [post.userId, user?.uid, router]);
 
   // 공유하기 핸들러
   const handleShare = useCallback(async (type: 'copy' | 'facebook' | 'twitter' | 'whatsapp') => {
@@ -234,6 +346,27 @@ export const PostCard: React.FC<PostCardProps> = ({
     return date.toLocaleDateString();
   };
 
+  // 설정 메뉴 토글 핸들러
+  const handleSettingsToggle = useCallback(() => {
+    setShowSettingsMenu(!showSettingsMenu);
+  }, [showSettingsMenu]);
+
+  // 수정 핸들러
+  const handleEditClick = useCallback(() => {
+    setShowSettingsMenu(false);
+    if (onEdit && post.id) {
+      onEdit(post.id);
+    }
+  }, [onEdit, post.id]);
+
+  // 삭제 핸들러
+  const handleDeleteClick = useCallback(() => {
+    setShowSettingsMenu(false);
+    if (onDelete && post.id) {
+      onDelete(post.id);
+    }
+  }, [onDelete, post.id]);
+
   // 단일 이미지 렌더링
   const renderSingleImage = () => (
     <div className="card-image single-image">
@@ -241,6 +374,8 @@ export const PostCard: React.FC<PostCardProps> = ({
         src={imageUrls.thumbnails[0]} 
         alt="게시물 이미지"
         loading="lazy"
+        onClick={() => handleImageClick(0)}
+        style={{ cursor: 'pointer' }}
         onError={(e) => {
           e.currentTarget.style.display = 'none';
           e.currentTarget.nextElementSibling?.setAttribute('style', 'display: flex');
@@ -273,6 +408,8 @@ export const PostCard: React.FC<PostCardProps> = ({
               src={imageUrl} 
               alt={`게시물 이미지 ${index + 1}`}
               loading="lazy"
+              onClick={() => handleImageClick(index)}
+              style={{ cursor: 'pointer' }}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.setAttribute('style', 'display: flex');
@@ -299,7 +436,7 @@ export const PostCard: React.FC<PostCardProps> = ({
       {/* 카드 헤더 */}
       <div className="card-header">
         {showUserInfo && (
-          <div className="user-info">
+          <div className="user-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
             <div className="user-avatar">
               {userInfo.profileImage ? (
                 <img src={userInfo.profileImage} alt={userInfo.name} />
@@ -318,6 +455,17 @@ export const PostCard: React.FC<PostCardProps> = ({
                 ) : '위치 정보 없음'}
               </div>
             </div>
+            
+            {/* 채팅 버튼 (본인 게시물이 아닌 경우에만 표시) */}
+            {user?.uid && post.userId !== user.uid && (
+              <button 
+                className="chat-btn"
+                onClick={handleChatClick}
+                title="채팅하기"
+              >
+                💬
+              </button>
+            )}
           </div>
         )}
         
@@ -326,6 +474,30 @@ export const PostCard: React.FC<PostCardProps> = ({
           <div className="header-place-name">
             <img src="/assets/location.svg" alt="위치" className="location-icon" />
             {post.location.name}
+          </div>
+        )}
+
+        {/* 설정 메뉴 (본인 게시물인 경우에만 표시) */}
+        {showSettings && (
+          <div className="settings-menu-container">
+            <button 
+              className="settings-btn"
+              onClick={handleSettingsToggle}
+              title="설정"
+            >
+              ⋯
+            </button>
+            
+            {showSettingsMenu && (
+              <div className="settings-dropdown">
+                <button className="settings-option" onClick={handleEditClick}>
+                  수정하기
+                </button>
+                <button className="settings-option delete" onClick={handleDeleteClick}>
+                  삭제하기
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -350,17 +522,19 @@ export const PostCard: React.FC<PostCardProps> = ({
           <button 
             className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
             onClick={handleLikeToggle}
+            disabled={isLoading}
           >
             <span className="action-icon">{isLiked ? '❤️' : '🤍'}</span>
             <span className="action-count">{likesCount}</span>
           </button>
           
           <button 
-            className={`action-btn comment-btn ${showComments ? 'active' : ''}`}
-            onClick={handleCommentsToggle}
+            className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
+            onClick={handleBookmarkToggle}
+            disabled={isLoading}
           >
-            <span className="action-icon">💬</span>
-            <span className="action-count">{post.comments || 0}</span>
+            <span className="action-icon">{isBookmarked ? '🔖' : '📌'}</span>
+            <span className="action-count">{bookmarksCount}</span>
           </button>
           
           <button 
@@ -389,30 +563,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             </button>
           </div>
         )}
-        
-        {/* 댓글 섹션 (표시될 때만) */}
-        {showComments && (
-          <div className="comments-section">
-            <div className="comment-input">
-              <input 
-                type="text" 
-                placeholder={t('addComment') || '댓글을 입력하세요...'}
-                className="comment-input-field"
-              />
-              <button className="comment-submit-btn">
-                {t('post') || '게시'}
-              </button>
-            </div>
-            {post.comments > 0 && (
-              <div className="comments-list">
-                <div className="comment-item">
-                  <span className="comment-author">사용자1</span>
-                  <span className="comment-text">멋진 여행지네요! 👍</span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+
         <div className="location-info">
           {/* 게시물 내용 */}
           <div className={`post-content ${!post.content ? 'date-only' : ''}`}>
@@ -436,6 +587,53 @@ export const PostCard: React.FC<PostCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* 이미지 모달 */}
+      {showImageModal && imageUrls.medium && imageUrls.medium.length > 0 && selectedImageIndex < imageUrls.medium.length && (
+        <div className="image-modal-overlay" onClick={handleCloseImageModal}>
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={handleCloseImageModal}>
+              ✕
+            </button>
+            <div className="modal-image-container">
+              <img 
+                src={imageUrls.medium[selectedImageIndex]} 
+                alt={`게시물 이미지 ${selectedImageIndex + 1}`}
+                className="modal-image"
+              />
+              {imageUrls.medium.length > 1 && (
+                <div className="modal-navigation">
+                  <button 
+                    className="modal-nav-btn prev"
+                    onClick={() => setSelectedImageIndex(prev => {
+                      const maxIndex = imageUrls.medium.length - 1;
+                      return prev > 0 ? prev - 1 : maxIndex;
+                    })}
+                    disabled={imageUrls.medium.length <= 1}
+                  >
+                    ‹
+                  </button>
+                  <button 
+                    className="modal-nav-btn next"
+                    onClick={() => setSelectedImageIndex(prev => {
+                      const maxIndex = imageUrls.medium.length - 1;
+                      return prev < maxIndex ? prev + 1 : 0;
+                    })}
+                    disabled={imageUrls.medium.length <= 1}
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
+              {imageUrls.medium.length > 1 && (
+                <span className="modal-image-counter">
+                  {selectedImageIndex + 1} / {imageUrls.medium.length}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

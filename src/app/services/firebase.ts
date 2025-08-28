@@ -31,7 +31,7 @@ let app: any;
 let auth: any;
 let db: any;
 let storage: any;
-let database: any;
+let realtimeDb: any;
 
 const initializeFirebase = () => {
   console.log('🚀 Firebase 초기화 시작...');
@@ -51,7 +51,7 @@ const initializeFirebase = () => {
       auth = null;
       db = null;
       storage = null;
-      database = null;
+      realtimeDb = null;
       return;
     }
     
@@ -63,7 +63,7 @@ const initializeFirebase = () => {
     auth = getAuth(app);
     db = getFirestore(app);
     storage = getStorage(app);
-    database = getDatabase(app);
+    realtimeDb = getDatabase(app);
     
     console.log('✅ Firebase가 성공적으로 초기화되었습니다.');
     console.log('auth 상태:', !!auth);
@@ -73,7 +73,7 @@ const initializeFirebase = () => {
     auth = null;
     db = null;
     storage = null;
-    database = null;
+    realtimeDb = null;
   }
 };
 
@@ -83,7 +83,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Firebase 서비스 export
-export { app, auth, db, storage, database };
+export { app, auth, db, storage, realtimeDb };
 
 // Firebase 초기화 상태 확인 헬퍼
 export const isFirebaseInitialized = () => {
@@ -113,8 +113,8 @@ export const getFirebaseStorage = () => {
 };
 
 export const getFirebaseDatabase = () => {
-  if (!database && typeof window !== 'undefined') {
+  if (!realtimeDb && typeof window !== 'undefined') {
     initializeFirebase();
   }
-  return database;
+  return realtimeDb;
 };

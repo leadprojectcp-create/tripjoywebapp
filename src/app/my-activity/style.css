@@ -1,0 +1,262 @@
+/* My Activity Container */
+.my-activity-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+}
+
+/* Main Content */
+.my-activity-main-content {
+  width: calc(100% - 650px); /* 전체 너비에서 좌측(250px) + 우측(400px) 마진 제외 */
+  padding: 30px;
+  margin-top: 60px; /* AppBar 높이만큼 아래로 */
+  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
+  margin-right: 0;
+  min-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Header */
+.my-activity-header {
+  width: 740px;
+  margin-bottom: 30px;
+}
+
+.my-activity-header h1 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+/* Activity Tabs */
+.activity-tabs {
+  width: 740px;
+  display: flex;
+  gap: 0;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.tab-button:hover {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.tab-button.active {
+  background-color: #ff6b35;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.tab-icon {
+  font-size: 18px;
+}
+
+.tab-count {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Activity Content */
+.activity-content {
+  width: 740px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Loading */
+.activity-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.loading-spinner {
+  font-size: 32px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.activity-loading p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* No Posts */
+.no-posts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+}
+
+.no-posts-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.no-posts h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.no-posts p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Posts Grid */
+.posts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  width: 100%;
+}
+
+/* 태블릿에서 우측 사이드바가 숨겨질 때 */
+@media (max-width: 1200px) {
+  .my-activity-main-content {
+    width: calc(100% - 280px); /* 좌측(250px) + 우측 기본여백(30px) 제외 */
+    margin-right: 0;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .my-activity-main-content {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 60px; /* AppBar 높이만큼 마진 추가 */
+    padding: 20px;
+    padding-bottom: 80px; /* BottomNavigator 공간 확보 */
+  }
+
+  .my-activity-header {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .my-activity-header h1 {
+    font-size: 28px;
+  }
+
+  .activity-tabs {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .tab-button {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .tab-icon {
+    font-size: 16px;
+  }
+
+  .activity-content {
+    width: 100%;
+  }
+
+  .no-posts {
+    padding: 60px 20px;
+  }
+
+  .no-posts-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .no-posts h3 {
+    font-size: 20px;
+  }
+
+  .no-posts p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-activity-main-content {
+    margin-top: 60px; /* AppBar 높이만큼 마진 유지 */
+    padding: 15px 8px;
+    padding-bottom: 80px;
+  }
+
+  .my-activity-header h1 {
+    font-size: 24px;
+  }
+
+  .tab-button {
+    padding: 12px 14px;
+    font-size: 14px;
+    gap: 6px;
+  }
+
+  .tab-count {
+    font-size: 12px;
+  }
+
+  .no-posts {
+    padding: 40px 16px;
+  }
+
+  .no-posts h3 {
+    font-size: 18px;
+  }
+
+  .no-posts p {
+    font-size: 13px;
+  }
+}

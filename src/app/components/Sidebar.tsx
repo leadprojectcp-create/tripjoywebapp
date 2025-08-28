@@ -13,7 +13,7 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/home-active.svg" 
+        src="/icons/home_active.svg" 
         alt="Home Active" 
         width={24} 
         height={24}
@@ -23,7 +23,7 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/home.svg" 
+      src="/icons/home.svg" 
       alt="Home" 
       width={24} 
       height={24}
@@ -37,7 +37,7 @@ const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/curator-active.svg" 
+        src="/icons/curator_active.svg" 
         alt="Curator Active" 
         width={24} 
         height={24}
@@ -47,7 +47,7 @@ const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/curator.svg" 
+      src="/icons/curator.svg" 
       alt="Curator" 
       width={24} 
       height={24}
@@ -59,7 +59,7 @@ const MessageIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/message-active.svg" 
+        src="/icons/message_active.svg" 
         alt="Message Active" 
         width={24} 
         height={24}
@@ -69,7 +69,7 @@ const MessageIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/message.svg" 
+      src="/icons/message.svg" 
       alt="Message" 
       width={24} 
       height={24}
@@ -81,7 +81,7 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/profile-active.svg" 
+        src="/icons/profile_active.svg" 
         alt="Profile Active" 
         width={24} 
         height={24}
@@ -91,7 +91,7 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/profile.svg" 
+      src="/icons/profile.svg" 
       alt="Profile" 
       width={24} 
       height={24}
@@ -99,12 +99,12 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
-const LikeIcon = ({ isActive }: { isActive: boolean }) => {
+const ActivityIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/like-active.svg" 
-        alt="Like Active" 
+        src="/icons/activity_active.svg" 
+        alt="Activity Active" 
         width={24} 
         height={24}
       />
@@ -113,20 +113,20 @@ const LikeIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/like.svg" 
-      alt="Like" 
+      src="/icons/activity.svg" 
+      alt="Activity" 
       width={24} 
       height={24}
     />
   );
 };
 
-const BookmarkIcon = ({ isActive }: { isActive: boolean }) => {
+const ReceiveIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/bookmark-active.svg" 
-        alt="Bookmark Active" 
+        src="/icons/receive_active.svg" 
+        alt="Receive Active" 
         width={24} 
         height={24}
       />
@@ -135,8 +135,52 @@ const BookmarkIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/bookmark.svg" 
-      alt="Bookmark" 
+      src="/icons/receive.svg" 
+      alt="Receive" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const SendIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/icons/send_active.svg" 
+        alt="Send Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/icons/send.svg" 
+      alt="Send" 
+      width={24} 
+      height={24}
+    />
+  );
+};
+
+const SettingIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/icons/setting_active.svg" 
+        alt="Setting Active" 
+        width={24} 
+        height={24}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/icons/setting.svg" 
+      alt="Setting" 
       width={24} 
       height={24}
     />
@@ -147,7 +191,7 @@ const PostIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/sidebar-icons/post-active.svg" 
+        src="/icons/upload_active.svg" 
         alt="Post Active" 
         width={24} 
         height={24}
@@ -157,7 +201,7 @@ const PostIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/sidebar-icons/post.svg" 
+      src="/icons/upload.svg" 
       alt="Post" 
       width={24} 
       height={24}
@@ -207,33 +251,19 @@ export const Sidebar = (): React.JSX.Element => {
           <span>{t('curator')}</span>
         </Link>
         
-        <div className="nav-item" onClick={handlePostUpload} style={{ cursor: 'pointer' }}>
+        <div className={`nav-item ${isActive('/post-upload') ? 'active' : ''}`} onClick={handlePostUpload} style={{ cursor: 'pointer' }}>
           <div className="nav-icon">
             <PostIcon isActive={isActive('/post-upload')} />
           </div>
           <span>{t('uploadPost')}</span>
         </div>
         
-        <Link href="/received-companions" className={`nav-item ${isActive('/received-companions') ? 'active' : ''}`}>
+        <Link href="/my-activity" className={`nav-item ${isActive('/my-activity') ? 'active' : ''}`}>
           <div className="nav-icon">
-            <BookmarkIcon isActive={isActive('/received-companions')} />
+            <ActivityIcon isActive={isActive('/my-activity')} />
           </div>
-          <span>{t('receivedCompanions')}</span>
+          <span>{t('myActivity')}</span>
         </Link>
-        
-        <Link href="/requested-companions" className={`nav-item ${isActive('/requested-companions') ? 'active' : ''}`}>
-          <div className="nav-icon">
-            <PostIcon isActive={isActive('/requested-companions')} />
-          </div>
-          <span>{t('requestedCompanions')}</span>
-        </Link>
-        
-        <div className="nav-item">
-          <div className="nav-icon">
-            <MessageIcon isActive={false} />
-          </div>
-          <span>{t('message')}</span>
-        </div>
         
         <Link href="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>
           <div className="nav-icon">
@@ -242,19 +272,33 @@ export const Sidebar = (): React.JSX.Element => {
           <span>{t('profile')}</span>
         </Link>
         
-        <div className="nav-item">
+        <Link href="/chat" className={`nav-item ${isActive('/chat') ? 'active' : ''}`}>
           <div className="nav-icon">
-            <LikeIcon isActive={false} />
+            <MessageIcon isActive={isActive('/chat')} />
           </div>
-          <span>{t('like')}</span>
-        </div>
+          <span>{t('chat')}</span>
+        </Link>
         
-        <div className="nav-item">
+        <Link href="/received-companions" className={`nav-item ${isActive('/received-companions') ? 'active' : ''}`}>
           <div className="nav-icon">
-            <BookmarkIcon isActive={false} />
+            <ReceiveIcon isActive={isActive('/received-companions')} />
           </div>
-          <span>{t('bookmark')}</span>
-        </div>
+          <span>{t('receivedCompanions')}</span>
+        </Link>
+        
+        <Link href="/requested-companions" className={`nav-item ${isActive('/requested-companions') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <SendIcon isActive={isActive('/requested-companions')} />
+          </div>
+          <span>{t('requestedCompanions')}</span>
+        </Link>
+        
+        <Link href="/settings" className={`nav-item ${isActive('/settings') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <SettingIcon isActive={isActive('/settings')} />
+          </div>
+          <span>{t('settings')}</span>
+        </Link>
       </nav>
       
       {/* 로그아웃 버튼 (로그인된 경우에만 표시) */}

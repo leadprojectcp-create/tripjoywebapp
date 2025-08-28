@@ -1,0 +1,164 @@
+{
+  "title": {
+    "ko": "프로필 편집",
+    "en": "Edit Profile",
+    "vi": "Chỉnh sửa hồ sơ",
+    "zh": "编辑个人资料",
+    "ja": "プロフィール編集",
+    "th": "แก้ไขโปรไฟล์",
+    "fil": "I-edit ang Profile"
+  },
+  "profileImage": {
+    "ko": "프로필 이미지 변경",
+    "en": "Change Profile Image",
+    "vi": "Thay đổi ảnh đại diện",
+    "zh": "更改头像",
+    "ja": "プロフィール画像変更",
+    "th": "เปลี่ยนรูปโปรไฟล์",
+    "fil": "Palitan ang Profile Image"
+  },
+  "nickname": {
+    "ko": "닉네임",
+    "en": "Nickname",
+    "vi": "Biệt danh",
+    "zh": "昵称",
+    "ja": "ニックネーム",
+    "th": "ชื่อเล่น",
+    "fil": "Palayaw"
+  },
+  "email": {
+    "ko": "이메일",
+    "en": "Email",
+    "vi": "Email",
+    "zh": "邮箱",
+    "ja": "メール",
+    "th": "อีเมล",
+    "fil": "Email"
+  },
+  "phoneNumber": {
+    "ko": "휴대폰 번호",
+    "en": "Phone Number",
+    "vi": "Số điện thoại",
+    "zh": "手机号码",
+    "ja": "電話番号",
+    "th": "หมายเลขโทรศัพท์",
+    "fil": "Numero ng Telepono"
+  },
+  "gender": {
+    "ko": "성별",
+    "en": "Gender",
+    "vi": "Giới tính",
+    "zh": "性别",
+    "ja": "性別",
+    "th": "เพศ",
+    "fil": "Kasarian"
+  },
+  "genderMale": {
+    "ko": "남성",
+    "en": "Male",
+    "vi": "Nam",
+    "zh": "男性",
+    "ja": "男性",
+    "th": "ชาย",
+    "fil": "Lalaki"
+  },
+  "genderFemale": {
+    "ko": "여성",
+    "en": "Female",
+    "vi": "Nữ",
+    "zh": "女性",
+    "ja": "女性",
+    "th": "หญิง",
+    "fil": "Babae"
+  },
+  "bio": {
+    "ko": "자기소개",
+    "en": "Bio",
+    "vi": "Tiểu sử",
+    "zh": "个人简介",
+    "ja": "自己紹介",
+    "th": "แนะนำตัว",
+    "fil": "Tungkol sa Sarili"
+  },
+  "bioPlaceholder": {
+    "ko": "자신을 소개해보세요",
+    "en": "Tell us about yourself",
+    "vi": "Hãy giới thiệu về bản thân",
+    "zh": "介绍一下自己",
+    "ja": "自己紹介をしてください",
+    "th": "แนะนำตัวเอง",
+    "fil": "Ipakilala ang inyong sarili"
+  },
+  "bioMaxLength": {
+    "ko": "150자 이내로 작성해주세요",
+    "en": "Please write within 150 characters",
+    "vi": "Vui lòng viết trong vòng 150 ký tự",
+    "zh": "请在150字以内",
+    "ja": "150文字以内で入力してください",
+    "th": "กรุณาเขียนไม่เกิน 150 ตัวอักษร",
+    "fil": "Mangyaring sumulat sa loob ng 150 karakter"
+  },
+  "notificationSettings": {
+    "ko": "동행신청 활성화",
+    "en": "Enable Companion Requests",
+    "vi": "Bật yêu cầu đồng hành",
+    "zh": "启用同行申请",
+    "ja": "同行申請を有効化",
+    "th": "เปิดใช้งานคำขอเดินทางร่วม",
+    "fil": "I-enable ang Companion Requests"
+  },
+  "notificationDescription": {
+    "ko": "동행 신청을 활성화하면 다른 사용자가 나에게 동행을 요청할 수 있어요. 이용자의 시 차이로 인해 동행 신청은 받지 않습니다.",
+    "en": "When companion requests are enabled, other users can request to accompany you. Due to time zone differences, companion requests are not accepted.",
+    "vi": "Khi bật yêu cầu đồng hành, người dùng khác có thể yêu cầu đi cùng bạn. Do sự khác biệt múi giờ, yêu cầu đồng hành không được chấp nhận.",
+    "zh": "启用同行申请后，其他用户可以向您发送同行请求。由于用户时差问题，不接受同行申请。",
+    "ja": "同行申請を有効にすると、他のユーザーがあなたに同行を要請できます。利用者の時差により、同行申請は受け付けません。",
+    "th": "เมื่อเปิดใช้งานคำขอเดินทางร่วม ผู้ใช้อื่นสามารถขอเดินทางร่วมกับคุณได้ เนื่องจากความแตกต่างของเขตเวลา คำขอเดินทางร่วมจะไม่ถูกยอมรับ",
+    "fil": "Kapag na-enable ang companion requests, maaaring humingi ng kasama ang ibang users. Dahil sa pagkakaiba ng time zone, hindi tinatanggap ang companion requests."
+  },
+  "saveButton": {
+    "ko": "편집완료",
+    "en": "Save Changes",
+    "vi": "Lưu thay đổi",
+    "zh": "完成编辑",
+    "ja": "編集完了",
+    "th": "บันทึกการเปลี่ยนแปลง",
+    "fil": "I-save ang mga Pagbabago"
+  },
+  "cancelButton": {
+    "ko": "취소",
+    "en": "Cancel",
+    "vi": "Hủy",
+    "zh": "取消",
+    "ja": "キャンセル",
+    "th": "ยกเลิก",
+    "fil": "Kanselahin"
+  },
+  "imageUploadError": {
+    "ko": "이미지 업로드 중 오류가 발생했습니다.",
+    "en": "An error occurred while uploading the image.",
+    "vi": "Đã xảy ra lỗi khi tải lên hình ảnh.",
+    "zh": "图片上传时发生错误。",
+    "ja": "画像のアップロード中にエラーが発生しました。",
+    "th": "เกิดข้อผิดพลาดขณะอัปโหลดรูปภาพ",
+    "fil": "May naganap na error habang nag-uupload ng larawan."
+  },
+  "updateSuccess": {
+    "ko": "프로필이 성공적으로 업데이트되었습니다.",
+    "en": "Profile updated successfully.",
+    "vi": "Hồ sơ đã được cập nhật thành công.",
+    "zh": "个人资料更新成功。",
+    "ja": "プロフィールが正常に更新されました。",
+    "th": "อัปเดตโปรไฟล์สำเร็จ",
+    "fil": "Matagumpay na na-update ang profile."
+  },
+  "updateError": {
+    "ko": "프로필 업데이트 중 오류가 발생했습니다.",
+    "en": "An error occurred while updating the profile.",
+    "vi": "Đã xảy ra lỗi khi cập nhật hồ sơ.",
+    "zh": "更新个人资料时发生错误。",
+    "ja": "プロフィールの更新中にエラーが発生しました。",
+    "th": "เกิดข้อผิดพลาดขณะอัปเดตโปรไฟล์",
+    "fil": "May naganap na error habang nag-uupdate ng profile."
+  }
+}

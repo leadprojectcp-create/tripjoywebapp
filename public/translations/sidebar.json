@@ -44,23 +44,23 @@
     "th": "โปรไฟล์",
     "fil": "Profile"
   },
-  "like": {
-    "ko": "좋아요",
-    "en": "Like",
-    "vi": "Thích",
-    "zh": "点赞",
-    "ja": "いいね",
-    "th": "ไลค์",
-    "fil": "Like"
+  "myActivity": {
+    "ko": "내활동",
+    "en": "My Activity",
+    "vi": "Hoạt động của tôi",
+    "zh": "我的活动",
+    "ja": "マイアクティビティ",
+    "th": "กิจกรรมของฉัน",
+    "fil": "Aking Aktibidad"
   },
-  "bookmark": {
-    "ko": "스크랩",
-    "en": "Bookmark",
-    "vi": "Đánh dấu",
-    "zh": "收藏",
-    "ja": "ブックマーク",
-    "th": "บุ๊คมาร์ค",
-    "fil": "Bookmark"
+  "chat": {
+    "ko": "채팅",
+    "en": "Chat",
+    "vi": "Trò chuyện",
+    "zh": "聊天",
+    "ja": "チャット",
+    "th": "แชท",
+    "fil": "Chat"
   },
   "uploadPost": {
     "ko": "게시물 업로드",
@@ -88,6 +88,15 @@
     "ja": "申請した同行",
     "th": "คำเชิญที่ส่ง",
     "fil": "Hiniling na Kasama"
+  },
+  "settings": {
+    "ko": "설정",
+    "en": "Settings",
+    "vi": "Cài đặt",
+    "zh": "设置",
+    "ja": "設定",
+    "th": "การตั้งค่า",
+    "fil": "Mga Setting"
   },
   "logout": {
     "ko": "로그아웃",

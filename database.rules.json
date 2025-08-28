@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "messages": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "chat": {
+      ".read": "auth != null", 
+      ".write": "auth != null"
+    },
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "users_test": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "tripfriends_users": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}

@@ -52,6 +52,205 @@ export const getImageKitAuthToken = async (): Promise<{
 };
 
 /**
+ * 이미지를 가로 450px로 리사이즈하고 세로는 비율 유지하는 함수
+ */
+const resizeImageToWidth = (file: File, targetWidth: number = 450): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      if (!ctx) {
+        reject(new Error('Canvas context를 가져올 수 없습니다.'));
+        return;
+      }
+
+      // 원본 이미지 크기
+      const { width: originalWidth, height: originalHeight } = img;
+      
+      // 가로를 450px로 맞추고 세로는 비율 유지
+      const aspectRatio = originalHeight / originalWidth;
+      const targetHeight = Math.round(targetWidth * aspectRatio);
+
+      // Canvas 크기 설정
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      console.log('🖼️ 이미지 리사이즈 정보:');
+      console.log(`   원본 크기: ${originalWidth}x${originalHeight}`);
+      console.log(`   비율: ${aspectRatio.toFixed(3)}`);
+      console.log(`   최종 크기: ${targetWidth}x${targetHeight}`);
+
+      // 배경을 흰색으로 채우기
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+      // 이미지를 비율 유지하며 리사이즈하여 그리기
+      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+      // Canvas를 Blob으로 변환 (JPEG, 90% 품질)
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('이미지 변환에 실패했습니다.'));
+          return;
+        }
+
+        // Blob을 File로 변환
+        const resizedFile = new File([blob], file.name, {
+          type: 'image/jpeg',
+          lastModified: Date.now(),
+        });
+
+        console.log('✅ 이미지 리사이즈 완료:', {
+          원본크기: `${originalWidth}x${originalHeight}`,
+          리사이즈크기: `${targetWidth}x${targetHeight}`,
+          원본용량: `${(file.size / 1024).toFixed(1)}KB`,
+          리사이즈용량: `${(resizedFile.size / 1024).toFixed(1)}KB`,
+          압축률: `${((1 - resizedFile.size / file.size) * 100).toFixed(1)}%`
+        });
+
+        resolve(resizedFile);
+      }, 'image/jpeg', 0.9);
+    };
+
+    img.onerror = () => {
+      reject(new Error('이미지 로드에 실패했습니다.'));
+    };
+
+    // 이미지 로드 시작
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+/**
+ * ImageKit에서 이미지 삭제 (서버 API 통해)
+ */
+export const deleteImageFromImageKit = async (imageUrl: string): Promise<boolean> => {
+  try {
+    console.log('🗑️ ImageKit 이미지 삭제 시작:', imageUrl);
+
+    // 서버 API를 통해 이미지 삭제 요청
+    const response = await fetch('/api/imagekit/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageUrl }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ ImageKit 이미지 삭제 성공:', result);
+      return true;
+    } else {
+      const errorText = await response.text();
+      console.error('❌ ImageKit 이미지 삭제 실패:', response.status, errorText);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ ImageKit 이미지 삭제 중 오류:', error);
+    return false;
+  }
+};
+
+/**
+ * ImageKit URL에서 fileId 추출
+ */
+const extractFileIdFromUrl = (imageUrl: string): string | null => {
+  try {
+    // ImageKit URL 패턴: https://ik.imagekit.io/your-imagekit-id/path/filename
+    // 또는 tr 파라미터가 있는 경우를 고려
+    const url = new URL(imageUrl);
+    const pathParts = url.pathname.split('/');
+    
+    // 마지막 부분이 파일명이고, 그 앞이 경로
+    const fileName = pathParts[pathParts.length - 1];
+    
+    // 파일명에서 확장자 제거하여 fileId로 사용
+    // 실제로는 ImageKit API를 통해 파일 목록을 조회해야 할 수도 있음
+    return fileName.split('.')[0];
+  } catch (error) {
+    console.error('URL 파싱 오류:', error);
+    return null;
+  }
+};
+
+/**
+ * 사용자의 기존 프로필 이미지 삭제
+ */
+export const deleteOldProfileImage = async (oldImageUrl: string): Promise<void> => {
+  if (!oldImageUrl || oldImageUrl.trim() === '') {
+    console.log('🔍 삭제할 기존 이미지가 없습니다.');
+    return;
+  }
+
+  try {
+    console.log('🗑️ 기존 프로필 이미지 삭제 시도:', oldImageUrl);
+    
+    // 삭제 시도 (실패해도 업로드는 계속 진행)
+    try {
+      const deleted = await deleteImageFromImageKit(oldImageUrl);
+      if (deleted) {
+        console.log('✅ 기존 프로필 이미지 삭제 완료');
+      } else {
+        console.warn('⚠️ 기존 프로필 이미지 삭제 실패 (계속 진행)');
+      }
+    } catch (deleteError) {
+      console.warn('⚠️ 이미지 삭제 실패하지만 업로드는 계속 진행:', deleteError);
+      // 삭제 실패는 치명적이지 않으므로 계속 진행
+    }
+  } catch (error) {
+    console.error('❌ 기존 프로필 이미지 삭제 중 오류:', error);
+    // 삭제 실패해도 새 이미지 업로드는 계속 진행
+  }
+};
+
+/**
+ * 프로필 이미지 업로드 (사용자 ID별 폴더)
+ */
+export const uploadImage = async (
+  file: File,
+  userId: string,
+  onProgress?: (progress: number, stage: string) => void,
+  oldImageUrl?: string
+): Promise<string> => {
+  try {
+    console.log('📸 원본 이미지:', {
+      이름: file.name,
+      크기: `${(file.size / 1024).toFixed(1)}KB`,
+      타입: file.type
+    });
+
+    // 0단계: 기존 이미지 삭제 (0-20%)
+    if (oldImageUrl) {
+      onProgress?.(5, '기존 이미지 삭제 중...');
+      await deleteOldProfileImage(oldImageUrl);
+      onProgress?.(20, '기존 이미지 삭제 완료');
+    }
+
+    // 1단계: 이미지 리사이즈 (20-60%)
+    onProgress?.(30, '이미지 처리 중...');
+    const resizedFile = await resizeImageToWidth(file, 450);
+    onProgress?.(60, '이미지 처리 완료');
+    
+    // 2단계: 업로드 (60-100%)
+    onProgress?.(70, '업로드 시작...');
+    const profileFolder = `profile/${userId}`;
+    console.log('📁 프로필 이미지 업로드 폴더:', profileFolder);
+    
+    const uploadedImage = await uploadImageToImageKit(resizedFile, profileFolder);
+    onProgress?.(100, '업로드 완료');
+    
+    return uploadedImage.url;
+  } catch (error) {
+    console.error('프로필 이미지 업로드 실패:', error);
+    onProgress?.(0, '업로드 실패');
+    throw error;
+  }
+};
+
+/**
  * ImageKit에 이미지 업로드
  */
 export const uploadImageToImageKit = async (
@@ -203,4 +402,32 @@ export const getOptimizedImageUrl = (
 
   const paramString = params.toString();
   return paramString ? `${originalUrl}?${paramString}` : originalUrl;
+};
+
+// ImageKit에서 폴더 전체 삭제
+export const deleteFolderFromImageKit = async (folderPath: string): Promise<boolean> => {
+  try {
+    console.log('🗂️ ImageKit 폴더 삭제 시작:', folderPath);
+
+    const response = await fetch('/api/imagekit/delete-folder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ folderPath }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ ImageKit 폴더 삭제 완료:', result);
+      return true;
+    } else {
+      const errorText = await response.text();
+      console.error('❌ ImageKit 폴더 삭제 실패:', response.status, errorText);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ ImageKit 폴더 삭제 실패:', error);
+    return false;
+  }
 };

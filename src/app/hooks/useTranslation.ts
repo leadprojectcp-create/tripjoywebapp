@@ -75,18 +75,20 @@ export const useTranslation = () => {
     const loadTranslations = async () => {
       try {
         // 여러 번역 파일 로드
-        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse] = await Promise.all([
+        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse] = await Promise.all([
           fetch('/translations/sidebar.json'),
           fetch('/translations/auth.json'),
           fetch('/translations/signup.json'),
           fetch('/translations/terms.json'),
           fetch('/translations/userinfo.json'),
           fetch('/translations/profile.json'),
+          fetch('/translations/profile-edit.json'),
           fetch('/translations/post-upload.json'),
           fetch('/translations/dashboard.json'),
           fetch('/translations/curators.json'),
           fetch('/translations/received-companions.json'),
-          fetch('/translations/requested-companions.json')
+          fetch('/translations/requested-companions.json'),
+          fetch('/translations/my-activity.json')
         ]);
         
         const sidebarData = await sidebarResponse.json();
@@ -95,11 +97,13 @@ export const useTranslation = () => {
         const termsData = await termsResponse.json();
         const userinfoData = await userinfoResponse.json();
         const profileData = await profileResponse.json();
+        const profileEditData = await profileEditResponse.json();
         const postUploadData = await postUploadResponse.json();
         const dashboardData = await dashboardResponse.json();
         const curatorsData = await curatorsResponse.json();
         const receivedCompanionsData = await receivedCompanionsResponse.json();
         const requestedCompanionsData = await requestedCompanionsResponse.json();
+        const myActivityData = await myActivityResponse.json();
         
         // 번역 데이터 병합
         const mergedTranslations = { 
@@ -109,11 +113,13 @@ export const useTranslation = () => {
           ...termsData, 
           ...userinfoData,
           ...profileData,
+          ...profileEditData,
           ...postUploadData,
           ...dashboardData,
           ...curatorsData,
           ...receivedCompanionsData,
-          ...requestedCompanionsData
+          ...requestedCompanionsData,
+          ...myActivityData
         };
         console.log('📚 Loaded translations:', mergedTranslations);
         setTranslations(mergedTranslations);

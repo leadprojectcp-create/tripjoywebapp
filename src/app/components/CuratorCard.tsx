@@ -1,8 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { CuratorData } from '../services/curatorService';
+import { getFollowStats } from '../services/followService';
+import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import './CuratorCard.css';
 
 interface CuratorCardProps {
@@ -11,8 +15,56 @@ interface CuratorCardProps {
 
 export const CuratorCard: React.FC<CuratorCardProps> = ({ curator }) => {
   const { t } = useTranslationContext();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(curator.followersCount || 52);
+  const router = useRouter();
+  const [curatorStats, setCuratorStats] = useState({
+    postsCount: 0,
+    followersCount: 0,
+    followingCount: 0
+  });
+
+  // 실제 posts 컬렉션에서 게시물 수 카운트
+  const getPostsCount = async (userId: string): Promise<number> => {
+    try {
+      const postsQuery = query(
+        collection(db, 'posts'),
+        where('userId', '==', userId)
+      );
+      const querySnapshot = await getDocs(postsQuery);
+      return querySnapshot.size;
+    } catch (error) {
+      console.error('게시물 수 카운트 실패:', error);
+      return 0;
+    }
+  };
+
+  // 큐레이터 통계 데이터 가져오기
+  useEffect(() => {
+    const fetchCuratorStats = async () => {
+      try {
+        console.log('🔍 큐레이터 통계 가져오는 중:', curator.id);
+        
+        // 팔로우 통계 가져오기
+        const followStats = await getFollowStats(curator.id);
+        console.log('📊 팔로우 통계:', followStats);
+        
+        // posts 컬렉션에서 실제 게시물 수 카운트
+        const postsCount = await getPostsCount(curator.id);
+        console.log('📝 실제 게시물 수:', postsCount);
+
+        setCuratorStats({
+          postsCount,
+          followersCount: followStats.followersCount,
+          followingCount: followStats.followingCount
+        });
+      } catch (error) {
+        console.error('큐레이터 통계 가져오기 실패:', error);
+      }
+    };
+
+    if (curator.id) {
+      fetchCuratorStats();
+    }
+  }, [curator.id]);
 
   // 국가코드를 현재 언어의 국가명으로 변환하는 함수
   const translateCountry = (countryCode: string): string => {
@@ -89,20 +141,18 @@ export const CuratorCard: React.FC<CuratorCardProps> = ({ curator }) => {
     return gender; // 번역이 없으면 원본 반환
   };
 
-  // 팔로우 토글
-  const handleFollowToggle = () => {
-    setIsFollowing(!isFollowing);
-    setFollowersCount(isFollowing ? followersCount - 1 : followersCount + 1);
-    
-    // TODO: 실제 API 호출
-    console.log('팔로우 토글:', !isFollowing, 'curatorId:', curator.id);
+
+
+  // 해당 큐레이터의 프로필 페이지로 이동 (PostCard와 동일한 방식)
+  const handleCuratorClick = () => {
+    router.push(`/profile?userId=${curator.id}`);
   };
 
   const age = calculateAge(curator.birthDate || '');
   const gender = translateGender(curator.gender || '');
 
   return (
-    <div className="curator-card">
+    <div className="curator-card" onClick={handleCuratorClick}>
       {/* 프로필 섹션 */}
       <div className="curator-profile">
         <div className="curator-avatar">
@@ -126,27 +176,22 @@ export const CuratorCard: React.FC<CuratorCardProps> = ({ curator }) => {
           </div>
         </div>
 
-        <button 
-          className={`follow-btn ${isFollowing ? 'following' : ''}`}
-          onClick={handleFollowToggle}
-        >
-          {isFollowing ? (t('following') || '팔로잉') : (t('follow') || '팔로우')}
-        </button>
+
       </div>
 
       {/* 통계 섹션 */}
       <div className="curator-stats">
         <div className="stat-item">
           <span className="stat-label">{t('posts') || '게시물'}</span>
-          <span className="stat-value">{curator.postsCount || 52}</span>
+          <span className="stat-value">{curatorStats.postsCount}</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">{t('followers') || '팔로워'}</span>
-          <span className="stat-value">{followersCount}</span>
+          <span className="stat-value">{curatorStats.followersCount}</span>
         </div>
         <div className="stat-item">
           <span className="stat-label">{t('following') || '팔로잉'}</span>
-          <span className="stat-value">{curator.followingCount || 12}</span>
+          <span className="stat-value">{curatorStats.followingCount}</span>
         </div>
       </div>
     </div>

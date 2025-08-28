@@ -12,9 +12,10 @@ import { useTranslationContext } from "../contexts/TranslationContext";
 import { db } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { PostCard } from "../components/PostCard";
-import { getPosts, PostData } from "../services/postService";
+import { getPosts, PostData, deletePost } from "../services/postService";
+import { followUser, unfollowUser, isFollowing, getFollowStats, getFollowersList, getFollowingList, UserInfo } from "../services/followService";
 import ClientStyleProvider from "../components/ClientStyleProvider";
-import "./page.css";
+import styles from "./style.module.css";
 
 // useSearchParams를 사용하는 컴포넌트를 별도로 분리
 function ProfileContent() {
@@ -28,6 +29,15 @@ function ProfileContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  
+  // 팔로우 상태 관리
+  const [isFollowingUser, setIsFollowingUser] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [followModalType, setFollowModalType] = useState<'followers' | 'following'>('followers');
+  const [followList, setFollowList] = useState<UserInfo[]>([]);
+  const [followListLoading, setFollowListLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     uid: '',
     name: '',
@@ -139,11 +149,118 @@ function ProfileContent() {
 
 
   const handleEdit = () => {
-    setEditData({
-      name: profileData.name || '',
-      introduction: profileData.introduction || ''
-    });
-    setIsEditing(true);
+    router.push('/profile/profile-edit');
+  };
+
+  // 이미지 클릭 핸들러 (팝업 열기)
+  const handleImageClick = () => {
+    if (profileData.photoUrl) {
+      setShowImageModal(true);
+    }
+  };
+
+  // 이미지 모달 닫기
+  const handleCloseImageModal = () => {
+    setShowImageModal(false);
+  };
+
+  // 팔로워 목록 클릭
+  const handleFollowersClick = async () => {
+    const targetUserId = profileUserId || user?.uid;
+    if (!targetUserId) return;
+
+    setFollowModalType('followers');
+    setShowFollowModal(true);
+    setFollowListLoading(true);
+    
+    try {
+      const followers = await getFollowersList(targetUserId);
+      setFollowList(followers);
+    } catch (error) {
+      console.error('팔로워 목록 조회 실패:', error);
+      setFollowList([]);
+    } finally {
+      setFollowListLoading(false);
+    }
+  };
+
+  // 팔로잉 목록 클릭
+  const handleFollowingClick = async () => {
+    const targetUserId = profileUserId || user?.uid;
+    if (!targetUserId) return;
+
+    setFollowModalType('following');
+    setShowFollowModal(true);
+    setFollowListLoading(true);
+    
+    try {
+      const following = await getFollowingList(targetUserId);
+      setFollowList(following);
+    } catch (error) {
+      console.error('팔로잉 목록 조회 실패:', error);
+      setFollowList([]);
+    } finally {
+      setFollowListLoading(false);
+    }
+  };
+
+  // 팔로우 모달 닫기
+  const handleCloseFollowModal = () => {
+    setShowFollowModal(false);
+    setFollowList([]);
+  };
+
+  // 게시물 수정 핸들러
+  const handleEditPost = (postId: string) => {
+    console.log('게시물 수정:', postId);
+    // TODO: 게시물 수정 페이지로 이동
+    router.push(`/post-upload?edit=${postId}`);
+  };
+
+  // 게시물 삭제 핸들러
+  const handleDeletePost = async (postId: string) => {
+    if (!user?.uid) return;
+
+    const confirmDelete = window.confirm('정말로 이 게시물을 삭제하시겠습니까?\n삭제된 게시물은 복구할 수 없습니다.');
+    if (!confirmDelete) return;
+
+    try {
+      console.log('🗑️ 게시물 삭제 시작:', postId);
+      const success = await deletePost(postId, user.uid);
+      
+      if (success) {
+        console.log('✅ 게시물 삭제 완료');
+        alert('게시물이 삭제되었습니다.');
+        // 페이지 새로고침으로 목록 업데이트
+        window.location.reload();
+      } else {
+        console.error('❌ 게시물 삭제 실패');
+        alert('게시물 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('❌ 게시물 삭제 중 오류:', error);
+      alert('게시물 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 언팔로우 처리
+  const handleUnfollow = async (targetUserId: string) => {
+    if (!user?.uid) return;
+
+    try {
+      await unfollowUser(user.uid, targetUserId);
+      
+      // 목록에서 제거
+      setFollowList(prev => prev.filter(item => item.id !== targetUserId));
+      
+      // 실제 데이터를 다시 로드해서 정확한 카운트 반영
+      window.location.reload();
+      
+      console.log('✅ 언팔로우 완료:', targetUserId);
+    } catch (error) {
+      console.error('❌ 언팔로우 실패:', error);
+      alert('언팔로우에 실패했습니다.');
+    }
   };
 
   const handleSave = async () => {
@@ -219,6 +336,12 @@ function ProfileContent() {
         
         if (userDoc.exists()) {
           const userData = userDoc.data();
+          console.log('✅ 사용자 데이터 로드 성공:', userData);
+          console.log('📊 팔로워 배열:', userData.followers);
+          console.log('📊 팔로잉 배열:', userData.following);
+          console.log('📊 팔로워 수:', userData.followers?.length || 0);
+          console.log('📊 팔로잉 수:', userData.following?.length || 0);
+          
           const profile = {
             uid: targetUserId,
             name: userData.name || '사용자',
@@ -227,8 +350,8 @@ function ProfileContent() {
             location: userData.location || '',
             gender: userData.gender || '',
             birthDate: userData.birthDate || '',
-            followerCount: userData.followerCount || 0,
-            followingCount: userData.followingCount || 0,
+            followerCount: (userData.followers && Array.isArray(userData.followers)) ? userData.followers.length : 0,
+            followingCount: (userData.following && Array.isArray(userData.following)) ? userData.following.length : 0,
             postCount: userData.postCount || 0
           };
           
@@ -237,6 +360,12 @@ function ProfileContent() {
             name: profile.name,
             introduction: profile.introduction
           });
+
+          // 다른 사용자의 프로필인 경우 팔로우 상태 확인
+          if (targetUserId !== user?.uid && user?.uid) {
+            const followingStatus = await isFollowing(user.uid, targetUserId);
+            setIsFollowingUser(followingStatus);
+          }
         } else {
           console.error('사용자 데이터를 찾을 수 없습니다.');
         }
@@ -255,9 +384,35 @@ function ProfileContent() {
     fetchUserProfile();
   }, [profileUserId, user?.uid]);
 
-  const handleFollow = () => {
-    // TODO: 팔로우/언팔로우 로직 구현
-    console.log('팔로우 버튼 클릭');
+  const handleFollow = async () => {
+    const targetUserId = profileUserId || user?.uid;
+    if (!user?.uid || !targetUserId || isFollowLoading || targetUserId === user?.uid) return;
+    
+    try {
+      setIsFollowLoading(true);
+      
+      if (isFollowingUser) {
+        // 언팔로우
+        const success = await unfollowUser(user.uid, targetUserId);
+        if (success) {
+          setIsFollowingUser(false);
+          // 실제 데이터를 다시 로드해서 정확한 카운트 반영
+          window.location.reload();
+        }
+      } else {
+        // 팔로우
+        const success = await followUser(user.uid, targetUserId);
+        if (success) {
+          setIsFollowingUser(true);
+          // 실제 데이터를 다시 로드해서 정확한 카운트 반영
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error('팔로우/언팔로우 실패:', error);
+    } finally {
+      setIsFollowLoading(false);
+    }
   };
 
   const handleChat = () => {
@@ -316,9 +471,9 @@ function ProfileContent() {
           />
           <div className="body-content">
             <Sidebar />
-            <div className="profile-main-content">
-              <div className="profile-loading">
-                <div className="profile-loading-spinner">로딩 중...</div>
+            <div className={styles.profileMainContent}>
+              <div className={styles.profileLoading}>
+                <div className={styles.profileLoadingSpinner}>로딩 중...</div>
               </div>
             </div>
             <RightSidebar />
@@ -333,7 +488,7 @@ function ProfileContent() {
     <>
       <AuthGuard>
         <ClientStyleProvider>
-          <div className="profile-container">
+          <div className={styles.profileContainer}>
             {/* Top AppBar */}
             <AppBar 
               showBackButton={false}
@@ -347,43 +502,44 @@ function ProfileContent() {
               <Sidebar />
 
               {/* Main Content */}
-              <div className="profile-main-content">
+              <div className={styles.profileMainContent}>
                 {isLoading ? (
-                <div className="profile-loading">
-                  <div className="profile-loading-spinner">{t('loading')}</div>
+                <div className={styles.profileLoading}>
+                  <div className={styles.profileLoadingSpinner}>{t('loading')}</div>
                 </div>
               ) : (
                 <>
                   {/* Profile Header */}
-                  <div className="profile-header">
-                    <div className="profile-info">
-                      <div className="profile-avatar">
+                  <div className={styles.profileHeader}>
+                    <div className={styles.profileInfo}>
+                      <div className={styles.profileAvatar}>
                         {profileData.photoUrl ? (
                           <img 
                             src={profileData.photoUrl} 
                             alt="프로필 이미지" 
-                            className="avatar-image"
+                            className={`${styles.avatarImage} ${styles.clickable}`}
+                            onClick={handleImageClick}
                           />
                         ) : (
-                          <div className="avatar-circle">👤</div>
+                          <div className={styles.avatarCircle}>👤</div>
                         )}
                       </div>
-                      <div className="profile-basic-info">
+                      <div className={styles.profileBasicInfo}>
                         {isEditing ? (
                           <input
                             type="text"
-                            className="profile-name-input"
+                            className={styles.profileNameInput}
                             value={editData.name}
                             onChange={(e) => handleInputChange('name', e.target.value)}
                             placeholder={t('enterNamePlaceholder')}
                           />
                         ) : (
-                          <h1 className="profile-name">
+                          <h1 className={styles.profileName}>
                             {profileData.name || t('setNamePlaceholder')}
                           </h1>
                         )}
                         
-                        <div className="profile-details">
+                        <div className={styles.profileDetails}>
                           <span>
                             {translateCountry(profileData.location)}
                             {profileData.gender && `, ${translateGender(profileData.gender)}`}
@@ -392,9 +548,9 @@ function ProfileContent() {
                         </div>
                         
                         {isEditing ? (
-                          <div className="profile-introduction-edit">
+                          <div className={styles.profileIntroductionEdit}>
                             <textarea
-                              className="profile-introduction-input"
+                              className={styles.profileIntroductionInput}
                               value={editData.introduction}
                               onChange={(e) => handleInputChange('introduction', e.target.value)}
                               placeholder={t('introPlaceholder')}
@@ -402,80 +558,87 @@ function ProfileContent() {
                             />
                           </div>
                         ) : (
-                          <div className="profile-introduction">
+                          <div className={styles.profileIntroduction}>
                             {profileData.introduction || (isOwnProfile ? t('addIntroPlaceholder') : "")}
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="profile-actions">
+                    <div className={styles.profileActions}>
                       {isOwnProfile ? (
                         !isEditing ? (
-                          <button className="edit-profile-btn" onClick={handleEdit}>
+                          <button className={styles.editProfileBtn} onClick={handleEdit}>
                             {t('editProfile')}
                           </button>
                         ) : (
-                          <div className="edit-actions">
-                            <button className="save-btn" onClick={handleSave}>
+                          <div className={styles.editActions}>
+                            <button className={styles.saveBtn} onClick={handleSave}>
                               {t('save')}
                             </button>
-                            <button className="cancel-btn" onClick={handleCancel}>
+                            <button className={styles.cancelBtn} onClick={handleCancel}>
                               {t('cancel')}
                             </button>
                           </div>
                         )
                       ) : (
-                        <button className="follow-btn" onClick={handleFollow}>
-                          {t('follow')}
+                        <button 
+                          className={`${styles.followBtn} ${isFollowingUser ? styles.following : ''}`} 
+                          onClick={handleFollow}
+                          disabled={isFollowLoading}
+                        >
+                          {isFollowLoading 
+                            ? '...' 
+                            : isFollowingUser 
+                              ? (t('following') || '팔로잉') 
+                              : (t('follow') || '팔로우')
+                          }
                         </button>
                       )}
                     </div>
                   </div>
 
                   {/* Stats Section - 로그인한 사용자의 프로필인 경우만 표시 */}
-                  {isOwnProfile && (
-                    <div className="profile-stats">
-                      <div className="stat-item">
-                        <span className="stat-number">{profileData.followerCount}</span>
-                        <span className="stat-label">{t('followers')}</span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-number">{profileData.followingCount}</span>
-                        <span className="stat-label">{t('following')}</span>
-                      </div>
-                      <div className="stat-item">
-                        <span className="stat-number">{profileData.postCount}</span>
-                        <span className="stat-label">{t('posts')}</span>
-                      </div>
+                  <div className={styles.profileStats}>
+                    <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowersClick}>
+                      <span className={styles.statNumber}>{profileData.followerCount}</span>
+                      <span className={styles.statLabel}>{t('followers')}</span>
                     </div>
-                  )}
+                    <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowingClick}>
+                      <span className={styles.statNumber}>{profileData.followingCount}</span>
+                      <span className={styles.statLabel}>{t('following')}</span>
+                    </div>
+                    <div className={styles.statItem}>
+                      <span className={styles.statNumber}>{profileData.postCount}</span>
+                      <span className={styles.statLabel}>{t('posts')}</span>
+                    </div>
+                  </div>
 
                   {/* Action Buttons */}
-                  <div className="profile-action-buttons">
+                  <div className={styles.profileActionButtons}>
                     {isOwnProfile ? (
                       <>
-                        <button className="action-btn primary" onClick={handleReceivedBookings}>
+                        <button className={`${styles.actionBtn} ${styles.primary}`} onClick={handleReceivedBookings}>
                           {t('receivedBookings')}
                         </button>
-                        <button className="action-btn secondary" onClick={handleMyBookings}>
+                        <button className={`${styles.actionBtn} ${styles.secondary}`} onClick={handleMyBookings}>
                           {t('myBookings')}
                         </button>
                         {/* 모바일에서만 보이는 게시물 업로드 버튼 */}
-                        <button className="action-btn upload-btn mobile-only" onClick={handleUploadPost}>
-                          <span className="upload-icon">
+                        <button className={`${styles.actionBtn} ${styles.uploadBtn} ${styles.mobileOnly}`} onClick={handleUploadPost}>
+                          <span className={styles.uploadIcon}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                               <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </span>
-                          <span className="upload-text">{t('uploadPost')}</span>
+                          <span className={styles.uploadText}>{t('uploadPost')}</span>
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className="action-btn primary" onClick={handleChat}>
+                        <button className={`${styles.actionBtn} ${styles.primary}`} onClick={handleChat}>
                           {t('chat')}
                         </button>
-                        <button className="action-btn secondary" onClick={handleCompanionRequest}>
+                        <button className={`${styles.actionBtn} ${styles.secondary}`} onClick={handleCompanionRequest}>
                           {t('companionRequest')}
                         </button>
                       </>
@@ -488,16 +651,16 @@ function ProfileContent() {
 
               {/* Posts Section - 로딩 완료 후에만 표시 */}
               {!isLoading && (
-                <div className="profile-posts-section">
+                <div className={styles.profilePostsSection}>
                   <h2>{isOwnProfile ? t('myPosts') : `${profileData.name}${t('userPosts')}`}</h2>
-                  <div className="profile-content-grid">
+                  <div className={styles.profileContentGrid}>
                     {postsLoading ? (
-                      <div className="profile-loading">
-                        <div className="profile-loading-spinner">🔄</div>
+                      <div className={styles.profileLoading}>
+                        <div className={styles.profileLoadingSpinner}>🔄</div>
                         <span>로딩 중...</span>
                       </div>
                     ) : userPosts.length === 0 ? (
-                      <div className="no-posts">
+                      <div className={styles.noPosts}>
                         <h3>아직 게시물이 없습니다</h3>
                         <p>첫 번째 게시물을 작성해보세요!</p>
                       </div>
@@ -514,6 +677,10 @@ function ProfileContent() {
                             birthDate: profileData.birthDate
                           }}
                           showUserInfo={false}
+                          showSettings={isOwnProfile}
+                          onEdit={handleEditPost}
+                          onDelete={handleDeletePost}
+
                         />
                       ))
                     )}
@@ -530,6 +697,77 @@ function ProfileContent() {
           {/* Mobile Bottom Navigator */}
           <BottomNavigator />
         </ClientStyleProvider>
+
+        {/* 이미지 모달 */}
+        {showImageModal && profileData.photoUrl && (
+          <div className={styles.imageModalOverlay} onClick={handleCloseImageModal}>
+            <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.modalCloseBtn} onClick={handleCloseImageModal}>
+                ✕
+              </button>
+              <div className={styles.modalImageContainer}>
+                <img 
+                  src={profileData.photoUrl} 
+                  alt="프로필 이미지"
+                  className={styles.modalImage}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 팔로우 모달 */}
+        {showFollowModal && (
+          <div className={styles.followModalOverlay} onClick={handleCloseFollowModal}>
+            <div className={styles.followModalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.followModalHeader}>
+                <h3>{followModalType === 'followers' ? t('followers') : t('following')}</h3>
+                <button className={styles.modalCloseBtn} onClick={handleCloseFollowModal}>
+                  ✕
+                </button>
+              </div>
+              
+              <div className={styles.followModalBody}>
+                {followListLoading ? (
+                  <div className={styles.followModalLoading}>로딩 중...</div>
+                ) : followList.length === 0 ? (
+                  <div className={styles.followModalEmpty}>
+                    {followModalType === 'followers' ? '팔로워가 없습니다.' : '팔로잉이 없습니다.'}
+                  </div>
+                ) : (
+                  <div className={styles.followList}>
+                    {followList.map((userInfo) => (
+                      <div key={userInfo.id} className={styles.followItem}>
+                        <div className={styles.followUserInfo}>
+                          <div className={styles.followUserAvatar}>
+                            {userInfo.photoUrl ? (
+                              <img src={userInfo.photoUrl} alt={userInfo.name} />
+                            ) : (
+                              <div className={styles.defaultAvatar}>👤</div>
+                            )}
+                          </div>
+                          <div className={styles.followUserName}>
+                            {userInfo.name}
+                          </div>
+                        </div>
+                        
+                        {/* 팔로잉 목록에서만 취소 버튼 표시 (내가 팔로우한 사람들) */}
+                        {followModalType === 'following' && isOwnProfile && (
+                          <button 
+                            className={styles.unfollowBtn}
+                            onClick={() => handleUnfollow(userInfo.id)}
+                          >
+                            취소
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </AuthGuard>
     </>
   );
@@ -538,8 +776,8 @@ function ProfileContent() {
 // 로딩 컴포넌트
 function ProfileLoading() {
   return (
-    <div className="profile-loading">
-      <div className="loading-spinner">로딩 중...</div>
+    <div className={styles.profileLoading}>
+      <div className={styles.profileLoadingSpinner}>로딩 중...</div>
     </div>
   );
 }

@@ -24,6 +24,11 @@ export interface UserData {
   loginType: string; // "email" | "google" | "kakao" | "apple"
   photoUrl?: string;
   
+  // 프로필 편집 관련 필드
+  bio?: string;
+  image?: string;
+  companionRequestEnabled?: boolean;
+  
   // 포인트 시스템
   points: number;
   usage_count: number;
@@ -40,6 +45,13 @@ export interface UserData {
     marketing: boolean;
     thirdParty: boolean;
   };
+  
+  // 좋아요/북마크한 게시물들 (postId -> timestamp)
+  likedPosts?: { [postId: string]: any }; // serverTimestamp
+  bookmarkedPosts?: { [postId: string]: any }; // serverTimestamp
+  
+  // 채팅방 ID 목록
+  chatIds?: string[]; // 참여 중인 채팅방 ID 배열
   
   // 타임스탬프들
   createdAt: string;
@@ -228,6 +240,9 @@ export const getUserData = async (userId: string): Promise<UserData | null> => {
   }
 };
 
+// getUserInfo는 getUserData의 별칭 (호환성을 위해)
+export const getUserInfo = getUserData;
+
 // 현재 로그인한 사용자 가져오기
 export const getCurrentUser = (): User | null => {
   if (typeof window === 'undefined') return null;
@@ -255,6 +270,46 @@ export const signOut = async (): Promise<void> => {
     console.log('✅ 로그아웃 성공');
   } catch (error) {
     logError(error, 'signOut');
+    throw new Error(getErrorMessage(error));
+  }
+};
+
+// 사용자 프로필 업데이트
+export const updateUserProfile = async (
+  userId: string, 
+  updateData: {
+    name?: string;
+    phoneNumber?: string;
+    gender?: string;
+    bio?: string;
+    image?: string;
+    photoUrl?: string;
+    companionRequestEnabled?: boolean;
+  }
+) => {
+  try {
+    const userRef = doc(db, 'users_test', userId);
+    
+    // 기존 데이터 가져오기
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+    
+    // 업데이트할 데이터만 병합
+    const updatedData = {
+      ...userDoc.data(),
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Firestore에 업데이트
+    await setDoc(userRef, updatedData, { merge: true });
+    
+    console.log('✅ 프로필 업데이트 성공:', updateData);
+    return updatedData;
+  } catch (error) {
+    logError(error, 'updateUserProfile');
     throw new Error(getErrorMessage(error));
   }
 };

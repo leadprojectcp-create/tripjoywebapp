@@ -1,0 +1,74 @@
+{
+  "myActivity": {
+    "ko": "내활동",
+    "en": "My Activity",
+    "vi": "Hoạt động của tôi",
+    "zh": "我的活动",
+    "ja": "マイアクティビティ",
+    "th": "กิจกรรมของฉัน",
+    "fil": "Aking Aktibidad"
+  },
+  "liked": {
+    "ko": "좋아요",
+    "en": "Liked",
+    "vi": "Đã thích",
+    "zh": "点赞",
+    "ja": "いいね",
+    "th": "ไลค์",
+    "fil": "Nagustuhan"
+  },
+  "bookmarked": {
+    "ko": "북마크",
+    "en": "Bookmarked",
+    "vi": "Đã đánh dấu",
+    "zh": "收藏",
+    "ja": "ブックマーク",
+    "th": "บุ๊คมาร์ค",
+    "fil": "Na-bookmark"
+  },
+  "noLikedPosts": {
+    "ko": "좋아요한 게시물이 없습니다",
+    "en": "No liked posts",
+    "vi": "Không có bài viết đã thích",
+    "zh": "没有点赞的帖子",
+    "ja": "いいねした投稿がありません",
+    "th": "ไม่มีโพสต์ที่ไลค์",
+    "fil": "Walang nagustuhang post"
+  },
+  "noBookmarkedPosts": {
+    "ko": "북마크한 게시물이 없습니다",
+    "en": "No bookmarked posts",
+    "vi": "Không có bài viết đã đánh dấu",
+    "zh": "没有收藏的帖子",
+    "ja": "ブックマークした投稿がありません",
+    "th": "ไม่มีโพสต์ที่บุ๊คมาร์ค",
+    "fil": "Walang na-bookmark na post"
+  },
+  "likePostsHint": {
+    "ko": "마음에 드는 게시물에 좋아요를 눌러보세요!",
+    "en": "Like posts that you enjoy!",
+    "vi": "Hãy thích những bài viết bạn yêu thích!",
+    "zh": "为你喜欢的帖子点赞吧！",
+    "ja": "気に入った投稿にいいねしてみましょう！",
+    "th": "ไลค์โพสต์ที่คุณชอบ!",
+    "fil": "Mag-like sa mga post na nagustuhan mo!"
+  },
+  "bookmarkPostsHint": {
+    "ko": "나중에 보고 싶은 게시물을 북마크해보세요!",
+    "en": "Bookmark posts you want to read later!",
+    "vi": "Đánh dấu những bài viết bạn muốn xem sau!",
+    "zh": "收藏你想稍后阅读的帖子！",
+    "ja": "後で見たい投稿をブックマークしてみましょう！",
+    "th": "บุ๊คมาร์คโพสต์ที่คุณต้องการอ่านทีหลัง!",
+    "fil": "I-bookmark ang mga post na gusto mong basahin mamaya!"
+  },
+  "loading": {
+    "ko": "로딩 중...",
+    "en": "Loading...",
+    "vi": "Đang tải...",
+    "zh": "加载中...",
+    "ja": "読み込み中...",
+    "th": "กำลังโหลด...",
+    "fil": "Naglo-load..."
+  }
+}
