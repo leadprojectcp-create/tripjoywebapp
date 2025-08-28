@@ -58,6 +58,24 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  
+  - variable: NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
+    value: public_QPT5XZczBoiDTDV0KFeRhMM4Bzo=
+    availability:
+      - BUILD
+      - RUNTIME
+  
+  - variable: IMAGEKIT_PRIVATE_KEY
+    value: private_CHqSZza/WPEZ/kn4Dc7aXAnQJ3E=
+    availability:
+      - BUILD
+      - RUNTIME
+  
+  - variable: NEXT_PUBLIC_IMAGEKIT_ENDPOINT
+    value: https://ik.imagekit.io/leadproject/
+    availability:
+      - BUILD
+      - RUNTIME
 
   # Grant access to secrets in Cloud Secret Manager.
   # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
