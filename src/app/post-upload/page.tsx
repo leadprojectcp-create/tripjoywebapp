@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
@@ -34,7 +34,7 @@ interface PreviewImage {
   originalUrl?: string; // 기존 이미지의 원본 URL (ImageKit 삭제용)
 }
 
-const PostUpload: React.FC = () => {
+const PostUploadContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuthContext();
@@ -544,6 +544,14 @@ const PostUpload: React.FC = () => {
         <RightSidebar />
       </div>
     </AuthGuard>
+  );
+};
+
+const PostUpload: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PostUploadContent />
+    </Suspense>
   );
 };
 
