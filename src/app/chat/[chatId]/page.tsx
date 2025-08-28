@@ -264,7 +264,11 @@ const ChatRoomPage: React.FC = () => {
         
         <div className="chat-room-info">
           <div className="participant-avatar">
-            <span>{otherParticipant?.name.charAt(0) || '?'}</span>
+            {otherParticipant?.image ? (
+              <img src={otherParticipant.image} alt={otherParticipant.name} />
+            ) : (
+              <span>{otherParticipant?.name.charAt(0) || '?'}</span>
+            )}
           </div>
           <div className="participant-details">
             <h2>{otherParticipant?.name || '채팅방'}</h2>
@@ -323,7 +327,11 @@ const ChatRoomPage: React.FC = () => {
                 <div className={`message-item ${isMyMessage ? 'my-message' : 'other-message'}`}>
                   {!isMyMessage && (
                     <div className="message-avatar">
-                      <span>{message.senderName.charAt(0)}</span>
+                      {otherParticipant?.image ? (
+                        <img src={otherParticipant.image} alt={message.senderName} />
+                      ) : (
+                        <span>{message.senderName.charAt(0)}</span>
+                      )}
                     </div>
                   )}
                   

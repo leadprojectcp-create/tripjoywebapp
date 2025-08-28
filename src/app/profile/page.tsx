@@ -673,6 +673,7 @@ function ProfileContent() {
                             name: profileData.name,
                             location: profileData.location,
                             profileImage: profileData.photoUrl,
+                            photoUrl: profileData.photoUrl,
                             gender: profileData.gender,
                             birthDate: profileData.birthDate
                           }}

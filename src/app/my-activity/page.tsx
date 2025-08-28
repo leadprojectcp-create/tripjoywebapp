@@ -38,6 +38,7 @@ export default function MyActivity() {
         name: userData?.name || '사용자',
         location: userData?.location || '위치 미상',
         profileImage: userData?.photoUrl,
+        photoUrl: userData?.photoUrl,
         gender: userData?.gender,
         birthDate: userData?.birthDate
       };

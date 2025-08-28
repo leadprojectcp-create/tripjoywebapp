@@ -14,6 +14,7 @@ interface PostCardProps {
     name: string;
     location: string;
     profileImage?: string;
+    photoUrl?: string;
     gender?: string;
     birthDate?: string;
   };
@@ -438,8 +439,8 @@ export const PostCard: React.FC<PostCardProps> = ({
         {showUserInfo && (
           <div className="user-info" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
             <div className="user-avatar">
-              {userInfo.profileImage ? (
-                <img src={userInfo.profileImage} alt={userInfo.name} />
+              {userInfo.photoUrl || userInfo.profileImage ? (
+                <img src={userInfo.photoUrl || userInfo.profileImage} alt={userInfo.name} />
               ) : (
                 <span>{userInfo.name.charAt(0)}</span>
               )}

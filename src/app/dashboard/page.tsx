@@ -54,6 +54,7 @@ export default function Dashboard() {
           name: userData.name || '사용자',
           location: userData.location || '위치 미상',
           profileImage: userData.profileImage || null,
+          photoUrl: userData.photoUrl || null,
           gender: userData.gender || '',
           birthDate: userData.birthDate || ''
         };

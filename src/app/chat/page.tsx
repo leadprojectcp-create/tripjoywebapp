@@ -169,7 +169,11 @@ const ChatRoomList: React.FC = () => {
                 onClick={() => handleChatRoomClick(room.id)}
               >
                 <div className="chat-room-avatar">
-                  <span>{otherParticipant.name.charAt(0)}</span>
+                  {otherParticipant.image ? (
+                    <img src={otherParticipant.image} alt={otherParticipant.name} />
+                  ) : (
+                    <span>{otherParticipant.name.charAt(0)}</span>
+                  )}
                 </div>
                 
                 <div className="chat-room-info">
@@ -256,7 +260,9 @@ const NewChatContent: React.FC = () => {
         user.uid,
         targetUserId,
         currentUserInfo.name,
-        targetUserInfo.name
+        targetUserInfo.name,
+        currentUserInfo.photoUrl,
+        targetUserInfo.photoUrl
       );
 
       // 채팅방으로 이동

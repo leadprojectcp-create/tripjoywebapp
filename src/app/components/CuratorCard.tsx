@@ -156,8 +156,8 @@ export const CuratorCard: React.FC<CuratorCardProps> = ({ curator }) => {
       {/* 프로필 섹션 */}
       <div className="curator-profile">
         <div className="curator-avatar">
-          {curator.profileImage ? (
-            <img src={curator.profileImage} alt={curator.name} />
+          {curator.photoUrl ? (
+            <img src={curator.photoUrl} alt={curator.name} />
           ) : (
             <span className="avatar-initial">{curator.name.charAt(0)}</span>
           )}

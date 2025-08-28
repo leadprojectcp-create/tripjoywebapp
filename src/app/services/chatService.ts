@@ -57,7 +57,9 @@ export const createChatRoom = async (
   currentUserId: string, 
   targetUserId: string,
   currentUserName: string,
-  targetUserName: string
+  targetUserName: string,
+  currentUserImage?: string,
+  targetUserImage?: string
 ): Promise<string> => {
   try {
     console.log('🚀 채팅방 생성 시작:', { currentUserId, targetUserId });
@@ -67,7 +69,52 @@ export const createChatRoom = async (
     if (existingChatId) {
       console.log('✅ 기존 채팅방 사용:', existingChatId, 
         `참여자: [${[currentUserId, targetUserId].sort().join(', ')}]`);
+      
+      // 기존 채팅방의 이미지 정보도 최신으로 업데이트
+      try {
+        const currentUserDoc = await getDoc(doc(db, 'users_test', currentUserId));
+        const targetUserDoc = await getDoc(doc(db, 'users_test', targetUserId));
+        
+        const currentUserPhotoUrl = currentUserDoc.exists() ? currentUserDoc.data().photoUrl || '' : '';
+        const targetUserPhotoUrl = targetUserDoc.exists() ? targetUserDoc.data().photoUrl || '' : '';
+        
+        const chatRoomRef = ref(realtimeDb, `chatRooms/${existingChatId}`);
+        await update(chatRoomRef, {
+          participantImages: {
+            [currentUserId]: currentUserPhotoUrl,
+            [targetUserId]: targetUserPhotoUrl
+          }
+        });
+        console.log('✅ 기존 채팅방 이미지 정보 업데이트 완료');
+      } catch (error) {
+        console.error('❌ 기존 채팅방 이미지 정보 업데이트 실패:', error);
+      }
+      
       return existingChatId;
+    }
+
+    // users_test에서 실제 사용자 정보 가져오기
+    let actualCurrentUserImage = currentUserImage || '';
+    let actualTargetUserImage = targetUserImage || '';
+    
+    try {
+      // 현재 사용자 정보 가져오기
+      const currentUserDoc = await getDoc(doc(db, 'users_test', currentUserId));
+      if (currentUserDoc.exists()) {
+        const currentUserData = currentUserDoc.data();
+        actualCurrentUserImage = currentUserData.photoUrl || '';
+        console.log('📸 현재 사용자 photoUrl:', actualCurrentUserImage);
+      }
+      
+      // 대상 사용자 정보 가져오기
+      const targetUserDoc = await getDoc(doc(db, 'users_test', targetUserId));
+      if (targetUserDoc.exists()) {
+        const targetUserData = targetUserDoc.data();
+        actualTargetUserImage = targetUserData.photoUrl || '';
+        console.log('📸 대상 사용자 photoUrl:', actualTargetUserImage);
+      }
+    } catch (error) {
+      console.error('❌ 사용자 photoUrl 가져오기 실패:', error);
     }
 
     // 새 채팅방 생성 (push 키는 서버 타임베이스를 포함하여 충돌 가능성 매우 낮음)
@@ -89,8 +136,8 @@ export const createChatRoom = async (
         [targetUserId]: targetUserName
       },
       participantImages: {
-        [currentUserId]: '',
-        [targetUserId]: ''
+        [currentUserId]: actualCurrentUserImage,
+        [targetUserId]: actualTargetUserImage
       },
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()

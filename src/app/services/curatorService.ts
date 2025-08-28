@@ -6,6 +6,7 @@ export interface CuratorData {
   name: string;
   email: string;
   profileImage?: string;
+  photoUrl?: string;
   gender?: string;
   birthDate?: string;
   location?: string;
@@ -35,6 +36,7 @@ export const getCurators = async (): Promise<CuratorData[]> => {
         name: data.name || '사용자',
         email: data.email || '',
         profileImage: data.profileImage,
+        photoUrl: data.photoUrl,
         gender: data.gender,
         birthDate: data.birthDate,
         location: data.location,
@@ -71,6 +73,7 @@ export const getCuratorById = async (curatorId: string): Promise<CuratorData | n
           name: data.name || '사용자',
           email: data.email || '',
           profileImage: data.profileImage,
+          photoUrl: data.photoUrl,
           gender: data.gender,
           birthDate: data.birthDate,
           location: data.location,
