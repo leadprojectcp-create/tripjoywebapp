@@ -29,9 +29,7 @@
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background: white;
   border-bottom: 1px solid #e9ecef;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
@@ -315,6 +313,23 @@
   font-size: 11px;
   color: #999;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message-read-status {
+  font-size: 10px;
+  color: #666;
+  font-weight: 500;
+}
+
+.my-message .message-time {
+  justify-content: flex-end;
+}
+
+.other-message .message-time {
+  justify-content: flex-start;
 }
 
 /* 메시지 입력 폼 */

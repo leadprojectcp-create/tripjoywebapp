@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useAuthContext } from "../contexts/AuthContext";
+import { SettingsModal } from "./SettingsModal";
 import "./Sidebar.css";
 
 // SVG 아이콘 컴포넌트들
@@ -215,11 +216,26 @@ const LogoutIcon = () => (
   </svg>
 );
 
-export const Sidebar = (): React.JSX.Element => {
+interface SidebarProps {
+  unreadMessageCount?: number;
+}
+
+export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Element => {
   const { t } = useTranslationContext();
   const { logout, isAuthenticated } = useAuthContext();
   const pathname = usePathname();
   const router = useRouter();
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  // 설정 모달 핸들러
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsSettingsModalOpen(true);
+  };
+
+  const handleCloseSettingsModal = () => {
+    setIsSettingsModalOpen(false);
+  };
 
   // 현재 경로에 따라 active 상태 결정
   const isActive = (path: string) => {
@@ -275,6 +291,9 @@ export const Sidebar = (): React.JSX.Element => {
         <Link href="/chat" className={`nav-item ${isActive('/chat') ? 'active' : ''}`}>
           <div className="nav-icon">
             <MessageIcon isActive={isActive('/chat')} />
+            {unreadMessageCount > 0 && (
+              <div className="unread-dot"></div>
+            )}
           </div>
           <span>{t('chat')}</span>
         </Link>
@@ -293,12 +312,15 @@ export const Sidebar = (): React.JSX.Element => {
           <span>{t('requestedCompanions')}</span>
         </Link>
         
-        <Link href="/settings" className={`nav-item ${isActive('/settings') ? 'active' : ''}`}>
+        <div 
+          className={`nav-item ${isSettingsModalOpen ? 'active' : ''}`}
+          onClick={handleSettingsClick}
+        >
           <div className="nav-icon">
-            <SettingIcon isActive={isActive('/settings')} />
+            <SettingIcon isActive={isSettingsModalOpen} />
           </div>
           <span>{t('settings')}</span>
-        </Link>
+        </div>
       </nav>
       
       {/* 로그아웃 버튼 (로그인된 경우에만 표시) */}
@@ -312,6 +334,12 @@ export const Sidebar = (): React.JSX.Element => {
           </div>
         </div>
       )}
+      
+      {/* 설정 모달 - 포털로 렌더링됨 */}
+      <SettingsModal 
+        isOpen={isSettingsModalOpen} 
+        onClose={handleCloseSettingsModal} 
+      />
     </div>
   );
 };

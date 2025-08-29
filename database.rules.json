@@ -4,6 +4,10 @@
       ".read": "auth != null",
       ".write": "auth != null"
     },
+    "chatRooms": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
     "chat": {
       ".read": "auth != null", 
       ".write": "auth != null"

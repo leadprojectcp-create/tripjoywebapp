@@ -61,6 +61,18 @@ const getBrowserLanguage = (): Language => {
   return 'en';
 };
 
+// 템플릿 문자열 파라미터 치환 함수
+const replaceParams = (text: string, params?: Record<string, string>): string => {
+  if (!params) return text;
+  
+  let result = text;
+  Object.entries(params).forEach(([key, value]) => {
+    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+  });
+  
+  return result;
+};
+
 export const useTranslation = () => {
   const [translations, setTranslations] = useState<Translations>({});
   const [currentLanguage, setCurrentLanguage] = useState<Language>('ko');
@@ -75,7 +87,7 @@ export const useTranslation = () => {
     const loadTranslations = async () => {
       try {
         // 여러 번역 파일 로드
-        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse] = await Promise.all([
+        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse] = await Promise.all([
           fetch('/translations/sidebar.json'),
           fetch('/translations/auth.json'),
           fetch('/translations/signup.json'),
@@ -88,7 +100,11 @@ export const useTranslation = () => {
           fetch('/translations/curators.json'),
           fetch('/translations/received-companions.json'),
           fetch('/translations/requested-companions.json'),
-          fetch('/translations/my-activity.json')
+          fetch('/translations/my-activity.json'),
+          fetch('/translations/alert.json'),
+          fetch('/translations/notice.json'),
+          fetch('/translations/faq.json'),
+          fetch('/translations/footer.json')
         ]);
         
         const sidebarData = await sidebarResponse.json();
@@ -104,6 +120,10 @@ export const useTranslation = () => {
         const receivedCompanionsData = await receivedCompanionsResponse.json();
         const requestedCompanionsData = await requestedCompanionsResponse.json();
         const myActivityData = await myActivityResponse.json();
+        const alertData = await alertResponse.json();
+        const noticeData = await noticeResponse.json();
+        const faqData = await faqResponse.json();
+        const footerData = await footerResponse.json();
         
         // 번역 데이터 병합
         const mergedTranslations = { 
@@ -119,7 +139,11 @@ export const useTranslation = () => {
           ...curatorsData,
           ...receivedCompanionsData,
           ...requestedCompanionsData,
-          ...myActivityData
+          ...myActivityData,
+          ...alertData,
+          ...noticeData,
+          ...faqData,
+          ...footerData
         };
         console.log('📚 Loaded translations:', mergedTranslations);
         setTranslations(mergedTranslations);
@@ -140,7 +164,7 @@ export const useTranslation = () => {
     loadTranslations();
   }, []);
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string>): string => {
     console.log(`🔍 Translating key: ${key}, language: ${currentLanguage}, forceUpdate: ${forceUpdate}`);
     
     // SSR hydration mismatch 방지: 클라이언트가 준비되지 않은 상태에서는 빈 문자열 반환
@@ -169,7 +193,7 @@ export const useTranslation = () => {
       }
       
       console.log(`✅ Nested translation found: ${key} = ${translation}`);
-      return translation;
+      return replaceParams(translation, params);
     }
     
     // 일반 키 처리
@@ -186,7 +210,7 @@ export const useTranslation = () => {
     }
     
     console.log(`✅ Translation found: ${key} = ${translation}`);
-    return translation;
+    return replaceParams(translation, params);
   };
 
   const changeLanguage = (language: Language) => {

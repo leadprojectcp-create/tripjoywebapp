@@ -9,6 +9,7 @@ import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
 import { useTranslationContext } from "../contexts/TranslationContext";
+import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { db } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { PostCard } from "../components/PostCard";
@@ -21,6 +22,7 @@ import styles from "./style.module.css";
 function ProfileContent() {
   const { user } = useAuthContext();
   const { t, currentLanguage } = useTranslationContext();
+  const unreadMessageCount = useUnreadMessageCount();
   const router = useRouter();
   const searchParams = useSearchParams();
   const profileUserId = searchParams.get('userId'); // URL에서 사용자 ID 가져오기
@@ -470,7 +472,7 @@ function ProfileContent() {
             showLanguageSelector={true}
           />
           <div className="body-content">
-            <Sidebar />
+            <Sidebar unreadMessageCount={unreadMessageCount} />
             <div className={styles.profileMainContent}>
               <div className={styles.profileLoading}>
                 <div className={styles.profileLoadingSpinner}>로딩 중...</div>
@@ -499,7 +501,7 @@ function ProfileContent() {
             {/* Body Content */}
             <div className="body-content">
               {/* Left Sidebar */}
-              <Sidebar />
+              <Sidebar unreadMessageCount={unreadMessageCount} />
 
               {/* Main Content */}
               <div className={styles.profileMainContent}>

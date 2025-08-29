@@ -1,0 +1,258 @@
+/* 설정 모달 오버레이 */
+.settings-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+}
+
+/* 설정 모달 */
+.settings-modal {
+  position: fixed;
+  top: 60px; /* AppBar 높이만큼 아래 */
+  left: 250px; /* Sidebar 너비만큼 오른쪽 */
+  width: 320px;
+  max-height: calc(100vh - 80px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  z-index: 9999;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 모달 헤더 */
+.settings-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.settings-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.settings-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.settings-modal-close:hover {
+  background-color: #e9ecef;
+}
+
+/* 모달 컨텐츠 */
+.settings-modal-content {
+  padding: 8px 0;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+/* 설정 항목 */
+.settings-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.settings-item:hover {
+  background-color: #f8f9fa;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+/* 회원탈퇴는 빨간색으로 */
+.settings-item[data-id="delete-account"] {
+  color: #dc3545;
+}
+
+.settings-item[data-id="delete-account"]:hover {
+  background-color: #fff5f5;
+}
+
+/* 설정 항목 아이콘 */
+.settings-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  background-color: #f1f3f4;
+  border-radius: 8px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.settings-item[data-id="delete-account"] .settings-item-icon {
+  background-color: #ffebee;
+  color: #dc3545;
+}
+
+/* 설정 항목 라벨 */
+.settings-item-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.settings-item[data-id="delete-account"] .settings-item-label {
+  color: #dc3545;
+}
+
+/* 설정 항목 화살표 */
+.settings-item-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  margin-left: 8px;
+}
+
+.settings-item[data-id="delete-account"] .settings-item-arrow {
+  color: #dc3545;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .settings-modal {
+    left: 200px; /* 모바일에서 Sidebar 너비 */
+    width: calc(100vw - 220px);
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-modal {
+    left: 20px;
+    right: 20px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* 버전 정보 관련 스타일 */
+.version-toggle {
+  font-size: 12px;
+  color: #666;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.settings-item.version-expanded {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.version-info-section {
+  background-color: #f8f9fa;
+  border-radius: 0 0 8px 8px;
+  margin: 0 -16px -8px -16px;
+  padding: 0;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+  }
+}
+
+.version-info-content {
+  padding: 20px;
+}
+
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.version-item:last-child {
+  border-bottom: none;
+  margin-bottom: 12px;
+}
+
+.version-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.version-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.version-value.beta {
+  background-color: #4a90e2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.version-description {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.version-description p {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 버전 번호 스타일 */
+.version-number {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+  background-color: #f1f3f4;
+  padding: 2px 6px;
+  border-radius: 8px;
+}

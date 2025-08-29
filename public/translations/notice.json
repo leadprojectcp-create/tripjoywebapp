@@ -1,0 +1,119 @@
+{
+  "noticeTitle": {
+    "ko": "공지사항",
+    "en": "Notice",
+    "vi": "Thông báo chung",
+    "zh": "公告",
+    "ja": "お知らせ",
+    "th": "ประกาศ",
+    "fil": "Pabatid"
+  },
+  "description": {
+    "ko": "TRIPJOY의 최신 소식과 중요한 안내사항을 확인하세요",
+    "en": "Check the latest news and important announcements from TRIPJOY",
+    "vi": "Kiểm tra tin tức mới nhất và thông báo quan trọng từ TRIPJOY",
+    "zh": "查看TRIPJOY的最新消息和重要公告",
+    "ja": "TRIPJOYの最新ニュースと重要なお知らせをご確認ください",
+    "th": "ตรวจสอบข่าวสารล่าสุดและประกาศสำคัญจาก TRIPJOY",
+    "fil": "Tingnan ang mga pinakabagong balita at mahalagang pabatid mula sa TRIPJOY"
+  },
+  "loading": {
+    "ko": "공지사항을 불러오는 중...",
+    "en": "Loading notices...",
+    "vi": "Đang tải thông báo...",
+    "zh": "正在加载公告...",
+    "ja": "お知らせを読み込み中...",
+    "th": "กำลังโหลดประกาศ...",
+    "fil": "Naglo-load ng mga pabatid..."
+  },
+  "empty": {
+    "ko": "현재 공지사항이 없습니다",
+    "en": "No notices available",
+    "vi": "Hiện tại không có thông báo nào",
+    "zh": "目前没有公告",
+    "ja": "現在、お知らせはありません",
+    "th": "ขณะนี้ไม่มีประกาศ",
+    "fil": "Walang available na pabatid sa ngayon"
+  },
+  "filterAll": {
+    "ko": "전체",
+    "en": "All",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  },
+  "filterUpdate": {
+    "ko": "업데이트",
+    "en": "Updates",
+    "vi": "Cập nhật",
+    "zh": "更新",
+    "ja": "アップデート",
+    "th": "อัปเดต",
+    "fil": "Mga Update"
+  },
+  "filterMaintenance": {
+    "ko": "점검",
+    "en": "Maintenance",
+    "vi": "Bảo trì",
+    "zh": "维护",
+    "ja": "メンテナンス",
+    "th": "การบำรุงรักษา",
+    "fil": "Maintenance"
+  },
+  "filterEvent": {
+    "ko": "이벤트",
+    "en": "Events",
+    "vi": "Sự kiện",
+    "zh": "活动",
+    "ja": "イベント",
+    "th": "กิจกรรม",
+    "fil": "Mga Event"
+  },
+  "filterGeneral": {
+    "ko": "일반",
+    "en": "General",
+    "vi": "Chung",
+    "zh": "一般",
+    "ja": "一般",
+    "th": "ทั่วไป",
+    "fil": "Pangkalahatan"
+  },
+  "categoryUpdate": {
+    "ko": "업데이트",
+    "en": "Update",
+    "vi": "Cập nhật",
+    "zh": "更新",
+    "ja": "アップデート",
+    "th": "อัปเดต",
+    "fil": "Update"
+  },
+  "categoryMaintenance": {
+    "ko": "점검",
+    "en": "Maintenance",
+    "vi": "Bảo trì",
+    "zh": "维护",
+    "ja": "メンテナンス",
+    "th": "การบำรุงรักษา",
+    "fil": "Maintenance"
+  },
+  "categoryEvent": {
+    "ko": "이벤트",
+    "en": "Event",
+    "vi": "Sự kiện",
+    "zh": "活动",
+    "ja": "イベント",
+    "th": "กิจกรรม",
+    "fil": "Event"
+  },
+  "categoryGeneral": {
+    "ko": "일반",
+    "en": "General",
+    "vi": "Chung",
+    "zh": "一般",
+    "ja": "一般",
+    "th": "ทั่วไป",
+    "fil": "Pangkalahatan"
+  }
+}

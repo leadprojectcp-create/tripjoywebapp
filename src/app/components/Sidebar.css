@@ -65,12 +65,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .nav-icon svg {
   width: 20px;
   height: 20px;
   transition: filter 0.2s;
+}
+
+/* 읽지 않은 메시지 표시 점 */
+.nav-icon .unread-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  border: 2px solid white;
 }
 
 .nav-item span {

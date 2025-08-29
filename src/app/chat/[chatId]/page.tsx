@@ -184,7 +184,43 @@ const ChatRoomPage: React.FC = () => {
   const formatMessageTime = (timestamp: any) => {
     if (!timestamp) return '';
     
-    const date = new Date(timestamp.seconds * 1000);
+    let date: Date;
+    
+    try {
+      // Firebase Timestamp 객체인 경우
+      if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+      }
+      // toDate() 메서드가 있는 경우 (Firestore Timestamp)
+      else if (timestamp && typeof timestamp.toDate === 'function') {
+        date = timestamp.toDate();
+      }
+      // 이미 Date 객체인 경우
+      else if (timestamp instanceof Date) {
+        date = timestamp;
+      }
+      // 숫자 타임스탬프인 경우
+      else if (typeof timestamp === 'number') {
+        date = new Date(timestamp);
+      }
+      // 문자열인 경우
+      else if (typeof timestamp === 'string') {
+        date = new Date(timestamp);
+      }
+      else {
+        return '';
+      }
+      
+      // 유효한 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      
+    } catch (error) {
+      console.error('메시지 타임스탬프 파싱 오류:', error, timestamp);
+      return '';
+    }
+    
     return date.toLocaleTimeString('ko-KR', { 
       hour: '2-digit', 
       minute: '2-digit',
@@ -192,21 +228,56 @@ const ChatRoomPage: React.FC = () => {
     });
   };
 
+  // 안전한 날짜 파싱 헬퍼 함수
+  const parseTimestamp = (timestamp: any): Date | null => {
+    if (!timestamp) return null;
+    
+    try {
+      // Firebase Timestamp 객체인 경우
+      if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+        return new Date(timestamp.seconds * 1000);
+      }
+      // toDate() 메서드가 있는 경우 (Firestore Timestamp)
+      else if (timestamp && typeof timestamp.toDate === 'function') {
+        return timestamp.toDate();
+      }
+      // 이미 Date 객체인 경우
+      else if (timestamp instanceof Date) {
+        return timestamp;
+      }
+      // 숫자 타임스탬프인 경우
+      else if (typeof timestamp === 'number') {
+        return new Date(timestamp);
+      }
+      // 문자열인 경우
+      else if (typeof timestamp === 'string') {
+        return new Date(timestamp);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('타임스탬프 파싱 오류:', error, timestamp);
+      return null;
+    }
+  };
+
   // 날짜 구분선 표시 여부
   const shouldShowDateSeparator = (currentMsg: ChatMessage, prevMsg?: ChatMessage) => {
     if (!prevMsg) return true;
     
-    const currentDate = new Date(currentMsg.timestamp?.seconds * 1000).toDateString();
-    const prevDate = new Date(prevMsg.timestamp?.seconds * 1000).toDateString();
+    const currentDate = parseTimestamp(currentMsg.timestamp);
+    const prevDate = parseTimestamp(prevMsg.timestamp);
     
-    return currentDate !== prevDate;
+    if (!currentDate || !prevDate) return true;
+    
+    return currentDate.toDateString() !== prevDate.toDateString();
   };
 
   // 날짜 포맷
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return '';
+    const date = parseTimestamp(timestamp);
+    if (!date || isNaN(date.getTime())) return '';
     
-    const date = new Date(timestamp.seconds * 1000);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -344,6 +415,11 @@ const ChatRoomPage: React.FC = () => {
                     </div>
                     <div className="message-time">
                       {formatMessageTime(message.timestamp)}
+                      {isMyMessage && (
+                        <span className="message-read-status">
+                          {message.readBy && Object.keys(message.readBy).length > 1 ? '읽음' : '안읽음'}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

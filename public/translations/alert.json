@@ -1,0 +1,74 @@
+{
+  "alertTitle": {
+    "ko": "내 포스트 알림",
+    "en": "My Post Notifications",
+    "vi": "Thông báo bài viết của tôi",
+    "zh": "我的帖子通知",
+    "ja": "私の投稿通知",
+    "th": "การแจ้งเตือนโพสต์ของฉัน",
+    "fil": "Mga Abiso sa Aking Post"
+  },
+  "loading": {
+    "ko": "알림을 불러오는 중...",
+    "en": "Loading notifications...",
+    "vi": "Đang tải thông báo...",
+    "zh": "正在加载通知...",
+    "ja": "通知を読み込み中...",
+    "th": "กำลังโหลดการแจ้งเตือน...",
+    "fil": "Naglo-load ng mga abiso..."
+  },
+  "empty": {
+    "ko": "새로운 알림이 없습니다",
+    "en": "No new notifications",
+    "vi": "Không có thông báo mới",
+    "zh": "暂无新通知",
+    "ja": "新しい通知はありません",
+    "th": "ไม่มีการแจ้งเตือนใหม่",
+    "fil": "Walang bagong abiso"
+  },
+  "filterAll": {
+    "ko": "전체",
+    "en": "All",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  },
+  "filterLikes": {
+    "ko": "좋아요",
+    "en": "Likes",
+    "vi": "Thích",
+    "zh": "点赞",
+    "ja": "いいね",
+    "th": "ถูกใจ",
+    "fil": "Mga Like"
+  },
+  "filterBookmarks": {
+    "ko": "스크랩",
+    "en": "Bookmarks",
+    "vi": "Đã lưu",
+    "zh": "收藏",
+    "ja": "ブックマーク",
+    "th": "บุ๊คมาร์ก",
+    "fil": "Mga Bookmark"
+  },
+  "likeMessage": {
+    "ko": "{userName}님이 내 포스트에 좋아요를 눌렀습니다",
+    "en": "{userName} liked your post",
+    "vi": "{userName} đã thích bài viết của bạn",
+    "zh": "{userName} 点赞了您的帖子",
+    "ja": "{userName}があなたの投稿にいいねしました",
+    "th": "{userName} ถูกใจโพสต์ของคุณ",
+    "fil": "Si {userName} ay nag-like sa inyong post"
+  },
+  "bookmarkMessage": {
+    "ko": "{userName}님이 내 포스트를 스크랩했습니다",
+    "en": "{userName} bookmarked your post",
+    "vi": "{userName} đã lưu bài viết của bạn",
+    "zh": "{userName} 收藏了您的帖子",
+    "ja": "{userName}があなたの投稿をブックマークしました",
+    "th": "{userName} บุ๊คมาร์กโพสต์ของคุณ",
+    "fil": "Si {userName} ay nag-bookmark sa inyong post"
+  }
+}

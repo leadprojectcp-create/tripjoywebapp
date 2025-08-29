@@ -8,6 +8,7 @@ import { BottomNavigator } from "../components/BottomNavigator";
 import { PostCard } from "../components/PostCard";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
+import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { AuthGuard } from "../components/AuthGuard";
 import { SignupFlow } from "../auth/signup/SignupFlow";
 import { SignupMethod } from "../auth/signup/types";
@@ -25,6 +26,7 @@ export default function Dashboard() {
   } = useAuthContext();
   
   const { t } = useTranslationContext();
+  const unreadMessageCount = useUnreadMessageCount();
 
   // 게시물 상태 관리
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -164,7 +166,7 @@ export default function Dashboard() {
           {/* Body Content */}
           <div className="body-content">
             {/* Left Sidebar */}
-            <Sidebar />
+            <Sidebar unreadMessageCount={unreadMessageCount} />
 
             {/* Main Content */}
             <div className="main-content">

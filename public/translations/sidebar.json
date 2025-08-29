@@ -106,5 +106,59 @@
     "ja": "ログアウト",
     "th": "ออกจากระบบ",
     "fil": "Logout"
+  },
+  "notifications": {
+    "ko": "알림",
+    "en": "Notifications",
+    "vi": "Thông báo",
+    "zh": "通知",
+    "ja": "通知",
+    "th": "การแจ้งเตือน",
+    "fil": "Mga Abiso"
+  },
+  "customerService": {
+    "ko": "고객센터",
+    "en": "Customer Service",
+    "vi": "Dịch vụ khách hàng",
+    "zh": "客服中心",
+    "ja": "カスタマーサービス",
+    "th": "บริการลูกค้า",
+    "fil": "Serbisyo sa Customer"
+  },
+  "faq": {
+    "ko": "FAQ",
+    "en": "FAQ",
+    "vi": "Câu hỏi thường gặp",
+    "zh": "常见问题",
+    "ja": "よくある質問",
+    "th": "คำถามที่พบบ่อย",
+    "fil": "FAQ"
+  },
+  "notice": {
+    "ko": "공지사항",
+    "en": "Notice",
+    "vi": "Thông báo chung",
+    "zh": "公告",
+    "ja": "お知らせ",
+    "th": "ประกาศ",
+    "fil": "Pabatid"
+  },
+  "version": {
+    "ko": "버전",
+    "en": "Version",
+    "vi": "Phiên bản",
+    "zh": "版本",
+    "ja": "バージョン",
+    "th": "เวอร์ชัน",
+    "fil": "Bersyon"
+  },
+  "deleteAccount": {
+    "ko": "회원탈퇴",
+    "en": "Delete Account",
+    "vi": "Xóa tài khoản",
+    "zh": "删除账户",
+    "ja": "アカウント削除",
+    "th": "ลบบัญชี",
+    "fil": "Tanggalin ang Account"
   }
 }

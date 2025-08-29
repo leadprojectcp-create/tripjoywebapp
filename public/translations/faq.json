@@ -1,0 +1,182 @@
+{
+  "faqTitle": {
+    "ko": "자주 묻는 질문",
+    "en": "Frequently Asked Questions",
+    "vi": "Câu hỏi thường gặp",
+    "zh": "常见问题",
+    "ja": "よくある質問",
+    "th": "คำถามที่พบบ่อย",
+    "fil": "Mga Madalas na Tanong"
+  },
+  "description": {
+    "ko": "TRIPJOY 사용에 대한 궁금한 점을 해결해보세요",
+    "en": "Find answers to common questions about using TRIPJOY",
+    "vi": "Tìm câu trả lời cho các câu hỏi thường gặp về việc sử dụng TRIPJOY",
+    "zh": "找到关于使用TRIPJOY的常见问题答案",
+    "ja": "TRIPJOYの使用に関するよくある質問の答えを見つけましょう",
+    "th": "หาคำตอบสำหรับคำถามที่พบบ่อยเกี่ยวกับการใช้ TRIPJOY",
+    "fil": "Hanapin ang mga sagot sa mga karaniwang tanong tungkol sa paggamit ng TRIPJOY"
+  },
+  "searchPlaceholder": {
+    "ko": "질문이나 키워드를 검색하세요...",
+    "en": "Search questions or keywords...",
+    "vi": "Tìm kiếm câu hỏi hoặc từ khóa...",
+    "zh": "搜索问题或关键词...",
+    "ja": "質問やキーワードを検索...",
+    "th": "ค้นหาคำถามหรือคำสำคัญ...",
+    "fil": "Maghanap ng mga tanong o keyword..."
+  },
+  "loading": {
+    "ko": "FAQ를 불러오는 중...",
+    "en": "Loading FAQs...",
+    "vi": "Đang tải FAQ...",
+    "zh": "正在加载FAQ...",
+    "ja": "FAQを読み込み中...",
+    "th": "กำลังโหลด FAQ...",
+    "fil": "Naglo-load ng FAQ..."
+  },
+  "empty": {
+    "ko": "현재 FAQ가 없습니다",
+    "en": "No FAQs available",
+    "vi": "Hiện tại không có FAQ nào",
+    "zh": "目前没有FAQ",
+    "ja": "現在、FAQはありません",
+    "th": "ขณะนี้ไม่มี FAQ",
+    "fil": "Walang available na FAQ sa ngayon"
+  },
+  "noSearchResults": {
+    "ko": "검색 결과가 없습니다",
+    "en": "No search results found",
+    "vi": "Không tìm thấy kết quả tìm kiếm",
+    "zh": "未找到搜索结果",
+    "ja": "検索結果が見つかりません",
+    "th": "ไม่พบผลการค้นหา",
+    "fil": "Walang nahanap na resulta"
+  },
+  "clearSearch": {
+    "ko": "검색 지우기",
+    "en": "Clear Search",
+    "vi": "Xóa tìm kiếm",
+    "zh": "清除搜索",
+    "ja": "検索をクリア",
+    "th": "ล้างการค้นหา",
+    "fil": "I-clear ang Paghahanap"
+  },
+  "filterAll": {
+    "ko": "전체",
+    "en": "All",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  },
+  "filterGeneral": {
+    "ko": "일반",
+    "en": "General",
+    "vi": "Chung",
+    "zh": "一般",
+    "ja": "一般",
+    "th": "ทั่วไป",
+    "fil": "Pangkalahatan"
+  },
+  "filterAccount": {
+    "ko": "계정",
+    "en": "Account",
+    "vi": "Tài khoản",
+    "zh": "账户",
+    "ja": "アカウント",
+    "th": "บัญชี",
+    "fil": "Account"
+  },
+  "filterTravel": {
+    "ko": "여행",
+    "en": "Travel",
+    "vi": "Du lịch",
+    "zh": "旅行",
+    "ja": "旅行",
+    "th": "การท่องเที่ยว",
+    "fil": "Paglalakbay"
+  },
+  "filterCompanion": {
+    "ko": "동행",
+    "en": "Companion",
+    "vi": "Đồng hành",
+    "zh": "同行",
+    "ja": "同行",
+    "th": "เพื่อนร่วมทาง",
+    "fil": "Kasama"
+  },
+  "filterTechnical": {
+    "ko": "기술지원",
+    "en": "Technical",
+    "vi": "Kỹ thuật",
+    "zh": "技术支持",
+    "ja": "技術サポート",
+    "th": "เทคนิค",
+    "fil": "Technical"
+  },
+  "filterSafety": {
+    "ko": "안전",
+    "en": "Safety",
+    "vi": "An toàn",
+    "zh": "安全",
+    "ja": "安全",
+    "th": "ความปลอดภัย",
+    "fil": "Kaligtasan"
+  },
+  "categoryGeneral": {
+    "ko": "일반",
+    "en": "General",
+    "vi": "Chung",
+    "zh": "一般",
+    "ja": "一般",
+    "th": "ทั่วไป",
+    "fil": "Pangkalahatan"
+  },
+  "categoryAccount": {
+    "ko": "계정",
+    "en": "Account",
+    "vi": "Tài khoản",
+    "zh": "账户",
+    "ja": "アカウント",
+    "th": "บัญชี",
+    "fil": "Account"
+  },
+  "categoryTravel": {
+    "ko": "여행",
+    "en": "Travel",
+    "vi": "Du lịch",
+    "zh": "旅行",
+    "ja": "旅行",
+    "th": "การท่องเที่ยว",
+    "fil": "Paglalakbay"
+  },
+  "categoryCompanion": {
+    "ko": "동행",
+    "en": "Companion",
+    "vi": "Đồng hành",
+    "zh": "同行",
+    "ja": "同行",
+    "th": "เพื่อนร่วมทาง",
+    "fil": "Kasama"
+  },
+  "categoryTechnical": {
+    "ko": "기술지원",
+    "en": "Technical",
+    "vi": "Kỹ thuật",
+    "zh": "技术支持",
+    "ja": "技術サポート",
+    "th": "เทคนิค",
+    "fil": "Technical"
+  },
+  "categorySafety": {
+    "ko": "안전",
+    "en": "Safety",
+    "vi": "An toàn",
+    "zh": "安全",
+    "ja": "安全",
+    "th": "ความปลอดภัย",
+    "fil": "Kaligtasan"
+  }
+}

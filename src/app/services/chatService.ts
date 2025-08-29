@@ -276,37 +276,76 @@ export const subscribeToMessages = (
   limit: number = 50
 ): (() => void) => {
   try {
+    console.log('🔗 Firebase Realtime Database 연결 상태:', {
+      realtimeDb: !!realtimeDb,
+      chatId,
+      path: `messages/${chatId}`
+    });
+    
     const messagesRef = ref(realtimeDb, `messages/${chatId}`);
     const messagesQuery = query(
       messagesRef,
       orderByChild('timestamp'),
       limitToLast(limit)
     );
+    
+    console.log('📡 메시지 구독 쿼리 생성 완료:', messagesQuery);
 
     const unsubscribe = onValue(messagesQuery, (snapshot) => {
+      console.log('🔄 메시지 데이터 업데이트:', chatId, snapshot.exists());
       const messages: ChatMessage[] = [];
       
       if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
           const messageData = childSnapshot.val();
+          console.log('📨 개별 메시지 데이터:', {
+            id: childSnapshot.key,
+            data: messageData
+          });
           messages.push({
             id: childSnapshot.key!,
             ...messageData
           });
         });
+      } else {
+        console.log('📭 메시지 데이터가 없습니다:', chatId);
       }
       
-      // 시간순 정렬
+      console.log('📋 정렬 전 메시지:', messages.length, '개');
+      
+      // 시간순 정렬 (Firebase Realtime Database 타임스탬프 처리)
       messages.sort((a, b) => {
-        const timeA = a.timestamp?.seconds || 0;
-        const timeB = b.timestamp?.seconds || 0;
+        let timeA = 0;
+        let timeB = 0;
+        
+        // Firebase Realtime Database serverTimestamp는 숫자일 수 있음
+        if (typeof a.timestamp === 'number') {
+          timeA = a.timestamp;
+        } else if (a.timestamp?.seconds) {
+          timeA = a.timestamp.seconds;
+        }
+        
+        if (typeof b.timestamp === 'number') {
+          timeB = b.timestamp;
+        } else if (b.timestamp?.seconds) {
+          timeB = b.timestamp.seconds;
+        }
+        
+        console.log('🕐 메시지 타임스탬프:', { 
+          messageA: a.id, 
+          timeA, 
+          messageB: b.id, 
+          timeB 
+        });
+        
         return timeA - timeB;
       });
       
+      console.log('📋 정렬 후 메시지:', messages.length, '개');
       callback(messages);
     });
 
-    return () => off(messagesQuery, 'value', unsubscribe);
+    return unsubscribe;
   } catch (error) {
     console.error('❌ 메시지 구독 실패:', error);
     return () => {};
@@ -399,20 +438,6 @@ export const markMessageAsRead = async (
 // 채팅방 정보 가져오기
 export const getChatRoom = async (chatId: string): Promise<ChatRoom | null> => {
   try {
-    // 디버깅: Firebase 인증 상태 확인
-    const { auth } = await import('./firebase');
-    console.log('🔍 Firebase Auth 상태:', {
-      auth: !!auth,
-      currentUser: !!auth?.currentUser,
-      uid: auth?.currentUser?.uid,
-      realtimeDb: !!realtimeDb
-    });
-    
-    if (!auth?.currentUser) {
-      console.error('❌ 사용자가 인증되지 않았습니다.');
-      throw new Error('사용자가 인증되지 않았습니다.');
-    }
-    
     const chatRoomRef = ref(realtimeDb, `chatRooms/${chatId}`);
     const snapshot = await get(chatRoomRef);
     
@@ -563,5 +588,94 @@ export const deleteChatRoomAndBlockUser = async (
   } catch (error) {
     console.error('❌ 채팅방 삭제 및 사용자 차단 실패:', error);
     return false;
+  }
+};
+
+// 읽지 않은 메시지 수 가져오기
+export const getUnreadMessageCount = async (chatId: string, userId: string): Promise<number> => {
+  try {
+    const messagesRef = ref(realtimeDb, `messages/${chatId}`);
+    const snapshot = await get(messagesRef);
+    
+    if (!snapshot.exists()) {
+      return 0;
+    }
+    
+    let unreadCount = 0;
+    snapshot.forEach((childSnapshot) => {
+      const message = childSnapshot.val();
+      // 내가 보낸 메시지가 아니고, 내가 읽지 않은 메시지인 경우
+      if (message.senderId !== userId && (!message.readBy || !message.readBy[userId])) {
+        unreadCount++;
+      }
+    });
+    
+    return unreadCount;
+  } catch (error) {
+    console.error('읽지 않은 메시지 수 가져오기 실패:', error);
+    return 0;
+  }
+};
+
+// 모든 채팅방의 이미지 정보를 업데이트하는 함수 (개발용)
+export const updateAllChatRoomImages = async (userId: string): Promise<void> => {
+  try {
+    console.log('🔄 모든 채팅방 이미지 정보 업데이트 시작:', userId);
+    
+    // 사용자의 채팅방 목록 가져오기
+    const userDocRef = doc(db, 'users_test', userId);
+    const userDoc = await getDoc(userDocRef);
+    
+    if (!userDoc.exists()) {
+      console.log('❌ 사용자 문서가 존재하지 않습니다:', userId);
+      return;
+    }
+    
+    const userData = userDoc.data();
+    const chatIds = userData.chatIds || [];
+    
+    console.log('📋 업데이트할 채팅방 개수:', chatIds.length);
+    
+    for (const chatId of chatIds) {
+      try {
+        const chatRoomRef = ref(realtimeDb, `chatRooms/${chatId}`);
+        const snapshot = await get(chatRoomRef);
+        
+        if (snapshot.exists()) {
+          const chatRoom = snapshot.val() as ChatRoom;
+          const participants = chatRoom.participants || [];
+          
+          // 각 참여자의 최신 photoUrl 가져오기
+          const updatedImages: { [userId: string]: string } = {};
+          
+          for (const participantId of participants) {
+            try {
+              const participantDoc = await getDoc(doc(db, 'users_test', participantId));
+              if (participantDoc.exists()) {
+                const participantData = participantDoc.data();
+                updatedImages[participantId] = participantData.photoUrl || '';
+                console.log(`📸 ${participantId} photoUrl:`, participantData.photoUrl);
+              }
+            } catch (error) {
+              console.error(`❌ 참여자 ${participantId} 정보 가져오기 실패:`, error);
+              updatedImages[participantId] = '';
+            }
+          }
+          
+          // 채팅방 이미지 정보 업데이트
+          await update(chatRoomRef, {
+            participantImages: updatedImages
+          });
+          
+          console.log('✅ 채팅방 이미지 업데이트 완료:', chatId);
+        }
+      } catch (error) {
+        console.error(`❌ 채팅방 ${chatId} 업데이트 실패:`, error);
+      }
+    }
+    
+    console.log('✅ 모든 채팅방 이미지 정보 업데이트 완료');
+  } catch (error) {
+    console.error('❌ 채팅방 이미지 정보 업데이트 실패:', error);
   }
 };
