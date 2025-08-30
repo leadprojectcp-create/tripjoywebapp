@@ -14,7 +14,6 @@ export default function AlertPage() {
   const { t } = useTranslationContext();
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'like' | 'bookmark'>('all');
 
   useEffect(() => {
     if (user?.uid) {
@@ -36,21 +35,12 @@ export default function AlertPage() {
     }
   };
 
-  const filteredAlerts = alerts.filter(alert => {
-    if (filter === 'all') return true;
-    return alert.type === filter;
-  });
-
-  const getAlertIcon = (type: 'like' | 'bookmark') => {
-    return type === 'like' ? '❤️' : '📌';
-  };
-
   const getAlertMessage = (alert: AlertItem) => {
     const messageKey = alert.type === 'like' 
       ? 'likeMessage' 
       : 'bookmarkMessage';
     
-    return t(messageKey, { userName: alert.userName });
+    return t(messageKey).replace('{userName}', alert.userName);
   };
 
   return (
@@ -65,82 +55,47 @@ export default function AlertPage() {
                 <h1>{t('alertTitle')}</h1>
               </div>
 
-              {/* 필터 탭 메뉴 */}
-              <div className="alert-filter-tabs">
-                <button 
-                  className={`filter-tab ${filter === 'all' ? 'active' : ''}`}
-                  onClick={() => setFilter('all')}
-                >
-                  {t('filterAll')}
-                </button>
-                <button 
-                  className={`filter-tab ${filter === 'like' ? 'active' : ''}`}
-                  onClick={() => setFilter('like')}
-                >
-                  {t('filterLikes')}
-                </button>
-                <button 
-                  className={`filter-tab ${filter === 'bookmark' ? 'active' : ''}`}
-                  onClick={() => setFilter('bookmark')}
-                >
-                  {t('filterBookmarks')}
-                </button>
-              </div>
-
               <div className="alert-list-container">
-        {loading ? (
-          <div className="alert-loading">
-            <div className="loading-spinner"></div>
-            <p>{t('loading')}</p>
-          </div>
-        ) : filteredAlerts.length === 0 ? (
-          <div className="alert-empty">
-            <div className="empty-icon">🔔</div>
-            <p>{t('empty')}</p>
-          </div>
-        ) : (
-          <div className="alert-list">
-            {filteredAlerts.map((alert) => (
-              <div key={alert.id} className="alert-item">
-                <div className="alert-icon">
-                  {getAlertIcon(alert.type)}
-                </div>
-                
-                <div className="alert-user-info">
-                  {alert.userProfileImage ? (
-                    <img 
-                      src={alert.userProfileImage} 
-                      alt={alert.userName}
-                      className="user-avatar"
-                    />
-                  ) : (
-                    <div className="user-avatar-placeholder">
-                      {alert.userName.charAt(0)}
-                    </div>
-                  )}
-                </div>
+                {loading ? (
+                  <div className="alert-loading">
+                    <div className="loading-spinner"></div>
+                    <p>{t('loading')}</p>
+                  </div>
+                ) : alerts.length === 0 ? (
+                  <div className="alert-empty">
+                    <div className="empty-icon">🔔</div>
+                    <p>{t('noAlerts')}</p>
+                  </div>
+                ) : (
+                  <div className="alert-list">
+                    {alerts.map((alert: AlertItem) => (
+                      <div key={alert.id} className="alert-item">
+                        <div className="alert-user-info">
+                          {alert.userProfileImage ? (
+                            <img 
+                              src={alert.userProfileImage} 
+                              alt={alert.userName}
+                              className="user-avatar"
+                            />
+                          ) : (
+                            <div className="user-avatar-placeholder">
+                              {alert.userName.charAt(0)}
+                            </div>
+                          )}
+                        </div>
 
-                <div className="alert-content-info">
-                  <div className="alert-message">
-                    {getAlertMessage(alert)}
-                  </div>
-                  <div className="alert-post-preview">
-                    "{alert.postContent}"
-                  </div>
-                  <div className="alert-time">
-                    {formatAlertTime(alert.timestamp)}
-                  </div>
-                </div>
-
-                {alert.postImage && (
-                  <div className="alert-post-image">
-                    <img src={alert.postImage} alt="Post" />
+                        <div className="alert-content-info">
+                          <div className="alert-message">
+                            {getAlertMessage(alert)}
+                          </div>
+                          <div className="alert-time">
+                            {formatAlertTime(alert.timestamp)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
-              </div>
-            ))}
-          </div>
-        )}
               </div>
             </div>
           </div>

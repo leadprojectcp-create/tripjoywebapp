@@ -67,9 +67,9 @@ export default function SignupPage(): React.JSX.Element {
       const emailUserInfo = { ...userInfo, password: signupData.password };
       userData = await signUpWithEmail(signupData.email || '', signupData.password, emailUserInfo);
       
-      // 회원가입 완료 후 대시보드로 이동
+      // 회원가입 완료 후 홈으로 이동
       console.log('회원가입 완료:', userData);
-      router.push('/dashboard');
+      router.push('/');
     } catch (error) {
       console.error('회원가입 실패:', error);
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');

@@ -87,32 +87,17 @@
 .app-download-links {
   display: flex;
   gap: 12px;
-  margin-top: 12px;
 }
 
 .app-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  color: #333;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s ease;
 }
 
-.app-link:hover {
-  background-color: #f8f9fa;
-  border-color: #4a90e2;
-  color: #4a90e2;
-}
-
-.app-link svg {
-  flex-shrink: 0;
+.app-link img {
+  width: 156px;
+  height: 48px;
 }
 
 /* Footer 하단 */

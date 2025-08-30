@@ -53,11 +53,6 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.logo-container:hover {
-  opacity: 0.8;
 }
 
 .logo-image {
@@ -71,6 +66,175 @@
   padding-top: 60px;
 }
 
+/* 모바일 메시지 버튼 */
+.mobile-message-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-message-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 모바일 햄버거 메뉴 버튼 */
+.mobile-menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 데스크톱 언어 선택기 */
+.desktop-language-selector {
+  display: block;
+}
+
+/* 모바일 언어 선택기 */
+.mobile-language-selector {
+  display: none;
+}
+
+/* 모바일 메뉴 오버레이 */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 모바일 메뉴 */
+.mobile-menu {
+  background: white;
+  width: 280px;
+  height: 100vh;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.mobile-menu-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-close:hover {
+  background-color: #f5f5f5;
+}
+
+.mobile-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mobile-menu-items button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 16px 0;
+  text-align: left;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-items button:hover {
+  background-color: #f8f9fa;
+}
+
+.mobile-menu-items button:last-child {
+  border-bottom: none;
+}
+
+/* 모바일 설정 섹션 */
+.mobile-settings-section {
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  margin: 10px 0;
+  padding: 10px 0;
+}
+
+.mobile-settings-section button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  text-align: left;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-settings-section button:hover {
+  background-color: #f8f9fa;
+}
+
+.mobile-settings-section button:last-child {
+  border-bottom: none;
+}
+
+.mobile-settings-section button svg {
+  color: #666;
+  flex-shrink: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .app-bar {
@@ -80,6 +244,33 @@
   .logo-image {
     width: 80px;
     height: 26px;
+  }
+  
+  .mobile-message-button,
+  .mobile-menu-button {
+    display: flex;
+  }
+  
+  .mobile-language-selector {
+    display: block;
+  }
+  
+  .desktop-language-selector {
+    display: none;
+  }
+  
+  /* 모바일에서 언어 선택기 스타일 조정 */
+  .mobile-language-selector .language-selector {
+    margin: 0;
+  }
+  
+  /* 모바일에서 드롭다운이 제대로 표시되도록 z-index 조정 */
+  .mobile-language-selector .language-dropdown {
+    z-index: 10000;
+  }
+  
+  .mobile-language-selector .language-options {
+    z-index: 10001;
   }
 }
 

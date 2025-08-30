@@ -122,6 +122,22 @@ const ActivityIcon = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
+const TripTourIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff6b35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
+  }
+  
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+};
+
 const ReceiveIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
@@ -279,6 +295,13 @@ export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Ele
             <ActivityIcon isActive={isActive('/my-activity')} />
           </div>
           <span>{t('myActivity')}</span>
+        </Link>
+        
+        <Link href="/trip-tour" className={`nav-item ${isActive('/trip-tour') ? 'active' : ''}`}>
+          <div className="nav-icon">
+            <TripTourIcon isActive={isActive('/trip-tour')} />
+          </div>
+          <span>트립투어</span>
         </Link>
         
         <Link href="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>

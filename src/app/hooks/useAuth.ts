@@ -93,7 +93,7 @@ export const useAuth = () => {
       
       await signInWithEmail(email, password);
       // Firebase Auth의 onAuthStateChanged가 자동으로 사용자 상태를 업데이트
-      router.push('/dashboard');
+      router.push('/');
       return { success: true };
     } catch (error: any) {
       console.error('로그인 실패:', error);

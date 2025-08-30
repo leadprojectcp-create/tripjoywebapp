@@ -30,28 +30,6 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
-const SearchIcon = ({ isActive }: { isActive: boolean }) => {
-  if (isActive) {
-    return (
-      <Image 
-        src="/icons/home_active.svg" 
-        alt="Search Active" 
-        width={28} 
-        height={28}
-      />
-    );
-  }
-  
-  return (
-    <Image 
-      src="/icons/home.svg" 
-      alt="Search" 
-        width={28} 
-        height={28}
-    />
-  );
-};
-
 const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
@@ -68,18 +46,18 @@ const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
     <Image 
       src="/icons/curator.svg" 
       alt="Curator" 
-              width={28} 
-        height={28}
+      width={28} 
+      height={28}
     />
   );
 };
 
-const MessageIcon = ({ isActive }: { isActive: boolean }) => {
+const PostIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
       <Image 
-        src="/icons/message_active.svg" 
-        alt="Message Active" 
+        src="/icons/upload_active.svg" 
+        alt="Post Active" 
         width={28} 
         height={28}
       />
@@ -88,10 +66,32 @@ const MessageIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/icons/message.svg" 
-      alt="Message" 
-              width={28} 
+      src="/icons/upload.svg" 
+      alt="Post" 
+      width={28} 
+      height={28}
+    />
+  );
+};
+
+const ActivityIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/icons/activity_active.svg" 
+        alt="Activity Active" 
+        width={28} 
         height={28}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/icons/activity.svg" 
+      alt="Activity" 
+      width={28} 
+      height={28}
     />
   );
 };
@@ -112,9 +112,25 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
     <Image 
       src="/icons/profile.svg" 
       alt="Profile" 
-              width={28} 
-        height={28}
+      width={28} 
+      height={28}
     />
+  );
+};
+
+const TripTourIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff6b35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
+  }
+  
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
   );
 };
 
@@ -132,33 +148,33 @@ export const BottomNavigator = (): React.JSX.Element => {
 
   return (
     <div className="bottom-navigator">
-      <Link href="/dashboard" className={`nav-item ${isActive('/dashboard') ? 'active' : ''}`}>
+      <Link href="/" className={`nav-item ${isActive('/') ? 'active' : ''}`}>
         <div className="nav-icon">
-          <HomeIcon isActive={isActive('/dashboard')} />
+          <HomeIcon isActive={isActive('/')} />
         </div>
         <span>{t('home')}</span>
       </Link>
       
-      <div className="nav-item">
+      <Link href="/curators" className={`nav-item ${isActive('/curators') ? 'active' : ''}`}>
         <div className="nav-icon">
-          <SearchIcon isActive={false} />
-        </div>
-        <span>{t('search')}</span>
-      </div>
-      
-      <div className="nav-item">
-        <div className="nav-icon">
-          <CuratorIcon isActive={false} />
+          <CuratorIcon isActive={isActive('/curators')} />
         </div>
         <span>{t('curator')}</span>
-      </div>
+      </Link>
       
-      <div className="nav-item">
+      <Link href="/post-upload" className={`nav-item ${isActive('/post-upload') ? 'active' : ''}`}>
         <div className="nav-icon">
-          <MessageIcon isActive={false} />
+          <PostIcon isActive={isActive('/post-upload')} />
         </div>
-        <span>{t('message')}</span>
-      </div>
+        <span>{t('uploadPost')}</span>
+      </Link>
+      
+      <Link href="/trip-tour" className={`nav-item ${isActive('/trip-tour') ? 'active' : ''}`}>
+        <div className="nav-icon">
+          <TripTourIcon isActive={isActive('/trip-tour')} />
+        </div>
+        <span>트립투어</span>
+      </Link>
       
       <Link href="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>
         <div className="nav-icon">

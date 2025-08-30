@@ -17,7 +17,7 @@
     "th": "กำลังโหลดการแจ้งเตือน...",
     "fil": "Naglo-load ng mga abiso..."
   },
-  "empty": {
+  "noAlerts": {
     "ko": "새로운 알림이 없습니다",
     "en": "No new notifications",
     "vi": "Không có thông báo mới",

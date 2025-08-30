@@ -1,0 +1,128 @@
+/* Trip Tour Container */
+.trip-tour-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+/* Body Content (AppBar 아래의 Sidebar + Main Content) */
+.body-content {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  justify-content: flex-start; /* 왼쪽부터 정렬 */
+}
+
+/* Main Content */
+.main-content {
+  width: 100%;
+  padding: 30px;
+  margin-top: 60px; /* AppBar 높이만큼 아래로 (사이드바는 fixed라서 별도 처리) */
+  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
+  margin-right: 400px; /* 오른쪽 사이드바 너비 + 여백 (360px + 40px) */
+  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 내부 요소들을 가운데 정렬 */
+  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+}
+
+/* Trip Tour Content */
+.trip-tour-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px); /* AppBar + padding 고려 */
+  box-sizing: border-box;
+}
+
+/* Preparing Section */
+.preparing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 500px;
+  padding: 60px 20px;
+}
+
+.preparing-icon {
+  margin-bottom: 30px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.preparing-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.preparing-message {
+  font-size: 24px;
+  color: #ff6b35;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+}
+
+.preparing-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .main-content {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .body-content {
+    flex-direction: column;
+    width: 100%; /* 부모 너비에 맞춤 */
+    box-sizing: border-box;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 20px;
+  }
+  
+  .trip-tour-content {
+    min-height: calc(100vh - 100px);
+  }
+  
+  .preparing-section {
+    padding: 40px 20px;
+  }
+  
+  .preparing-title {
+    font-size: 28px;
+  }
+  
+  .preparing-message {
+    font-size: 20px;
+  }
+  
+  .preparing-subtitle {
+    font-size: 14px;
+  }
+}

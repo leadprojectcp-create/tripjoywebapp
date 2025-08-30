@@ -346,7 +346,7 @@ const PostUploadContent: React.FC = () => {
         alert(t('uploadSuccess'));
         
         // 홈으로 이동
-        router.push('/dashboard');
+        router.push('/');
       }
     } catch (error: any) {
       console.error('❌ 게시물 업로드 실패:', error);
