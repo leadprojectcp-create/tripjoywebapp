@@ -30,16 +30,20 @@ export interface KakaoAuthResult {
 export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
     console.log('🔄 카카오 로그인 시작');
+    console.log('🌐 현재 환경:', typeof window !== 'undefined' ? '웹' : '서버');
+    console.log('📱 웹뷰 환경:', typeof window !== 'undefined' && (window as any).ReactNativeWebView ? '예' : '아니오');
     
     // 모든 환경에서 Firebase OIDC 사용 (웹뷰 포함)
     console.log('🔥 Firebase OIDC로 카카오 로그인 처리');
     
     // Firebase OIDC Provider 생성
     const provider = new OAuthProvider('oidc.kakao');
+    console.log('🔧 OIDC Provider 생성 완료:', provider.providerId);
     
     // 추가 스코프 설정
     provider.addScope('profile');
     provider.addScope('email');
+    console.log('📋 스코프 설정 완료: profile, email');
     
     // 리다이렉트 방식 사용
     console.log('🔄 카카오 로그인 리다이렉트 시작...');
@@ -54,7 +58,8 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     console.error('❌ 카카오 로그인 실패:', error);
     console.error('Error code:', error.code);
     console.error('Error message:', error.message);
-    console.error('Full error:', JSON.stringify(error));
+    console.error('Error details:', error);
+    console.error('Full error:', JSON.stringify(error, null, 2));
     
     let errorMessage = '카카오 로그인에 실패했습니다.';
     
@@ -66,6 +71,14 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
       errorMessage = '로그인이 취소되었습니다.';
     } else if (error.code === 'auth/popup-blocked') {
       errorMessage = '팝업이 차단되었습니다. 팝업 차단을 해제해 주세요.';
+    } else if (error.code === 'auth/invalid-credential') {
+      errorMessage = '카카오 인증 정보가 유효하지 않습니다. Firebase OIDC 설정을 확인해주세요.';
+    } else if (error.code === 'auth/operation-not-allowed') {
+      errorMessage = '카카오 로그인이 허용되지 않습니다. Firebase Console에서 OIDC 설정을 확인해주세요.';
+    } else if (error.code === 'auth/network-request-failed') {
+      errorMessage = '네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.';
+    } else if (error.message && error.message.includes('KOE')) {
+      errorMessage = `카카오 로그인 오류: ${error.message}`;
     }
     
     return {
