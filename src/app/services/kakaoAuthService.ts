@@ -41,10 +41,10 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     const provider = new OAuthProvider('oidc.kakao');
     console.log('🔧 OIDC Provider 생성 완료:', provider.providerId);
     
-    // 추가 스코프 설정
-    provider.addScope('profile');
-    provider.addScope('email');
-    console.log('📋 스코프 설정 완료: profile, email');
+    // 카카오 개발자 콘솔에 설정된 동의 항목에 맞는 스코프 설정
+    // provider.addScope('profile'); // 제거
+    // provider.addScope('email');   // 제거
+    console.log('📋 스코프 설정 완료: 기본 스코프만 사용');
     
     // 웹뷰에서는 팝업이 차단될 수 있으므로 팝업 방식 먼저 시도
     console.log('🔄 카카오 로그인 팝업 방식 시도...');
