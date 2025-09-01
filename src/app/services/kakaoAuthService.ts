@@ -32,14 +32,27 @@ export interface KakaoAuthResult {
  * 카카오 SDK 초기화
  */
 const initializeKakaoSDK = () => {
+  console.log('🔄 카카오 SDK 초기화 시작...');
+  console.log('🌐 window 객체 존재:', typeof window !== 'undefined');
+  console.log('📱 Kakao 객체 존재:', typeof window !== 'undefined' && !!window.Kakao);
+  
   if (typeof window !== 'undefined' && window.Kakao) {
-    if (!window.Kakao.isInitialized()) {
-      window.Kakao.init('d63a09e76953cb133070b8ced4d4153b'); // JavaScript 키 사용
-      console.log('🔄 카카오 SDK 초기화 완료');
+    try {
+      if (!window.Kakao.isInitialized()) {
+        window.Kakao.init('d63a09e76953cb133070b8ced4d4153b'); // JavaScript 키 사용
+        console.log('🔄 카카오 SDK 초기화 완료');
+      } else {
+        console.log('🔄 카카오 SDK 이미 초기화됨');
+      }
+      return true;
+    } catch (error) {
+      console.error('❌ 카카오 SDK 초기화 실패:', error);
+      return false;
     }
-    return true;
+  } else {
+    console.error('❌ 카카오 SDK를 찾을 수 없습니다.');
+    return false;
   }
-  return false;
 };
 
 /**
@@ -50,6 +63,15 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     console.log('🔄 카카오 로그인 시작 (JavaScript SDK)');
     console.log('🌐 현재 환경:', typeof window !== 'undefined' ? '웹' : '서버');
     console.log('📱 웹뷰 환경:', typeof window !== 'undefined' && (window as any).ReactNativeWebView ? '예' : '아니오');
+    console.log('📱 Kakao SDK 로드 상태:', typeof window !== 'undefined' ? (window.Kakao ? '로드됨' : '로드 안됨') : '서버');
+    
+    // 카카오 SDK가 로드될 때까지 대기
+    let retryCount = 0;
+    while (typeof window !== 'undefined' && !window.Kakao && retryCount < 10) {
+      console.log(`🔄 카카오 SDK 로드 대기 중... (${retryCount + 1}/10)`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      retryCount++;
+    }
     
     // 카카오 SDK 초기화
     if (!initializeKakaoSDK()) {
