@@ -32,14 +32,22 @@ export default function LoginPage(): React.JSX.Element {
     const handleRedirectResult = async () => {
       try {
         console.log('🔄 리다이렉트 결과 확인 중...');
+        setIsLoading(true); // 리다이렉트 결과 처리 중 로딩 표시
         const result = await getRedirectResult(auth);
         
         if (result) {
           console.log('✅ 리다이렉트 로그인 성공:', result.user);
+          console.log('📝 Provider Data:', result.user.providerData);
+          console.log('📝 Provider ID:', result.providerId);
           
           // 사용자 정보를 Firestore에 저장/업데이트
           const user = result.user;
-          const providerId = user.providerId;
+          
+          // providerData에서 실제 provider 확인
+          const providerData = user.providerData[0];
+          const providerId = providerData?.providerId || result.providerId;
+          
+          console.log('🔍 실제 Provider ID:', providerId);
           
           if (providerId === 'oidc.kakao') {
             await saveKakaoUserToFirestore(user);
@@ -50,9 +58,23 @@ export default function LoginPage(): React.JSX.Element {
           }
           
           console.log('✅ 사용자 정보 저장 완료');
+          setIsLoading(false);
+        } else {
+          // 리다이렉트 결과가 없으면 로딩 해제
+          setIsLoading(false);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ 리다이렉트 결과 처리 실패:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        
+        // 에러가 있으면 사용자에게 표시
+        if (error.code === 'auth/invalid-credential') {
+          setError('카카오 로그인 인증에 실패했습니다. 다시 시도해주세요.');
+        } else if (error.code) {
+          setError('로그인 중 오류가 발생했습니다: ' + error.message);
+        }
+        setIsLoading(false);
       }
     };
 

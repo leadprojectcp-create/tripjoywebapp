@@ -45,8 +45,6 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     console.log('🔄 카카오 로그인 리다이렉트 시작...');
     await signInWithRedirect(auth, provider);
     
-    // 리다이렉트는 페이지를 떠나므로 여기까지 실행되지 않음
-    // 결과는 페이지 로드 시 getRedirectResult로 처리됨
     return {
       success: true,
       isNewUser: false
