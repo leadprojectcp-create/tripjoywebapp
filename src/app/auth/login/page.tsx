@@ -83,8 +83,7 @@ export default function LoginPage(): React.JSX.Element {
           setIsLoading(false);
         } else if (data.type === 'USE_WEB_KAKAO_LOGIN') {
           console.log('📱 앱에서 웹 카카오 로그인 사용 요청');
-          // 웹에서 직접 Firebase OIDC로 카카오 로그인 처리
-          handleKakaoLogin();
+          handleSocialLogin('kakao');
         } else if (data.type === 'GOOGLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 구글 로그인 성공:', data.user);
           setIsLoading(false);
