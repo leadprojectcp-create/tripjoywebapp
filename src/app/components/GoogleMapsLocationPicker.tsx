@@ -55,11 +55,17 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const locationInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // 🛡️ 강력한 Google Maps API 로딩 (새로고침 대응)
+  // 🛡️ 시크릿 모드 대응 Google Maps API 로딩
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
       console.error('❌ Google Maps API 키가 설정되지 않았습니다!');
       return;
+    }
+
+    // 시크릿 모드 감지
+    const isIncognito = !window.localStorage || !window.sessionStorage;
+    if (isIncognito) {
+      console.log('🕵️ 시크릿 모드 감지됨 - 특별 로딩 모드');
     }
 
     // 전역 로딩 상태 확인 (중복 로드 방지)
@@ -89,11 +95,12 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         }
       }, 100);
       
-      // 5초 후 타임아웃
+      // 시크릿 모드에서는 더 긴 타임아웃
+      const timeoutDuration = isIncognito ? 10000 : 5000;
       setTimeout(() => {
         clearInterval(checkInterval);
         setIsGoogleMapsLoaded(true);
-      }, 5000);
+      }, timeoutDuration);
       return;
     }
 
@@ -102,33 +109,46 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     // 전역 로딩 상태 설정
     (window as any).__googleMapsLoading = true;
     
+    // 시크릿 모드 대응: 콜백 없이 직접 로딩
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`;
+    if (isIncognito) {
+      // 시크릿 모드: 콜백 없이 직접 로딩
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.onload = () => {
+        console.log('✅ Google Maps API 로드 완료 (시크릿 모드)');
+        (window as any).__googleMapsLoading = false;
+        setTimeout(() => setIsGoogleMapsLoaded(true), 1000);
+      };
+    } else {
+      // 일반 모드: 콜백 사용
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`;
+      // 전역 콜백 함수 설정
+      (window as any).initGoogleMaps = () => {
+        console.log('✅ Google Maps API 로드 완료');
+        (window as any).__googleMapsLoading = false;
+        setTimeout(() => setIsGoogleMapsLoaded(true), 500);
+      };
+    }
+    
     script.async = true;
     script.defer = true;
-    
-    // 전역 콜백 함수 설정
-    (window as any).initGoogleMaps = () => {
-      console.log('✅ Google Maps API 로드 완료');
-      (window as any).__googleMapsLoading = false;
-      setTimeout(() => setIsGoogleMapsLoaded(true), 500);
-    };
     
     script.onerror = () => {
       console.error('❌ Google Maps 스크립트 로드 실패');
       (window as any).__googleMapsLoading = false;
       // 실패 시에도 강제로 로드된 것으로 처리
-      setTimeout(() => setIsGoogleMapsLoaded(true), 1000);
+      setTimeout(() => setIsGoogleMapsLoaded(true), 2000);
     };
     
     document.head.appendChild(script);
 
-    // 10초 후 타임아웃
+    // 시크릿 모드에서는 더 긴 타임아웃
+    const timeoutDuration = isIncognito ? 15000 : 10000;
     const timeout = setTimeout(() => {
       console.log('⚠️ Google Maps API 로딩 타임아웃, 강제 로드');
       (window as any).__googleMapsLoading = false;
       setIsGoogleMapsLoaded(true);
-    }, 10000);
+    }, timeoutDuration);
 
     return () => {
       clearTimeout(timeout);

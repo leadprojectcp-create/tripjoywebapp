@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   
   // 이미지 최적화
   images: {
-    domains: ['firebasestorage.googleapis.com'],
+    domains: ['firebasestorage.googleapis.com', 'maps.googleapis.com', 'maps.gstatic.com'],
     formats: ['image/webp', 'image/avif'],
     unoptimized: false, // Firebase App Hosting에서 이미지 최적화 사용
   },
@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
   compiler: {
     // CSS 최적화 활성화
     removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // CSS preload 경고 해결
+  optimizeFonts: false,
+  experimental: {
+    optimizePackageImports: ['firebase'],
+    optimizeCss: true, // CSS 최적화 활성화
   },
   
   // 보안 헤더
@@ -58,10 +65,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_FIREBASE_DATABASE_URL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
   },
   
-  // 빌드 최적화
-  experimental: {
-    optimizePackageImports: ['firebase'],
-  },
+
   
   // 타입스크립트 설정 (개발 모드에서만 비활성화)
   typescript: {
