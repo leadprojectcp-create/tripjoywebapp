@@ -28,9 +28,9 @@ export default function LoginPage(): React.JSX.Element {
     
     if (!result.success) {
       setError(result.error || "로그인에 실패했습니다.");
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
+    // 성공 시에는 로딩 상태를 유지하고 onAuthStateChanged에서 리다이렉션 처리
   };
 
   const handleSignupClick = () => {

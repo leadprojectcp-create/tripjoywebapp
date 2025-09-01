@@ -24,6 +24,9 @@ export const useAuth = () => {
   const [showSignupModal, setShowSignupModal] = useState(false);
   const router = useRouter();
 
+  // isAuthenticated 계산
+  const isAuthenticated = !!user;
+
 
 
   useEffect(() => {
@@ -58,6 +61,11 @@ export const useAuth = () => {
             setUser(defaultUserData);
             localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
           }
+          
+          // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
+          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
+            router.push('/');
+          }
         } catch (error) {
           console.error('Failed to get user data:', error);
           // 에러 발생 시 기본 정보 사용
@@ -69,6 +77,11 @@ export const useAuth = () => {
           };
           setUser(defaultUserData);
           localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
+          
+          // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
+          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
+            router.push('/');
+          }
         }
       } else {
         setUser(null);
@@ -93,7 +106,7 @@ export const useAuth = () => {
       
       await signInWithEmail(email, password);
       // Firebase Auth의 onAuthStateChanged가 자동으로 사용자 상태를 업데이트
-      router.push('/');
+      // 리다이렉션은 onAuthStateChanged에서 처리하도록 제거
       return { success: true };
     } catch (error: any) {
       console.error('로그인 실패:', error);
@@ -127,8 +140,6 @@ export const useAuth = () => {
   const closeSignupModal = () => {
     setShowSignupModal(false);
   };
-
-  const isAuthenticated = !!user;
 
   return {
     user,

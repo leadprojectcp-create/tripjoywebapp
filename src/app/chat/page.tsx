@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Sidebar } from '../components/Sidebar';
 import { AppBar } from '../components/AppBar';
-import { BottomNavigator } from '../components/BottomNavigator';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { AuthGuard } from '../components/AuthGuard';
@@ -830,7 +829,6 @@ const ChatPage: React.FC = () => {
             </Suspense>
           </div>
         </div>
-        <BottomNavigator />
       </div>
     </AuthGuard>
   );

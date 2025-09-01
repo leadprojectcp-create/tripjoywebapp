@@ -418,24 +418,20 @@ function ProfileContent() {
   };
 
   const handleChat = () => {
-    // TODO: 채팅하기 로직 구현
-    console.log('채팅하기 버튼 클릭');
+    if (profileUserId) {
+      // 해당 프로필과 채팅하기
+      router.push(`/chat?userId=${profileUserId}`);
+    }
   };
 
   const handleCompanionRequest = () => {
-    // TODO: 동행신청 로직 구현
-    console.log('동행신청 버튼 클릭');
+    if (profileUserId) {
+      // 동행신청 페이지로 이동
+      router.push(`/companion-request?userId=${profileUserId}`);
+    }
   };
 
-  const handleReceivedBookings = () => {
-    // TODO: 받은예약 로직 구현
-    console.log('받은예약 버튼 클릭');
-  };
 
-  const handleMyBookings = () => {
-    // TODO: 내가한 예약 로직 구현
-    console.log('내가한 예약 버튼 클릭');
-  };
 
   const handleUploadPost = () => {
     // 게시물 업로드 페이지로 이동
@@ -507,7 +503,7 @@ function ProfileContent() {
               <div className={styles.profileMainContent}>
                 {isLoading ? (
                 <div className={styles.profileLoading}>
-                  <div className={styles.profileLoadingSpinner}>{t('loading')}</div>
+                  <div className={styles.profileLoadingSpinner}>로딩 중...</div>
                 </div>
               ) : (
                 <>
@@ -619,12 +615,6 @@ function ProfileContent() {
                   <div className={styles.profileActionButtons}>
                     {isOwnProfile ? (
                       <>
-                        <button className={`${styles.actionBtn} ${styles.primary}`} onClick={handleReceivedBookings}>
-                          {t('receivedBookings')}
-                        </button>
-                        <button className={`${styles.actionBtn} ${styles.secondary}`} onClick={handleMyBookings}>
-                          {t('myBookings')}
-                        </button>
                         {/* 모바일에서만 보이는 게시물 업로드 버튼 */}
                         <button className={`${styles.actionBtn} ${styles.uploadBtn} ${styles.mobileOnly}`} onClick={handleUploadPost}>
                           <span className={styles.uploadIcon}>

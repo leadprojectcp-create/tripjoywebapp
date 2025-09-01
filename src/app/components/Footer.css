@@ -4,7 +4,7 @@
   background-color: #ffffff;
   border-top: 1px solid #e9ecef;
   margin-left: 250px; /* 사이드바 너비만큼 마진 */
-  padding: 40px 0;
+  padding-bottom: 80px;
   font-size: 14px;
   color: #666;
   width: calc(100% - 250px);
@@ -13,32 +13,20 @@
 
 .footer-content {
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0 40px;
 }
 
-.footer-section:first-child {
-  margin-bottom: 30px;
-}
-
-.footer-logo {
-  font-size: 24px;
-  font-weight: 700;
-  color: #333;
-  margin: 0 0 20px 0;
-  letter-spacing: -0.5px;
-}
-
 .footer-sections {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 40px;
 }
 
 .footer-column {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
 .footer-title {
@@ -46,6 +34,7 @@
   font-weight: 600;
   color: #333;
   margin: 0 0 16px 0;
+  text-align: left;
 }
 
 .footer-info p {
@@ -93,16 +82,31 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* 웹뷰 터치 피드백 제거 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+.app-link:active {
+  background-color: transparent !important;
 }
 
 .app-link img {
   width: 156px;
   height: 48px;
+  /* 이미지 터치 피드백 제거 */
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
 }
 
 /* Footer 하단 */
 .footer-bottom {
-  border-top: 1px solid #e9ecef;
   padding-top: 30px;
   display: flex;
   justify-content: space-between;
@@ -111,6 +115,7 @@
 
 .company-info {
   flex: 1;
+  margin-right: 40px;
 }
 
 .company-info p {
@@ -121,7 +126,7 @@
 }
 
 .copyright {
-  text-align: right;
+  margin-top: 20px;
 }
 
 .copyright p {
@@ -143,14 +148,22 @@
   }
   
   .footer-sections {
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: column;
     gap: 30px;
+  }
+  
+  .footer-column {
+    align-items: center;
+  }
+  
+  .footer-title {
+    text-align: center;
   }
 }
 
 @media (max-width: 768px) {
   .footer {
-    padding: 30px 0;
+    padding: 30px 0 80px 0;
   }
   
   .footer-content {
@@ -158,8 +171,6 @@
   }
   
   .footer-sections {
-    grid-template-columns: 1fr;
-    gap: 25px;
     margin-bottom: 30px;
   }
   
@@ -168,36 +179,55 @@
     gap: 20px;
   }
   
-  .copyright {
+  .company-info {
+    margin-right: 0;
+  }
+  
+  .footer-column {
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .footer-title {
     text-align: left;
   }
   
   .app-download-links {
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
+    justify-content: flex-start;
+    width: 100%;
   }
   
   .app-link {
+    flex: 1;
     justify-content: center;
-    padding: 12px 20px;
+  }
+  
+  .app-link img {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    max-height: 60px;
   }
 }
 
 @media (max-width: 480px) {
-  .footer-logo {
-    font-size: 20px;
-  }
-  
   .footer-title {
     font-size: 15px;
-  }
-  
-  .footer-sections {
-    gap: 20px;
   }
   
   .company-info p,
   .copyright p {
     font-size: 12px;
+  }
+  
+  .app-download-links {
+    gap: 6px;
+  }
+  
+  .app-link img {
+    max-width: 180px;
+    max-height: 55px;
   }
 }

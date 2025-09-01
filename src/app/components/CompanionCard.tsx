@@ -2,25 +2,11 @@
 
 import React, { useState } from 'react';
 import { useTranslationContext } from '../contexts/TranslationContext';
+import { CompanionRequest } from '../services/companionRequestService';
 import './CompanionCard.css';
 
 interface CompanionCardProps {
-  companion: {
-    id: string;
-    senderId: string;
-    senderName: string;
-    receiverId: string;
-    receiverName?: string;
-    hotelName: string;
-    location: string;
-    country: string;
-    city: string;
-    dateRequested: string;
-    timeRequested: string;
-    region: string;
-    status: 'pending' | 'accepted' | 'rejected' | 'past';
-    createdAt: any;
-  };
+  companion: CompanionRequest;
   type: 'received' | 'requested';
   onAccept?: () => void;
   onReject?: () => void;
@@ -74,8 +60,8 @@ export function CompanionCard({ companion, type, onAccept, onReject, onCancel }:
         return t('statusAccepted');
       case 'rejected':
         return t('statusRejected');
-      case 'past':
-        return t('statusPast');
+      case 'cancelled':
+        return t('statusCancelled');
       default:
         return companion.status;
     }
@@ -89,8 +75,8 @@ export function CompanionCard({ companion, type, onAccept, onReject, onCancel }:
         return 'status-accepted';
       case 'rejected':
         return 'status-rejected';
-      case 'past':
-        return 'status-past';
+      case 'cancelled':
+        return 'status-cancelled';
       default:
         return '';
     }
@@ -110,13 +96,13 @@ export function CompanionCard({ companion, type, onAccept, onReject, onCancel }:
         </div>
         <div className="companion-info">
           <div className="location-pin">📍</div>
-          <h3 className="hotel-name">{companion.hotelName}</h3>
-          <p className="hotel-location">{companion.location}</p>
+          <h3 className="hotel-name">{companion.place}</h3>
+          <p className="hotel-location">{companion.place}</p>
           <div className="companion-from">
             {type === 'received' ? (
-              <span>{t('from')}: {companion.senderName}</span>
+              <span>{t('from')}: {companion.requesterInfo.name}</span>
             ) : (
-              <span>{t('to')}: {companion.receiverName || t('unknown')}</span>
+              <span>{t('to')}: {companion.targetUserInfo.name}</span>
             )}
           </div>
         </div>

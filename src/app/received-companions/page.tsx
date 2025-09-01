@@ -2,42 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslationContext } from '../contexts/TranslationContext';
+import { useAuthContext } from '../contexts/AuthContext';
 import { CompanionCard } from '../components/CompanionCard';
-import { getReceivedCompanions } from '../services/companionService';
+import { getReceivedCompanionRequests, CompanionRequest } from '../services/companionRequestService';
 import { AppBar } from '../components/AppBar';
 import { Sidebar } from '../components/Sidebar';
 import { AuthGuard } from '../components/AuthGuard';
 import './style.css';
 
-// CompanionData 인터페이스
-interface CompanionData {
-  id: string;
-  senderId: string;
-  senderName: string;
-  receiverId: string;
-  hotelName: string;
-  location: string;
-  country: string;
-  city: string;
-  dateRequested: string;
-  timeRequested: string;
-  region: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'past';
-  createdAt: any;
-}
-
 export default function ReceivedCompanionsPage() {
   const { t } = useTranslationContext();
-  const [companions, setCompanions] = useState<CompanionData[]>([]);
+  const { user } = useAuthContext();
+  const [companions, setCompanions] = useState<CompanionRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'pending' | 'confirmed' | 'past'>('pending');
 
   useEffect(() => {
     const fetchCompanions = async () => {
+      if (!user?.uid) return;
+      
       try {
         setLoading(true);
-        const companionsData = await getReceivedCompanions();
+        const companionsData = await getReceivedCompanionRequests(user.uid);
         setCompanions(companionsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load companions');
@@ -47,7 +34,7 @@ export default function ReceivedCompanionsPage() {
     };
 
     fetchCompanions();
-  }, []);
+  }, [user?.uid]);
 
   const filteredCompanions = companions.filter(companion => {
     switch (activeTab) {
@@ -56,7 +43,7 @@ export default function ReceivedCompanionsPage() {
       case 'confirmed':
         return companion.status === 'accepted';
       case 'past':
-        return companion.status === 'past' || companion.status === 'rejected';
+        return companion.status === 'rejected' || companion.status === 'cancelled';
       default:
         return true;
     }

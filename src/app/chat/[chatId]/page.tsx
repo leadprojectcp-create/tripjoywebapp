@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Sidebar } from '../../components/Sidebar';
 import { AppBar } from '../../components/AppBar';
-import { BottomNavigator } from '../../components/BottomNavigator';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { AuthGuard } from '../../components/AuthGuard';
@@ -311,13 +310,12 @@ const ChatRoomPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <BottomNavigator />
         </div>
       </AuthGuard>
     );
   }
 
-  return (
+    return (
     <AuthGuard>
       <div className="chat-room-page">
         <AppBar />
@@ -441,7 +439,7 @@ const ChatRoomPage: React.FC = () => {
             placeholder="메시지를 입력하세요..."
             className="message-input"
             disabled={isSending}
-          />
+            />
           <button 
             type="submit" 
             className={`send-btn ${newMessage.trim() ? 'active' : ''}`}
@@ -453,7 +451,6 @@ const ChatRoomPage: React.FC = () => {
       </form>
           </div>
         </div>
-        <BottomNavigator />
       </div>
     </AuthGuard>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import './GoogleMapsLocationPicker.css';
 import { GOOGLE_MAPS_API_KEY } from '../utils/googleMaps';
@@ -38,10 +39,14 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   className = ''
 }) => {
   const { t, currentLanguage } = useTranslationContext();
+  const pathname = usePathname();
+  
+  // 게시물 업로드 페이지인지 확인
+  const isPostUploadPage = pathname?.includes('/post-upload');
   
   // States
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const [isMapVisible, setIsMapVisible] = useState(false);
+  const [isMapVisible, setIsMapVisible] = useState(true); // 기본적으로 지도 보이도록 변경
   const [autocomplete, setAutocomplete] = useState<any>(null);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
@@ -50,68 +55,89 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const locationInputRef = useRef<HTMLInputElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // 🛡️ 간단하고 안전한 Google Maps API 로딩
+  // 🛡️ 강력한 Google Maps API 로딩 (새로고침 대응)
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
       console.error('❌ Google Maps API 키가 설정되지 않았습니다!');
       return;
     }
 
+    // 전역 로딩 상태 확인 (중복 로드 방지)
+    if ((window as any).__googleMapsLoading) {
+      console.log('⏳ Google Maps API 이미 로딩 중...');
+      return;
+    }
+
     // 이미 로드되어 있는지 확인
     if (window.google?.maps?.places?.Autocomplete && 
         typeof window.google.maps.places.Autocomplete === 'function') {
-
-      setTimeout(() => setIsGoogleMapsLoaded(true), 300);
+      console.log('✅ Google Maps API 이미 로드됨');
+      setTimeout(() => setIsGoogleMapsLoaded(true), 100);
       return;
     }
 
-    // 중복 스크립트 방지
-    if (document.querySelector('script[src*="maps.googleapis.com"]')) {
-      // 이미 로딩 중이면 주기적으로 체크
+    // 이미 스크립트가 있는지 확인
+    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+    if (existingScript) {
+      console.log('⏳ Google Maps 스크립트 이미 존재, 로딩 대기...');
+      // 기존 스크립트 로딩 완료 대기
       const checkInterval = setInterval(() => {
         if (window.google?.maps?.places?.Autocomplete) {
           clearInterval(checkInterval);
+          console.log('✅ 기존 스크립트 로딩 완료');
           setIsGoogleMapsLoaded(true);
         }
-      }, 500);
+      }, 100);
       
-      // 30초 후 타임아웃
+      // 5초 후 타임아웃
       setTimeout(() => {
         clearInterval(checkInterval);
         setIsGoogleMapsLoaded(true);
-      }, 30000);
+      }, 5000);
       return;
     }
 
+    console.log('🔄 Google Maps API 로딩 시작...');
+    
+    // 전역 로딩 상태 설정
+    (window as any).__googleMapsLoading = true;
+    
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`;
     script.async = true;
     script.defer = true;
     
-    script.onload = () => {
-      // API 준비 상태를 체크
-      const checkReady = () => {
-        if (window.google?.maps?.places?.Autocomplete && 
-            typeof window.google.maps.places.Autocomplete === 'function') {
-          setTimeout(() => setIsGoogleMapsLoaded(true), 1000);
-        } else {
-          setTimeout(checkReady, 200);
-        }
-      };
-      
-      setTimeout(checkReady, 500);
+    // 전역 콜백 함수 설정
+    (window as any).initGoogleMaps = () => {
+      console.log('✅ Google Maps API 로드 완료');
+      (window as any).__googleMapsLoading = false;
+      setTimeout(() => setIsGoogleMapsLoaded(true), 500);
     };
     
     script.onerror = () => {
       console.error('❌ Google Maps 스크립트 로드 실패');
+      (window as any).__googleMapsLoading = false;
+      // 실패 시에도 강제로 로드된 것으로 처리
+      setTimeout(() => setIsGoogleMapsLoaded(true), 1000);
     };
     
     document.head.appendChild(script);
+
+    // 10초 후 타임아웃
+    const timeout = setTimeout(() => {
+      console.log('⚠️ Google Maps API 로딩 타임아웃, 강제 로드');
+      (window as any).__googleMapsLoading = false;
+      setIsGoogleMapsLoaded(true);
+    }, 10000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, []);
 
   // 🚀 Autocomplete 초기화 (완전 새로 생성)
   useEffect(() => {
-    if (!isGoogleMapsLoaded || !isMapVisible || !locationInputRef.current || autocomplete) {
+    if (!isGoogleMapsLoaded || !locationInputRef.current || autocomplete) {
       return;
     }
 
@@ -188,11 +214,22 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
 
   // 🗺️ Map 초기화 (완전 새로 생성)
   useEffect(() => {
-    if (!isGoogleMapsLoaded || !isMapVisible || !mapRef.current || map) {
+    if (!isGoogleMapsLoaded || !mapRef.current) {
       return;
     }
 
+    // 기존 지도가 있으면 정리
+    if (map) {
+      try {
+        window.google.maps.event.clearInstanceListeners(map);
+        setMap(null);
+      } catch (error) {
+        console.log('⚠️ 기존 지도 정리 실패:', error);
+      }
+    }
+
     try {
+      console.log('🗺️ 새 지도 생성 중...');
       const center = COUNTRY_MAP_CENTERS[(currentLanguage || 'ko') as Language];
       
       const mapInstance = new window.google.maps.Map(mapRef.current, {
@@ -203,6 +240,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         fullscreenControl: false
       });
 
+      console.log('✅ 지도 생성 완료');
       setMap(mapInstance);
     } catch (error) {
       console.error('❌ 지도 생성 실패:', error);
@@ -218,7 +256,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         }
       }
     };
-  }, [isGoogleMapsLoaded, isMapVisible, map, currentLanguage]);
+  }, [isGoogleMapsLoaded, currentLanguage]);
 
   // 🛡️ 지도 위치 업데이트 (안정한 의존성 배열)
   useEffect(() => {
@@ -306,13 +344,16 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         </label>
         
         <div className="search-input-wrapper">
-          <button
-            type="button"
-            className="map-toggle-btn"
-            onClick={toggleMapVisibility}
-          >
-            {isMapVisible ? '지도 숨기기' : '지도 보기'}
-          </button>
+          {/* 게시물 업로드 페이지가 아닐 때만 토글 버튼 표시 */}
+          {!isPostUploadPage && (
+            <button
+              type="button"
+              className="map-toggle-btn"
+              onClick={toggleMapVisibility}
+            >
+              {isMapVisible ? '지도 숨기기' : '지도 보기'}
+            </button>
+          )}
           
           {locationDetails && (
             <button
@@ -325,18 +366,16 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           )}
         </div>
         
-        {isMapVisible && (
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input
-              ref={locationInputRef}
-              type="text"
-              placeholder={getLocationHintByLanguage(currentLanguage as Language)}
-              className="location-input"
-              defaultValue={initialLocation}
-            />
-          </div>
-        )}
+        <div className="search-input-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            ref={locationInputRef}
+            type="text"
+            placeholder={getLocationHintByLanguage(currentLanguage as Language)}
+            className="location-input"
+            defaultValue={initialLocation}
+          />
+        </div>
       </div>
 
       {/* 선택된 위치 정보 */}
@@ -351,30 +390,36 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       )}
 
       {/* 지도 */}
-      {isMapVisible && (
-        <div className="map-container">
-          {isGoogleMapsLoaded ? (
-            <div>
-              {!map && (
-                <div className="map-loading">
-                  <div className="loading-spinner"></div>
-                  <p>🗺️ 새 지도 생성 중...</p>
-                </div>
-              )}
-              <div
-                ref={mapRef}
-                className="google-map"
-                style={{ display: map ? 'block' : 'none' }}
-              />
-            </div>
-          ) : (
-            <div className="map-loading">
-              <div className="loading-spinner"></div>
-              <p>📡 Google Maps API 로딩 중...</p>
-            </div>
-          )}
-        </div>
-      )}
+      <div className="map-container">
+        {isGoogleMapsLoaded ? (
+          <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+            {!map && (
+              <div className="map-loading" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
+                <div className="loading-spinner"></div>
+                <p>🗺️ 새 지도 생성 중...</p>
+              </div>
+            )}
+            <div
+              ref={mapRef}
+              className="google-map"
+              style={{ 
+                display: 'block',
+                height: '100%',
+                width: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: map ? 2 : 0
+              }}
+            />
+          </div>
+        ) : (
+          <div className="map-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <div className="loading-spinner"></div>
+            <p>📡 Google Maps API 로딩 중...</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
