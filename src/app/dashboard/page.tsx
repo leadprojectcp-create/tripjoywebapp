@@ -20,6 +20,9 @@ import "./style.css";
 
 export default function Dashboard() {
   const { 
+    user,
+    isAuthenticated,
+    isLoading: authLoading,
     showSignupModal,
     closeSignupModal,
     openSignupModal
@@ -41,6 +44,46 @@ export default function Dashboard() {
     console.log('회원가입 완료:', userData);
     closeSignupModal();
   };
+
+  // 웹뷰 환경에서 로그인 상태 확인
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      // 웹뷰 환경 감지
+      const isWebView = () => {
+        if (typeof window === 'undefined') return false;
+        
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        
+        // iOS WebView 감지
+        const isIOSWebView = /iphone|ipad|ipod/.test(userAgent) && 
+                            /webkit/.test(userAgent) && 
+                            !/safari/.test(userAgent);
+        
+        // Android WebView 감지
+        const isAndroidWebView = /android/.test(userAgent) && 
+                                /webkit/.test(userAgent) && 
+                                !/chrome/.test(userAgent);
+        
+        // React Native WebView 감지
+        const isReactNativeWebView = /react-native/.test(userAgent);
+        
+        // 기타 WebView 감지
+        const isOtherWebView = /wv/.test(userAgent) || 
+                              /mobile/.test(userAgent) && /safari/.test(userAgent);
+        
+        return isIOSWebView || isAndroidWebView || isReactNativeWebView || isOtherWebView;
+      };
+
+      if (isWebView()) {
+        // 웹뷰에서는 로그인 페이지로 리다이렉트하지 않고 로그인 모달 표시
+        console.log('웹뷰 환경에서 로그인 필요');
+        // 로그인 모달을 자동으로 열거나 적절한 처리
+      } else {
+        // 일반 브라우저에서는 로그인 페이지로 리다이렉트
+        window.location.href = '/auth/login';
+      }
+    }
+  }, [authLoading, isAuthenticated]);
 
   // 사용자 정보 가져오기
   const getUserInfo = async (userId: string) => {

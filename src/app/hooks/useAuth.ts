@@ -118,15 +118,60 @@ export const useAuth = () => {
     try {
       if (!auth) {
         setUser(null);
-        router.push('/auth/login');
+        // 웹뷰 환경 감지
+        if (isWebView()) {
+          // 웹뷰에서는 메인 페이지로 리다이렉트
+          router.push('/');
+        } else {
+          router.push('/auth/login');
+        }
         return;
       }
       
       await signOut();
-      router.push('/auth/login');
+      
+      // 웹뷰 환경 감지
+      if (isWebView()) {
+        // 웹뷰에서는 메인 페이지로 리다이렉트 (로그인 상태가 해제된 상태)
+        router.push('/');
+      } else {
+        router.push('/auth/login');
+      }
     } catch (error) {
       console.error('로그아웃 실패:', error);
+      // 에러 발생 시에도 웹뷰 환경에 따라 리다이렉트
+      if (isWebView()) {
+        router.push('/');
+      } else {
+        router.push('/auth/login');
+      }
     }
+  };
+
+  // 웹뷰 환경 감지 함수
+  const isWebView = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    
+    // iOS WebView 감지
+    const isIOSWebView = /iphone|ipad|ipod/.test(userAgent) && 
+                        /webkit/.test(userAgent) && 
+                        !/safari/.test(userAgent);
+    
+    // Android WebView 감지
+    const isAndroidWebView = /android/.test(userAgent) && 
+                            /webkit/.test(userAgent) && 
+                            !/chrome/.test(userAgent);
+    
+    // React Native WebView 감지
+    const isReactNativeWebView = /react-native/.test(userAgent);
+    
+    // 기타 WebView 감지
+    const isOtherWebView = /wv/.test(userAgent) || 
+                          /mobile/.test(userAgent) && /safari/.test(userAgent);
+    
+    return isIOSWebView || isAndroidWebView || isReactNativeWebView || isOtherWebView;
   };
 
   const openLoginPage = () => {

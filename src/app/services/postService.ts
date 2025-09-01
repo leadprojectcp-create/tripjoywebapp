@@ -42,6 +42,7 @@ export interface PostData {
     countryName?: string; // 전체 국가명 (예: "Vietnam", "South Korea")
   };
   hashtags: string[];
+  companionAvailable: boolean; // 동행 가능 여부
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
@@ -70,6 +71,7 @@ export const createPost = async (
   locationDetails: LocationDetails | null,
   locationDescription: string,
   hashtags: string,
+  companionAvailable: boolean,
   countryCityInfo?: CountryCityInfo,
   onProgress?: (progress: number) => void
 ): Promise<string> => {
@@ -137,6 +139,7 @@ export const createPost = async (
       images: uploadedImages, // 🎯 images만 저장 (중복 제거)
       location: locationData,
       hashtags: parsedHashtags,
+      companionAvailable, // 동행 가능 여부
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       likeCount: 0, // 좋아요 카운트
@@ -489,6 +492,7 @@ export const updatePost = async (
   countryCode: string,
   cityCode: string,
   hashtags: string[],
+  companionAvailable: boolean,
   newImages?: File[],
   remainingExistingImages?: UploadedImage[] // 남은 기존 이미지들
 ): Promise<boolean> => {
@@ -536,6 +540,7 @@ export const updatePost = async (
       countryCode,
       cityCode,
       hashtags,
+      companionAvailable,
       images: finalImages,
       updatedAt: new Date()
     };

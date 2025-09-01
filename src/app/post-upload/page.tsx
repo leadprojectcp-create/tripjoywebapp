@@ -25,6 +25,7 @@ interface PostData {
   cityCode: string;
   images: File[];
   hashtags: string;
+  companionAvailable: boolean; // 동행 가능 여부
 }
 
 interface PreviewImage {
@@ -53,7 +54,8 @@ const PostUploadContent: React.FC = () => {
     countryCode: '',
     cityCode: '',
     images: [],
-    hashtags: ''
+    hashtags: '',
+    companionAvailable: false // 동행 가능 여부 기본값
   });
 
   const [previewImages, setPreviewImages] = useState<PreviewImage[]>([]);
@@ -101,7 +103,8 @@ const PostUploadContent: React.FC = () => {
           countryCode: '',
           cityCode: '',
           images: [], // 기존 이미지는 File 객체가 아니므로 빈 배열
-          hashtags: existingPost.hashtags?.join(' ') || ''
+          hashtags: existingPost.hashtags?.join(' ') || '',
+          companionAvailable: existingPost.companionAvailable || false
         });
 
         // 기존 이미지들을 미리보기로 표시 (URL만)
@@ -301,6 +304,7 @@ const PostUploadContent: React.FC = () => {
           postData.countryCode,
           postData.cityCode,
           hashtags,
+          postData.companionAvailable,
           newImages,
           remainingExistingImages
         );
@@ -333,6 +337,7 @@ const PostUploadContent: React.FC = () => {
           postData.locationDetails,
           postData.locationDescription,
           postData.hashtags,
+          postData.companionAvailable,
           {
             countryCode: postData.countryCode,
             cityCode: postData.cityCode
@@ -503,6 +508,33 @@ const PostUploadContent: React.FC = () => {
               />
               <div className="hashtags-hint">
                 {t('hashtagsHint')}
+              </div>
+            </div>
+
+            {/* 동행 가능 여부 */}
+            <div className="form-group">
+              <div className="notification-section">
+                <h3>🤝 동행 가능 여부</h3>
+                <div className="notification-item">
+                  <div className="notification-info">
+                    <div className="notification-title">
+                      동행 가능 여부
+                    </div>
+                    <div className="notification-description">
+                      {postData.companionAvailable 
+                        ? '다른 여행자들과 함께 여행할 수 있습니다.' 
+                        : '혼자 여행하거나 동행을 원하지 않습니다.'}
+                    </div>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={postData.companionAvailable}
+                      onChange={(e) => setPostData(prev => ({ ...prev, companionAvailable: e.target.checked }))}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
               </div>
             </div>
 
