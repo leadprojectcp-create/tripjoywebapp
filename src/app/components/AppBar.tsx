@@ -46,6 +46,20 @@ export const AppBar = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // 모바일 메뉴가 열렸을 때 배경 스크롤 방지
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // 컴포넌트 언마운트 시 스크롤 복원
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   const handleMenuItemClick = (url: string) => {
     setIsMenuOpen(false);
     router.push(url);
