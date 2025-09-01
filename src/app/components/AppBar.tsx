@@ -67,54 +67,16 @@ export const AppBar = ({
     router.push(url);
   };
 
-  // 웹뷰 환경 감지 함수
-  const isWebView = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    
-    // iOS WebView 감지
-    const isIOSWebView = /iphone|ipad|ipod/.test(userAgent) && 
-                        /webkit/.test(userAgent) && 
-                        !/safari/.test(userAgent);
-    
-    // Android WebView 감지
-    const isAndroidWebView = /android/.test(userAgent) && 
-                            /webkit/.test(userAgent) && 
-                            !/chrome/.test(userAgent);
-    
-    // React Native WebView 감지
-    const isReactNativeWebView = /react-native/.test(userAgent);
-    
-    // 기타 WebView 감지
-    const isOtherWebView = /wv/.test(userAgent) || 
-                          /mobile/.test(userAgent) && /safari/.test(userAgent);
-    
-    return isIOSWebView || isAndroidWebView || isReactNativeWebView || isOtherWebView;
-  };
 
-  // 웹뷰 환경에 맞는 로그아웃 처리
+
+  // 로그아웃 처리 (PC 사이드바와 동일한 로직)
   const handleLogout = async () => {
     try {
       console.log('🔄 로그아웃 시작');
-      
-      // 기존 로그아웃 함수 호출
-      await logout();
-      
-      // 웹뷰 환경에서는 추가 처리
-      if (isWebView()) {
-        console.log('📱 웹뷰 환경에서 로그아웃 처리');
-        // 웹뷰에서는 메인 페이지로 리다이렉트
-        router.push('/');
-      }
-      
+      await logout(); // useAuth의 logout 함수가 이미 모든 처리를 담당
       console.log('✅ 로그아웃 완료');
     } catch (error) {
       console.error('❌ 로그아웃 실패:', error);
-      // 에러 발생 시에도 웹뷰 환경에 따라 리다이렉트
-      if (isWebView()) {
-        router.push('/');
-      }
     }
   };
 
