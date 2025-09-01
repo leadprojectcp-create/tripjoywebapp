@@ -146,26 +146,28 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
 };
 
 /**
- * Firebase Custom Token 생성 (백엔드 API 호출)
+ * Firebase Custom Token 생성 (Next.js API Route 호출)
  */
 const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Promise<string> => {
   try {
-    // 실제 구현에서는 백엔드 API를 호출하여 Custom Token을 생성해야 합니다
-    // 여기서는 임시로 에러를 발생시켜 백엔드 구현이 필요함을 알립니다
-    
     console.log('🔄 Firebase Custom Token 생성 요청...');
     console.log('Access Token:', accessToken);
     console.log('User Info:', userInfo);
     
-    // TODO: 백엔드 API 구현 필요
-    // const response = await fetch('/api/auth/kakao/custom-token', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ accessToken, userInfo })
-    // });
-    // const { customToken } = await response.json();
+    const response = await fetch('/api/auth/kakao/custom-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken, userInfo })
+    });
     
-    throw new Error('백엔드 API 구현이 필요합니다. Firebase Custom Token 생성 엔드포인트를 구현해주세요.');
+    if (!response.ok) {
+      throw new Error(`API 요청 실패: ${response.status}`);
+    }
+    
+    const { customToken } = await response.json();
+    console.log('✅ Firebase Custom Token 생성 완료');
+    
+    return customToken;
     
   } catch (error) {
     console.error('❌ Custom Token 생성 실패:', error);
