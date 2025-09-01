@@ -1,12 +1,9 @@
 /**
- * 카카오톡 로그인 서비스 (Firebase OpenID Connect)
+ * 카카오톡 로그인 서비스 (JavaScript SDK 직접 사용)
  */
 
 import { 
-  signInWithRedirect,
-  signInWithPopup,
-  getRedirectResult,
-  OAuthProvider, 
+  signInWithCustomToken,
   User 
 } from 'firebase/auth';
 import { 
@@ -16,7 +13,13 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import { isWebView } from '../utils/webviewDetector';
+
+// 카카오 SDK 타입 정의
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
 
 export interface KakaoAuthResult {
   success: boolean;
@@ -26,72 +29,89 @@ export interface KakaoAuthResult {
 }
 
 /**
- * 카카오 로그인 실행
+ * 카카오 SDK 초기화
+ */
+const initializeKakaoSDK = () => {
+  if (typeof window !== 'undefined' && window.Kakao) {
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init('d63a09e76953cb133070b8ced4d4153b'); // JavaScript 키 사용
+      console.log('🔄 카카오 SDK 초기화 완료');
+    }
+    return true;
+  }
+  return false;
+};
+
+/**
+ * 카카오 로그인 실행 (JavaScript SDK 직접 사용)
  */
 export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
-    console.log('🔄 카카오 로그인 시작');
+    console.log('🔄 카카오 로그인 시작 (JavaScript SDK)');
     console.log('🌐 현재 환경:', typeof window !== 'undefined' ? '웹' : '서버');
     console.log('📱 웹뷰 환경:', typeof window !== 'undefined' && (window as any).ReactNativeWebView ? '예' : '아니오');
     
-    // 모든 환경에서 Firebase OIDC 사용 (웹뷰 포함)
-    console.log('🔥 Firebase OIDC로 카카오 로그인 처리');
-    
-    // Firebase OIDC Provider 생성
-    const provider = new OAuthProvider('oidc.kakao');
-    console.log('🔧 OIDC Provider 생성 완료:', provider.providerId);
-    
-
-    console.log('📋 스코프 설정 완료: 기본 스코프만 사용');
-    
-    // 웹뷰에서는 팝업이 차단될 수 있으므로 팝업 방식 먼저 시도
-    console.log('🔄 카카오 로그인 팝업 방식 시도...');
-    
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log('✅ 팝업 로그인 성공:', result.user);
-      
-      return {
-        success: true,
-        user: result.user,
-        isNewUser: false
-      };
-    } catch (popupError: any) {
-      console.log('❌ 팝업 로그인 실패, 리다이렉트 방식으로 전환:', popupError);
-      
-      // 팝업이 실패하면 리다이렉트 방식 사용
-      console.log('🔄 카카오 로그인 리다이렉트 시작...');
-      await signInWithRedirect(auth, provider);
-      
-      return {
-        success: true,
-        isNewUser: false
-      };
+    // 카카오 SDK 초기화
+    if (!initializeKakaoSDK()) {
+      throw new Error('카카오 SDK를 초기화할 수 없습니다.');
     }
+
+    // 카카오 로그인 실행
+    const response = await new Promise((resolve, reject) => {
+      window.Kakao.Auth.login({
+        success: (authObj: any) => {
+          console.log('✅ 카카오 로그인 성공:', authObj);
+          resolve(authObj);
+        },
+        fail: (err: any) => {
+          console.error('❌ 카카오 로그인 실패:', err);
+          reject(err);
+        }
+      });
+    });
+
+    // 카카오 사용자 정보 가져오기
+    const userInfo = await new Promise((resolve, reject) => {
+      window.Kakao.API.request({
+        url: '/v2/user/me',
+        success: (res: any) => {
+          console.log('✅ 카카오 사용자 정보:', res);
+          resolve(res);
+        },
+        fail: (err: any) => {
+          console.error('❌ 카카오 사용자 정보 조회 실패:', err);
+          reject(err);
+        }
+      });
+    });
+
+    // Firebase Custom Token 생성 (백엔드 API 호출)
+    const customToken = await createFirebaseCustomToken((response as any).access_token, userInfo);
     
+    // Firebase Custom Token으로 로그인
+    const userCredential = await signInWithCustomToken(auth, customToken);
+    const user = userCredential.user;
+
+    console.log('✅ Firebase 로그인 성공:', user);
+
+    return {
+      success: true,
+      user: user,
+      isNewUser: false
+    };
+
   } catch (error: any) {
     console.error('❌ 카카오 로그인 실패:', error);
     console.error('Error code:', error.code);
     console.error('Error message:', error.message);
     console.error('Error details:', error);
-    console.error('Full error:', JSON.stringify(error, null, 2));
     
     let errorMessage = '카카오 로그인에 실패했습니다.';
     
-    if (error.code === 'auth/account-exists-with-different-credential') {
-      errorMessage = '이미 다른 방법으로 가입된 계정입니다.';
-    } else if (error.code === 'auth/popup-closed-by-user') {
-      errorMessage = '로그인 창이 닫혔습니다.';
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      errorMessage = '로그인이 취소되었습니다.';
-    } else if (error.code === 'auth/popup-blocked') {
-      errorMessage = '팝업이 차단되었습니다. 팝업 차단을 해제해 주세요.';
-    } else if (error.code === 'auth/invalid-credential') {
-      errorMessage = '카카오 인증 정보가 유효하지 않습니다. Firebase OIDC 설정을 확인해주세요.';
-    } else if (error.code === 'auth/operation-not-allowed') {
-      errorMessage = '카카오 로그인이 허용되지 않습니다. Firebase Console에서 OIDC 설정을 확인해주세요.';
-    } else if (error.code === 'auth/network-request-failed') {
-      errorMessage = '네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.';
+    if (error.code === 'auth/invalid-custom-token') {
+      errorMessage = '인증 토큰이 유효하지 않습니다.';
+    } else if (error.code === 'auth/custom-token-mismatch') {
+      errorMessage = '토큰이 일치하지 않습니다.';
     } else if (error.message && error.message.includes('KOE')) {
       errorMessage = `카카오 로그인 오류: ${error.message}`;
     }
@@ -100,6 +120,34 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
       success: false,
       error: errorMessage
     };
+  }
+};
+
+/**
+ * Firebase Custom Token 생성 (백엔드 API 호출)
+ */
+const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Promise<string> => {
+  try {
+    // 실제 구현에서는 백엔드 API를 호출하여 Custom Token을 생성해야 합니다
+    // 여기서는 임시로 에러를 발생시켜 백엔드 구현이 필요함을 알립니다
+    
+    console.log('🔄 Firebase Custom Token 생성 요청...');
+    console.log('Access Token:', accessToken);
+    console.log('User Info:', userInfo);
+    
+    // TODO: 백엔드 API 구현 필요
+    // const response = await fetch('/api/auth/kakao/custom-token', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ accessToken, userInfo })
+    // });
+    // const { customToken } = await response.json();
+    
+    throw new Error('백엔드 API 구현이 필요합니다. Firebase Custom Token 생성 엔드포인트를 구현해주세요.');
+    
+  } catch (error) {
+    console.error('❌ Custom Token 생성 실패:', error);
+    throw error;
   }
 };
 
