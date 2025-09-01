@@ -31,34 +31,21 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
     console.log('🔄 카카오 로그인 시작');
     
-    // 웹뷰 환경 감지
-    if (isWebView()) {
-      console.log('📱 웹뷰 환경에서 네이티브 카카오 로그인 호출');
+    // 웹뷰 환경에서 네이티브 앱 처리
+    if (isWebView() && typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+      console.log('📱 React Native 웹뷰에서 네이티브 카카오 로그인 호출');
       
-      // React Native WebView에서 네이티브 함수 호출
-      if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
-        (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'KAKAO_LOGIN'
-        }));
-        return {
-          success: true,
-          isNewUser: false
-        };
-      } else {
-        // 일반 웹뷰에서는 Firebase OIDC 사용
-        console.log('🔄 일반 웹뷰에서 Firebase OIDC 사용');
-        const provider = new OAuthProvider('oidc.kakao');
-        provider.addScope('profile');
-        provider.addScope('email');
-        
-        await signInWithRedirect(auth, provider);
-        return {
-          success: true,
-          isNewUser: false
-        };
-      }
+      // 네이티브 앱에 카카오 로그인 요청
+      (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'KAKAO_LOGIN'
+      }));
+      
+      return {
+        success: true,
+        isNewUser: false
+      };
     } else {
-      console.log('🖥️ 데스크톱 환경에서 Firebase OIDC 사용');
+      console.log('🖥️ 웹 환경에서 Firebase OIDC 사용');
       
       // Firebase OIDC Provider 생성
       const provider = new OAuthProvider('oidc.kakao');

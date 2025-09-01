@@ -59,10 +59,20 @@ export default function LoginPage(): React.JSX.Element {
     // 웹뷰 메시지 처리
     const handleWebViewMessage = (event: MessageEvent) => {
       try {
+        // JSON이 아닌 메시지는 무시
+        if (typeof event.data !== 'string' || !event.data.startsWith('{')) {
+          console.log('📱 웹뷰 메시지 (JSON 아님):', event.data);
+          return;
+        }
+        
         const data = JSON.parse(event.data);
         console.log('📱 웹뷰 메시지 수신:', data);
         
-        if (data.type === 'KAKAO_LOGIN_SUCCESS') {
+        if (data.type === 'KAKAO_LOGIN_REDIRECT') {
+          console.log('🔄 카카오 로그인 리다이렉트:', data.url);
+          // 카카오 로그인 페이지로 리다이렉트
+          window.location.href = data.url;
+        } else if (data.type === 'KAKAO_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 카카오 로그인 성공:', data.user);
           setIsLoading(false);
           // 네이티브에서 받은 사용자 정보로 Firebase 로그인 처리
@@ -88,7 +98,7 @@ export default function LoginPage(): React.JSX.Element {
         }
       } catch (error) {
         console.error('❌ 웹뷰 메시지 처리 실패:', error);
-        setIsLoading(false);
+        // JSON 파싱 실패는 무시 (다른 메시지들)
       }
     };
 
