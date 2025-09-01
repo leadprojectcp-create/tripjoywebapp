@@ -31,44 +31,30 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
     console.log('🔄 카카오 로그인 시작');
     
-    // 웹뷰 환경에서 네이티브 앱 처리
-    if (isWebView() && typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
-      console.log('📱 React Native 웹뷰에서 네이티브 카카오 로그인 호출');
-      
-      // 네이티브 앱에 카카오 로그인 요청
-      (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'KAKAO_LOGIN'
-      }));
-      
-      return {
-        success: true,
-        isNewUser: false
-      };
-    } else {
-      console.log('🖥️ 웹 환경에서 Firebase OIDC 사용');
-      
-      // Firebase OIDC Provider 생성
-      const provider = new OAuthProvider('oidc.kakao');
-      
-      // 추가 스코프 설정
-      provider.addScope('profile');
-      provider.addScope('email');
-      
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      console.log('✅ 카카오 로그인 성공:', user);
-      
-      // 사용자 정보를 Firestore에 저장/업데이트
-      await saveKakaoUserToFirestore(user);
-      
-      console.log('✅ 카카오 로그인 완료');
-      return {
-        success: true,
-        user: user,
-        isNewUser: false
-      };
-    }
+    // 웹뷰, 웹 모두 Firebase OIDC 사용
+    console.log('🔥 Firebase OIDC로 카카오 로그인 처리');
+    
+    // Firebase OIDC Provider 생성
+    const provider = new OAuthProvider('oidc.kakao');
+    
+    // 추가 스코프 설정
+    provider.addScope('profile');
+    provider.addScope('email');
+    
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    
+    console.log('✅ 카카오 로그인 성공:', user);
+    
+    // 사용자 정보를 Firestore에 저장/업데이트
+    await saveKakaoUserToFirestore(user);
+    
+    console.log('✅ 카카오 로그인 완료');
+    return {
+      success: true,
+      user: user,
+      isNewUser: false
+    };
     
   } catch (error: any) {
     console.error('❌ 카카오 로그인 실패:', error);
