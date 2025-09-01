@@ -239,6 +239,57 @@ interface SidebarProps {
 export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Element => {
   const { t } = useTranslationContext();
   const { logout, isAuthenticated } = useAuthContext();
+
+  // 웹뷰 환경 감지 함수
+  const isWebView = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    
+    // iOS WebView 감지
+    const isIOSWebView = /iphone|ipad|ipod/.test(userAgent) && 
+                        /webkit/.test(userAgent) && 
+                        !/safari/.test(userAgent);
+    
+    // Android WebView 감지
+    const isAndroidWebView = /android/.test(userAgent) && 
+                            /webkit/.test(userAgent) && 
+                            !/chrome/.test(userAgent);
+    
+    // React Native WebView 감지
+    const isReactNativeWebView = /react-native/.test(userAgent);
+    
+    // 기타 WebView 감지
+    const isOtherWebView = /wv/.test(userAgent) || 
+                          /mobile/.test(userAgent) && /safari/.test(userAgent);
+    
+    return isIOSWebView || isAndroidWebView || isReactNativeWebView || isOtherWebView;
+  };
+
+  // 웹뷰 환경에 맞는 로그아웃 처리
+  const handleLogout = async () => {
+    try {
+      console.log('🔄 로그아웃 시작');
+      
+      // 기존 로그아웃 함수 호출
+      await logout();
+      
+      // 웹뷰 환경에서는 추가 처리
+      if (isWebView()) {
+        console.log('📱 웹뷰 환경에서 로그아웃 처리');
+        // 웹뷰에서는 메인 페이지로 리다이렉트
+        router.push('/');
+      }
+      
+      console.log('✅ 로그아웃 완료');
+    } catch (error) {
+      console.error('❌ 로그아웃 실패:', error);
+      // 에러 발생 시에도 웹뷰 환경에 따라 리다이렉트
+      if (isWebView()) {
+        router.push('/');
+      }
+    }
+  };
   const pathname = usePathname();
   const router = useRouter();
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -349,7 +400,7 @@ export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Ele
       {/* 로그아웃 버튼 (로그인된 경우에만 표시) */}
       {isAuthenticated && (
         <div className="logout-section">
-          <div className="nav-item logout-item" onClick={logout}>
+          <div className="nav-item logout-item" onClick={handleLogout}>
             <div className="nav-icon">
               <LogoutIcon />
             </div>
