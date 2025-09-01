@@ -27,7 +27,7 @@ export default function LoginPage(): React.JSX.Element {
   
   console.log('🌍 Current language in LoginPage:', currentLanguage);
 
-  // 리다이렉트 결과 처리
+  // 리다이렉트 결과 처리 및 웹뷰 메시지 처리
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
@@ -56,7 +56,38 @@ export default function LoginPage(): React.JSX.Element {
       }
     };
 
+    // 웹뷰 메시지 처리
+    const handleWebViewMessage = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📱 웹뷰 메시지 수신:', data);
+        
+        if (data.type === 'KAKAO_LOGIN_SUCCESS') {
+          console.log('✅ 네이티브 카카오 로그인 성공');
+          // 네이티브에서 받은 사용자 정보로 Firebase 로그인 처리
+          // 이 부분은 네이티브 앱에서 구현해야 함
+        } else if (data.type === 'KAKAO_LOGIN_FAILED') {
+          console.error('❌ 네이티브 카카오 로그인 실패:', data.error);
+          setError('카카오 로그인에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('❌ 웹뷰 메시지 처리 실패:', error);
+      }
+    };
+
     handleRedirectResult();
+
+    // 웹뷰 메시지 리스너 등록
+    if (typeof window !== 'undefined') {
+      window.addEventListener('message', handleWebViewMessage);
+    }
+
+    // 클린업
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('message', handleWebViewMessage);
+      }
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,8 +118,16 @@ export default function LoginPage(): React.JSX.Element {
         
         if (!result.success) {
           setError(result.error || "카카오 로그인에 실패했습니다.");
+          setIsLoading(false);
+        } else {
+          // 웹뷰 환경에서는 로딩 상태를 유지 (네이티브 처리 대기)
+          if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+            console.log('📱 웹뷰에서 네이티브 카카오 로그인 대기 중...');
+            // 로딩 상태 유지
+          } else {
+            setIsLoading(false);
+          }
         }
-        // 성공 시에는 로딩 상태를 유지하고 onAuthStateChanged에서 리다이렉션 처리
       } catch (error: any) {
         console.error('카카오 로그인 오류:', error);
         setError('카카오 로그인 중 오류가 발생했습니다.');

@@ -25,30 +25,63 @@ export interface KakaoAuthResult {
 }
 
 /**
- * 카카오 로그인 실행 (Firebase OIDC)
+ * 카카오 로그인 실행
  */
 export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
-    console.log('🔄 카카오 로그인 시작 (Firebase OIDC)');
+    console.log('🔄 카카오 로그인 시작');
     
-    // Firebase OIDC Provider 생성
-    const provider = new OAuthProvider('oidc.kakao');
-    
-    // 추가 스코프 설정 (필요한 경우)
-    provider.addScope('profile');
-    provider.addScope('email');
-    
-    // 웹뷰 환경 감지하여 적절한 로그인 방식 선택
+    // 웹뷰 환경 감지
     if (isWebView()) {
-      console.log('📱 웹뷰 환경에서 리다이렉트 로그인 사용');
-      await signInWithRedirect(auth, provider);
-      // 리다이렉트 후에는 이 함수가 종료되고 페이지가 리로드됨
-      return {
-        success: true,
-        isNewUser: false
-      };
+      console.log('📱 웹뷰 환경에서 네이티브 카카오 로그인 호출');
+      
+      // 웹뷰에서 네이티브 앱의 카카오 로그인 호출
+      if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+        // React Native WebView에서 네이티브 함수 호출
+        (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'KAKAO_LOGIN'
+        }));
+        return {
+          success: true,
+          isNewUser: false
+        };
+      } else {
+        // 일반 웹뷰에서 카카오 앱 호출 시도
+        const kakaoAppUrl = 'kakaotalk://login';
+        const fallbackUrl = 'https://accounts.kakao.com/login';
+        
+        try {
+          // 카카오톡 앱이 설치되어 있는지 확인
+          window.location.href = kakaoAppUrl;
+          
+          // 앱이 없으면 웹으로 리다이렉트
+          setTimeout(() => {
+            window.location.href = fallbackUrl;
+          }, 1000);
+          
+          return {
+            success: true,
+            isNewUser: false
+          };
+        } catch (error) {
+          console.log('카카오톡 앱이 설치되지 않음, 웹으로 리다이렉트');
+          window.location.href = fallbackUrl;
+          return {
+            success: true,
+            isNewUser: false
+          };
+        }
+      }
     } else {
-      console.log('🖥️ 데스크톱 환경에서 팝업 로그인 사용');
+      console.log('🖥️ 데스크톱 환경에서 Firebase OIDC 사용');
+      
+      // Firebase OIDC Provider 생성
+      const provider = new OAuthProvider('oidc.kakao');
+      
+      // 추가 스코프 설정
+      provider.addScope('profile');
+      provider.addScope('email');
+      
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
@@ -61,7 +94,7 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
       return {
         success: true,
         user: user,
-        isNewUser: false // Firebase OIDC는 기존 사용자로 간주
+        isNewUser: false
       };
     }
     
