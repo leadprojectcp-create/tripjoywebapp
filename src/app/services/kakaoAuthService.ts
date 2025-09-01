@@ -3,8 +3,8 @@
  */
 
 import { 
-  signInWithPopup, 
   signInWithRedirect,
+  getRedirectResult,
   OAuthProvider, 
   User 
 } from 'firebase/auth';
@@ -31,7 +31,7 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
     console.log('🔄 카카오 로그인 시작');
     
-    // 웹뷰, 웹 모두 Firebase OIDC 사용
+    // 모든 환경에서 Firebase OIDC 사용 (웹뷰 포함)
     console.log('🔥 Firebase OIDC로 카카오 로그인 처리');
     
     // Firebase OIDC Provider 생성
@@ -41,18 +41,12 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     provider.addScope('profile');
     provider.addScope('email');
     
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    // 웹뷰에서는 팝업이 차단되므로 리다이렉트 사용
+    await signInWithRedirect(auth, provider);
     
-    console.log('✅ 카카오 로그인 성공:', user);
-    
-    // 사용자 정보를 Firestore에 저장/업데이트
-    await saveKakaoUserToFirestore(user);
-    
-    console.log('✅ 카카오 로그인 완료');
+    // 리다이렉트 후 결과는 getRedirectResult로 처리됨
     return {
       success: true,
-      user: user,
       isNewUser: false
     };
     
