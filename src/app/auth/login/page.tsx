@@ -149,15 +149,8 @@ export default function LoginPage(): React.JSX.Element {
         if (!result.success) {
           setError(result.error || "카카오 로그인에 실패했습니다.");
           setIsLoading(false);
-        } else {
-          // 웹뷰 환경에서는 로딩 상태를 유지 (네이티브 처리 대기)
-          if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
-            console.log('📱 웹뷰에서 네이티브 카카오 로그인 대기 중...');
-            // 로딩 상태 유지
-          } else {
-            setIsLoading(false);
-          }
         }
+        // 리다이렉트 방식에서는 페이지를 떠나므로 로딩 상태 유지
       } catch (error: any) {
         console.error('카카오 로그인 오류:', error);
         setError('카카오 로그인 중 오류가 발생했습니다.');

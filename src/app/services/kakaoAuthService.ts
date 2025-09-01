@@ -41,10 +41,12 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     provider.addScope('profile');
     provider.addScope('email');
     
-    // 웹뷰에서는 팝업이 차단되므로 리다이렉트 사용
+    // 리다이렉트 방식 사용
+    console.log('🔄 카카오 로그인 리다이렉트 시작...');
     await signInWithRedirect(auth, provider);
     
-    // 리다이렉트 후 결과는 getRedirectResult로 처리됨
+    // 리다이렉트는 페이지를 떠나므로 여기까지 실행되지 않음
+    // 결과는 페이지 로드 시 getRedirectResult로 처리됨
     return {
       success: true,
       isNewUser: false
@@ -52,6 +54,9 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     
   } catch (error: any) {
     console.error('❌ 카카오 로그인 실패:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+    console.error('Full error:', JSON.stringify(error));
     
     let errorMessage = '카카오 로그인에 실패했습니다.';
     
