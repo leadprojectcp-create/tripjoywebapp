@@ -4,6 +4,7 @@
 
 import { 
   signInWithRedirect,
+  signInWithPopup,
   getRedirectResult,
   OAuthProvider, 
   User 
@@ -45,14 +46,30 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     provider.addScope('email');
     console.log('📋 스코프 설정 완료: profile, email');
     
-    // 리다이렉트 방식 사용
-    console.log('🔄 카카오 로그인 리다이렉트 시작...');
-    await signInWithRedirect(auth, provider);
+    // 웹뷰에서는 팝업이 차단될 수 있으므로 팝업 방식 먼저 시도
+    console.log('🔄 카카오 로그인 팝업 방식 시도...');
     
-    return {
-      success: true,
-      isNewUser: false
-    };
+    try {
+      const result = await signInWithPopup(auth, provider);
+      console.log('✅ 팝업 로그인 성공:', result.user);
+      
+      return {
+        success: true,
+        user: result.user,
+        isNewUser: false
+      };
+    } catch (popupError: any) {
+      console.log('❌ 팝업 로그인 실패, 리다이렉트 방식으로 전환:', popupError);
+      
+      // 팝업이 실패하면 리다이렉트 방식 사용
+      console.log('🔄 카카오 로그인 리다이렉트 시작...');
+      await signInWithRedirect(auth, provider);
+      
+      return {
+        success: true,
+        isNewUser: false
+      };
+    }
     
   } catch (error: any) {
     console.error('❌ 카카오 로그인 실패:', error);
