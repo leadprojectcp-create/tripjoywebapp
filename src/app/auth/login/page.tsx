@@ -63,15 +63,32 @@ export default function LoginPage(): React.JSX.Element {
         console.log('📱 웹뷰 메시지 수신:', data);
         
         if (data.type === 'KAKAO_LOGIN_SUCCESS') {
-          console.log('✅ 네이티브 카카오 로그인 성공');
+          console.log('✅ 네이티브 카카오 로그인 성공:', data.user);
+          setIsLoading(false);
           // 네이티브에서 받은 사용자 정보로 Firebase 로그인 처리
-          // 이 부분은 네이티브 앱에서 구현해야 함
+          // 이 부분은 네이티브 앱에서 Firebase Auth로 처리됨
         } else if (data.type === 'KAKAO_LOGIN_FAILED') {
           console.error('❌ 네이티브 카카오 로그인 실패:', data.error);
           setError('카카오 로그인에 실패했습니다.');
+          setIsLoading(false);
+        } else if (data.type === 'GOOGLE_LOGIN_SUCCESS') {
+          console.log('✅ 네이티브 구글 로그인 성공:', data.user);
+          setIsLoading(false);
+        } else if (data.type === 'GOOGLE_LOGIN_FAILED') {
+          console.error('❌ 네이티브 구글 로그인 실패:', data.error);
+          setError('구글 로그인에 실패했습니다.');
+          setIsLoading(false);
+        } else if (data.type === 'APPLE_LOGIN_SUCCESS') {
+          console.log('✅ 네이티브 애플 로그인 성공:', data.user);
+          setIsLoading(false);
+        } else if (data.type === 'APPLE_LOGIN_FAILED') {
+          console.error('❌ 네이티브 애플 로그인 실패:', data.error);
+          setError('애플 로그인에 실패했습니다.');
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('❌ 웹뷰 메시지 처리 실패:', error);
+        setIsLoading(false);
       }
     };
 

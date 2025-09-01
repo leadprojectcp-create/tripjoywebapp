@@ -40,13 +40,26 @@ export const signInWithGoogle = async (): Promise<GoogleAuthResult> => {
     
     // 웹뷰 환경 감지하여 적절한 로그인 방식 선택
     if (isWebView()) {
-      console.log('📱 웹뷰 환경에서 리다이렉트 로그인 사용');
-      await signInWithRedirect(auth, provider);
-      // 리다이렉트 후에는 이 함수가 종료되고 페이지가 리로드됨
-      return {
-        success: true,
-        isNewUser: false
-      };
+      console.log('📱 웹뷰 환경에서 네이티브 구글 로그인 호출');
+      
+      // React Native WebView에서 네이티브 함수 호출
+      if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+        (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'GOOGLE_LOGIN'
+        }));
+        return {
+          success: true,
+          isNewUser: false
+        };
+      } else {
+        // 일반 웹뷰에서는 리다이렉트 사용
+        console.log('🔄 일반 웹뷰에서 리다이렉트 로그인 사용');
+        await signInWithRedirect(auth, provider);
+        return {
+          success: true,
+          isNewUser: false
+        };
+      }
     } else {
       console.log('🖥️ 데스크톱 환경에서 팝업 로그인 사용');
       const result = await signInWithPopup(auth, provider);

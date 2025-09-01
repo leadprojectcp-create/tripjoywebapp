@@ -35,9 +35,8 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     if (isWebView()) {
       console.log('📱 웹뷰 환경에서 네이티브 카카오 로그인 호출');
       
-      // 웹뷰에서 네이티브 앱의 카카오 로그인 호출
+      // React Native WebView에서 네이티브 함수 호출
       if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
-        // React Native WebView에서 네이티브 함수 호출
         (window as any).ReactNativeWebView.postMessage(JSON.stringify({
           type: 'KAKAO_LOGIN'
         }));
@@ -46,31 +45,17 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
           isNewUser: false
         };
       } else {
-        // 일반 웹뷰에서 카카오 앱 호출 시도
-        const kakaoAppUrl = 'kakaotalk://login';
-        const fallbackUrl = 'https://accounts.kakao.com/login';
+        // 일반 웹뷰에서는 Firebase OIDC 사용
+        console.log('🔄 일반 웹뷰에서 Firebase OIDC 사용');
+        const provider = new OAuthProvider('oidc.kakao');
+        provider.addScope('profile');
+        provider.addScope('email');
         
-        try {
-          // 카카오톡 앱이 설치되어 있는지 확인
-          window.location.href = kakaoAppUrl;
-          
-          // 앱이 없으면 웹으로 리다이렉트
-          setTimeout(() => {
-            window.location.href = fallbackUrl;
-          }, 1000);
-          
-          return {
-            success: true,
-            isNewUser: false
-          };
-        } catch (error) {
-          console.log('카카오톡 앱이 설치되지 않음, 웹으로 리다이렉트');
-          window.location.href = fallbackUrl;
-          return {
-            success: true,
-            isNewUser: false
-          };
-        }
+        await signInWithRedirect(auth, provider);
+        return {
+          success: true,
+          isNewUser: false
+        };
       }
     } else {
       console.log('🖥️ 데스크톱 환경에서 Firebase OIDC 사용');
