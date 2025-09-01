@@ -32,6 +32,8 @@ export default function LoginPage(): React.JSX.Element {
     const handleRedirectResult = async () => {
       try {
         console.log('🔄 리다이렉트 결과 확인 중...');
+        console.log('🌐 현재 URL:', window.location.href);
+        console.log('🔍 URL 파라미터:', window.location.search);
         setIsLoading(true); // 리다이렉트 결과 처리 중 로딩 표시
         const result = await getRedirectResult(auth);
         
@@ -39,6 +41,7 @@ export default function LoginPage(): React.JSX.Element {
           console.log('✅ 리다이렉트 로그인 성공:', result.user);
           console.log('📝 Provider Data:', result.user.providerData);
           console.log('📝 Provider ID:', result.providerId);
+          console.log('📝 전체 Result 객체:', result);
           
           // 사용자 정보를 Firestore에 저장/업데이트
           const user = result.user;
@@ -48,6 +51,7 @@ export default function LoginPage(): React.JSX.Element {
           const providerId = providerData?.providerId || result.providerId;
           
           console.log('🔍 실제 Provider ID:', providerId);
+          console.log('🔍 Provider Data 상세:', providerData);
           
           if (providerId === 'oidc.kakao') {
             await saveKakaoUserToFirestore(user);
@@ -61,6 +65,7 @@ export default function LoginPage(): React.JSX.Element {
           setIsLoading(false);
         } else {
           // 리다이렉트 결과가 없으면 로딩 해제
+          console.log('📝 리다이렉트 결과 없음');
           setIsLoading(false);
         }
       } catch (error: any) {
