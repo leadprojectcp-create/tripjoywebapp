@@ -4,6 +4,7 @@
 
 import { 
   signInWithPopup, 
+  signInWithRedirect,
   GoogleAuthProvider, 
   User 
 } from 'firebase/auth';
@@ -14,6 +15,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { isWebView } from '../utils/webviewDetector';
 
 export interface GoogleAuthResult {
   success: boolean;
@@ -36,21 +38,32 @@ export const signInWithGoogle = async (): Promise<GoogleAuthResult> => {
     provider.addScope('profile');
     provider.addScope('email');
     
-    // 로그인 팝업 실행
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    
-    console.log('✅ 구글 로그인 성공:', user);
-    
-    // 사용자 정보를 Firestore에 저장/업데이트
-    await saveGoogleUserToFirestore(user);
-    
-    console.log('✅ 구글 로그인 완료');
-    return {
-      success: true,
-      user: user,
-      isNewUser: result._tokenResponse?.isNewUser || false
-    };
+    // 웹뷰 환경 감지하여 적절한 로그인 방식 선택
+    if (isWebView()) {
+      console.log('📱 웹뷰 환경에서 리다이렉트 로그인 사용');
+      await signInWithRedirect(auth, provider);
+      // 리다이렉트 후에는 이 함수가 종료되고 페이지가 리로드됨
+      return {
+        success: true,
+        isNewUser: false
+      };
+    } else {
+      console.log('🖥️ 데스크톱 환경에서 팝업 로그인 사용');
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      console.log('✅ 구글 로그인 성공:', user);
+      
+      // 사용자 정보를 Firestore에 저장/업데이트
+      await saveGoogleUserToFirestore(user);
+      
+      console.log('✅ 구글 로그인 완료');
+      return {
+        success: true,
+        user: user,
+        isNewUser: false
+      };
+    }
     
   } catch (error: any) {
     console.error('❌ 구글 로그인 실패:', error);

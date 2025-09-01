@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./page.css";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../contexts/AuthContext";
@@ -9,6 +9,11 @@ import { AppBar } from "../../components/AppBar";
 import { signInWithKakao } from "../../services/kakaoAuthService";
 import { signInWithGoogle } from "../../services/googleAuthService";
 import { signInWithApple } from "../../services/appleAuthService";
+import { getRedirectResult } from "firebase/auth";
+import { auth } from "../../services/firebase";
+import { saveKakaoUserToFirestore } from "../../services/kakaoAuthService";
+import { saveGoogleUserToFirestore } from "../../services/googleAuthService";
+import { saveAppleUserToFirestore } from "../../services/appleAuthService";
 
 export default function LoginPage(): React.JSX.Element {
   const [email, setEmail] = useState("");
@@ -21,6 +26,38 @@ export default function LoginPage(): React.JSX.Element {
   const { t, currentLanguage } = useTranslationContext();
   
   console.log('🌍 Current language in LoginPage:', currentLanguage);
+
+  // 리다이렉트 결과 처리
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        console.log('🔄 리다이렉트 결과 확인 중...');
+        const result = await getRedirectResult(auth);
+        
+        if (result) {
+          console.log('✅ 리다이렉트 로그인 성공:', result.user);
+          
+          // 사용자 정보를 Firestore에 저장/업데이트
+          const user = result.user;
+          const providerId = user.providerId;
+          
+          if (providerId === 'oidc.kakao') {
+            await saveKakaoUserToFirestore(user);
+          } else if (providerId === 'google.com') {
+            await saveGoogleUserToFirestore(user);
+          } else if (providerId === 'apple.com') {
+            await saveAppleUserToFirestore(user);
+          }
+          
+          console.log('✅ 사용자 정보 저장 완료');
+        }
+      } catch (error) {
+        console.error('❌ 리다이렉트 결과 처리 실패:', error);
+      }
+    };
+
+    handleRedirectResult();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
