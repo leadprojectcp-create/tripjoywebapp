@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { auth } from '../services/firebase';
-import { signInWithEmail, getUserData, getUserDataByEmail, updateUserUID, signOut } from '../auth/services/authService';
+import { signInWithEmail, getUserData, signOut } from '../auth/services/authService';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { isUserProfileComplete } from '../utils/userProfileUtils';
 
 interface UserData {
   id: string;
@@ -44,28 +43,8 @@ export const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // 1단계: 현재 UID로 사용자 정보 조회
-          let userData = await getUserData(firebaseUser.uid);
-          
-          if (!userData && firebaseUser.email) {
-            // 2단계: 이메일로 기존 사용자 찾기
-            console.log('🔍 현재 UID에서 사용자 정보 없음. 이메일로 기존 사용자 찾는 중:', firebaseUser.email);
-            const existingUserData = await getUserDataByEmail(firebaseUser.email);
-            
-            if (existingUserData) {
-              // 3단계: 기존 사용자 발견 - UID 업데이트
-              console.log('📧 기존 사용자 발견! UID 업데이트 중:', { 
-                old: existingUserData.id, 
-                new: firebaseUser.uid 
-              });
-              
-              userData = await updateUserUID(existingUserData.id, firebaseUser.uid);
-              
-              if (userData) {
-                console.log('✅ UID 업데이트 완료. 기존 데이터 보존됨!');
-              }
-            }
-          }
+          // Firestore에서 사용자 정보 가져오기
+          const userData = await getUserData(firebaseUser.uid);
           
           if (userData) {
             // uid 필드 추가
@@ -86,9 +65,12 @@ export const useAuth = () => {
           
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            if (userData) {
-              // 간단한 로직: Firestore에 사용자 데이터가 있으면 → 기존 사용자 → 홈으로 이동
-              console.log('✅ Firestore에 사용자 데이터 존재 - 기존 사용자 → 홈으로 이동');
+            // 실제 Firestore userData만 체크 (defaultUserData는 제외)
+            const realUserData = await getUserData(firebaseUser.uid);
+            
+            if (realUserData) {
+              // 간단한 로직: Firestore에 실제 사용자 데이터가 있으면 → 기존 사용자 → 홈으로 이동
+              console.log('✅ Firestore에 실제 사용자 데이터 존재 - 기존 사용자 → 홈으로 이동');
               router.push('/');
             } else {
               // Firestore에 사용자 데이터가 없으면 → 새 사용자 → 회원가입 플로우
@@ -122,21 +104,33 @@ export const useAuth = () => {
           
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 에러 케이스: Firestore 조회 실패 → 새 사용자로 간주 → 회원가입 플로우
-            console.log('⚠️ Firestore 조회 실패 - 새 사용자로 간주하여 회원가입 플로우 진행');
-            
-            // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
-            const kakaoNewUser = localStorage.getItem('kakao_new_user');
-            const googleNewUser = localStorage.getItem('google_new_user');
-            const appleNewUser = localStorage.getItem('apple_new_user');
-            
-            let method = 'email';
-            if (kakaoNewUser) method = 'kakao';
-            else if (googleNewUser) method = 'google';  
-            else if (appleNewUser) method = 'apple';
-            
-            console.log('🔍 회원가입 플로우 진입 (에러 케이스):', { method, uid: firebaseUser.uid });
-            // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
+            // 에러 케이스도 실제 Firestore 데이터 다시 확인
+            try {
+              const realUserData = await getUserData(firebaseUser.uid);
+              
+              if (realUserData) {
+                console.log('✅ 에러 후 재확인: Firestore에 실제 사용자 데이터 존재 - 홈으로 이동');
+                router.push('/');
+              } else {
+                console.log('🔄 에러 후 재확인: Firestore에 사용자 데이터 없음 - 회원가입 플로우');
+                
+                // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
+                const kakaoNewUser = localStorage.getItem('kakao_new_user');
+                const googleNewUser = localStorage.getItem('google_new_user');
+                const appleNewUser = localStorage.getItem('apple_new_user');
+                
+                let method = 'email';
+                if (kakaoNewUser) method = 'kakao';
+                else if (googleNewUser) method = 'google';  
+                else if (appleNewUser) method = 'apple';
+                
+                console.log('🔍 회원가입 플로우 진입 (에러 케이스):', { method, uid: firebaseUser.uid });
+                // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
+              }
+            } catch (retryError) {
+              console.log('⚠️ 재확인도 실패 - 새 사용자로 간주하여 회원가입 플로우 진행');
+              // 재확인도 실패하면 새 사용자로 간주
+            }
           }
         }
       } else {

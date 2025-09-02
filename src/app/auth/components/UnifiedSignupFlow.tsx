@@ -197,6 +197,10 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
       
       // 회원가입 완료 후 홈으로 이동
       console.log('회원가입 완료:', userData);
+      
+      // 회원가입 완료 알림
+      alert('🎉 회원가입이 완료되었습니다!\nTRIPJOY에 오신 것을 환영합니다!');
+      
       router.push('/');
       
     } catch (error) {
