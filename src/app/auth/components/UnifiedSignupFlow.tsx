@@ -105,6 +105,14 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         
         console.log('✅ 소셜 사용자 회원가입 완료');
         
+        // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('kakao_new_user');
+          localStorage.removeItem('google_new_user');
+          localStorage.removeItem('apple_new_user');
+          console.log('🧹 새 사용자 플래그 제거 완료');
+        }
+        
         // 홈으로 이동
         router.push('/');
         return;
@@ -151,6 +159,14 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
           lastUpdated: new Date().toISOString(),
           lastLoginAt: new Date().toISOString(),
         };
+      }
+      
+      // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('kakao_new_user');
+        localStorage.removeItem('google_new_user');
+        localStorage.removeItem('apple_new_user');
+        console.log('🧹 회원가입 완료 후 새 사용자 플래그 제거');
       }
       
       // 회원가입 완료 후 홈으로 이동
