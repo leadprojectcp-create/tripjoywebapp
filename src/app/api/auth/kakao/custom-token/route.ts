@@ -1,79 +1,124 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// 카카오 ID 토큰으로 Firebase OIDC 인증
-async function authenticateWithFirebaseOIDC(idToken: string) {
+// Firebase Auth REST API를 사용하여 사용자 생성/업데이트 및 Custom Token 생성
+async function createOrUpdateUserAndToken(kakaoUid: string, email: string, profileNickname: string, profileImage?: string) {
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   
   try {
-    // Firebase OIDC 엔드포인트로 카카오 ID 토큰 검증
-    const oidcEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signInWithIdp`;
+    console.log(`🔄 Firebase 사용자 처리 시작: ${kakaoUid}`);
     
-    const response = await fetch(`${oidcEndpoint}?key=${apiKey}`, {
+    // 1. 먼저 기존 사용자 확인 (signInWithPassword로 시도)
+    const signInEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signInWithPassword`;
+    const tempPassword = `kakao_${kakaoUid}_temp_password`;
+    
+    try {
+      const signInResponse = await fetch(`${signInEndpoint}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: tempPassword,
+          returnSecureToken: true,
+        }),
+      });
+
+      if (signInResponse.ok) {
+        console.log(`✅ 기존 사용자 로그인 성공: ${kakaoUid}`);
+        const userData = await signInResponse.json();
+        
+        // 2. 사용자 정보 업데이트
+        const updateEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:update`;
+        const updateResponse = await fetch(`${updateEndpoint}?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idToken: userData.idToken,
+            displayName: profileNickname,
+            photoUrl: profileImage,
+            returnSecureToken: true,
+          }),
+        });
+
+        if (updateResponse.ok) {
+          console.log(`✅ 사용자 정보 업데이트 완료: ${kakaoUid}`);
+          return { success: true, userData: await updateResponse.json() };
+        }
+      }
+    } catch (signInError) {
+      console.log(`📝 기존 사용자 없음, 새로 생성: ${kakaoUid}`);
+    }
+
+    // 3. 새 사용자 생성
+    const signUpEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signUp`;
+    const signUpResponse = await fetch(`${signUpEndpoint}?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        postBody: `id_token=${idToken}&providerId=oidc.kakao`,
-        requestUri: 'http://localhost',
-        returnIdpCredential: true,
+        email: email,
+        password: tempPassword,
+        displayName: profileNickname,
+        photoUrl: profileImage,
         returnSecureToken: true,
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Firebase OIDC 응답 오류:', errorData);
-      throw new Error(`Firebase OIDC 오류: ${errorData.error?.message || response.statusText}`);
+    if (signUpResponse.ok) {
+      console.log(`✅ 새 사용자 생성 완료: ${kakaoUid}`);
+      const userData = await signUpResponse.json();
+      return { success: true, userData };
     }
 
-    const data = await response.json();
-    console.log('Firebase OIDC 응답 성공:', data);
-    return { success: true, data };
+    throw new Error('Firebase 사용자 생성/업데이트 실패');
     
   } catch (error) {
-    console.error('Firebase OIDC 인증 오류:', error);
+    console.error('Firebase 사용자 처리 오류:', error);
     throw error;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { idToken } = await request.json();
+    const { kakaoUid, firebaseIdentifier, profileNickname, profileImage } = await request.json();
     
-    if (!idToken) {
+    console.log('🔄 카카오 사용자 Firebase 인증 처리 시작:', { kakaoUid, firebaseIdentifier, profileNickname });
+    
+    if (!kakaoUid || !firebaseIdentifier || !profileNickname) {
       return NextResponse.json(
-        { error: 'ID 토큰이 필요합니다.' },
+        { error: '필수 필드가 누락되었습니다: kakaoUid, firebaseIdentifier, profileNickname' },
         { status: 400 }
       );
     }
     
-    console.log('🔄 Firebase OIDC를 통한 카카오 인증 처리 시작');
+    // Firebase 사용자 생성/업데이트 및 인증
+    const authResult = await createOrUpdateUserAndToken(
+      kakaoUid, 
+      firebaseIdentifier, 
+      profileNickname, 
+      profileImage
+    );
     
-    // Firebase OIDC로 카카오 사용자 인증
-    const authResult = await authenticateWithFirebaseOIDC(idToken);
-    
-    console.log('✅ Firebase OIDC 인증 완료');
+    console.log('✅ Firebase 사용자 인증 처리 완료');
     
     return NextResponse.json({ 
       success: true,
+      status: 'success',
       user: {
-        uid: authResult.data.localId,
-        email: authResult.data.email,
-        name: authResult.data.displayName,
-        picture: authResult.data.photoUrl,
+        uid: authResult.userData.localId,
+        email: authResult.userData.email,
+        name: authResult.userData.displayName,
+        picture: authResult.userData.photoUrl,
         provider: 'kakao'
       },
-      firebaseData: authResult.data
+      firebaseData: authResult.userData
     });
     
   } catch (error: any) {
-    console.error('❌ Firebase OIDC 인증 실패:', error);
+    console.error('❌ Firebase 사용자 인증 실패:', error);
     return NextResponse.json(
       { 
-        error: 'Firebase OIDC 인증에 실패했습니다.',
-        details: error.message 
+        error: `Firebase 사용자 인증에 실패했습니다: ${error.message}`,
+        status: 'error'
       },
       { status: 500 }
     );
