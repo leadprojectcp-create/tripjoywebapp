@@ -9,7 +9,6 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "type-check": "tsc --noEmit",
-    "build:prod": "npm run lint && npm run type-check && next build",
     "start:prod": "next start -p $PORT",
     "deploy": "firebase deploy --only apphosting",
     "deploy:preview": "firebase hosting:channel:deploy preview",
@@ -18,7 +17,6 @@
   "dependencies": {
     "critters": "^0.0.23",
     "firebase": "^12.1.0",
-    "firebase-admin": "^13.5.0",
     "imagekit": "^6.0.0",
     "next": "15.5.0",
     "react": "19.1.0",
