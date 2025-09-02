@@ -281,6 +281,8 @@ export const updateUserProfile = async (
     name?: string;
     phoneNumber?: string;
     gender?: string;
+    birthDate?: string;
+    location?: string;
     bio?: string;
     image?: string;
     photoUrl?: string;

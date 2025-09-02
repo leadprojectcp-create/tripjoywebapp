@@ -7,6 +7,7 @@ import { TermsAgreement } from "./TermsAgreement";
 import { UserInfoForm } from "./UserInfoForm";
 import { 
   signUpWithEmail,
+  updateUserProfile,
   UserData 
 } from "../services/authService";
 import { UserInfo, SignupMethod } from "../signup/types";
@@ -17,12 +18,14 @@ interface UnifiedSignupFlowProps {
   method: SignupMethod;
   uid?: string; // 소셜 로그인의 경우 Firebase UID
   initialData?: Partial<UserInfo>;
+  mode?: 'signup' | 'complete'; // 완성 모드인지 구분
 }
 
 export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({ 
   method, 
   uid, 
-  initialData 
+  initialData,
+  mode = 'signup'
 }) => {
   const [currentStep, setCurrentStep] = useState<SignupStep>('email');
   const [signupData, setSignupData] = useState<{
@@ -34,12 +37,13 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
 
   const router = useRouter();
 
-  // 소셜 로그인인 경우 약관동의부터 시작
+  // 모드와 방법에 따라 시작 스텝 결정
   useEffect(() => {
-    if (method !== 'email') {
+    if (mode === 'complete' || method !== 'email') {
+      // 완성 모드 또는 소셜 로그인인 경우 약관동의부터 시작
       setCurrentStep('terms');
     }
-  }, [method]);
+  }, [method, mode]);
 
   const handleTermsAgree = () => {
     setCurrentStep('userInfo');
@@ -65,6 +69,46 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
   const handleUserInfoComplete = async (userInfo: UserInfo) => {
     try {
       let userData: UserData;
+      
+      if (mode === 'complete') {
+        // 프로필 완성 모드: 기존 사용자 정보 업데이트
+        if (!uid) {
+          alert('사용자 ID가 필요합니다.');
+          return;
+        }
+
+        console.log('🔄 기존 사용자 프로필 업데이트 중...', { uid, userInfo });
+
+        // 국가코드에 따른 위치 변환
+        const getLocationByCountryCode = (countryCode: string): string => {
+          switch (countryCode) {
+            case '+82': return 'ko';  // 한국
+            case '+1': return 'en';   // 미국
+            case '+84': return 'vi';  // 베트남
+            case '+86': return 'zh';  // 중국
+            case '+81': return 'ja';  // 일본
+            case '+66': return 'th';  // 태국
+            case '+63': return 'fil'; // 필리핀
+            default: return 'en';     // 기본값
+          }
+        };
+
+        const updateData = {
+          name: userInfo.name,
+          phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
+          gender: userInfo.gender === 'male' ? '남성' : '여성',
+          birthDate: `${userInfo.birthYear}-${userInfo.birthMonth.padStart(2, '0')}-${userInfo.birthDay.padStart(2, '0')}`,
+          location: getLocationByCountryCode(userInfo.countryCode),
+        };
+
+        await updateUserProfile(uid, updateData);
+        
+        console.log('✅ 프로필 업데이트 완료');
+        
+        // 홈으로 이동
+        router.push('/');
+        return;
+      }
       
       if (method === 'email') {
         // 이메일 회원가입
@@ -120,7 +164,12 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
   };
 
   const handleUserInfoBack = () => {
-    setCurrentStep('terms');
+    if (mode === 'complete') {
+      // 완성 모드에서는 홈으로 돌아가기
+      router.push('/');
+    } else {
+      setCurrentStep('terms');
+    }
   };
 
   const getMethodText = () => {
@@ -157,8 +206,8 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
       {currentStep === 'userInfo' && (
         <UserInfoForm
           method={method}
-          initialData={initialData}
-          onComplete={handleUserInfoComplete}
+          uid={uid}
+          onSubmit={handleUserInfoComplete}
           onBack={handleUserInfoBack}
         />
       )}

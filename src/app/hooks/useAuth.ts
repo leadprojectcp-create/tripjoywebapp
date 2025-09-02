@@ -5,6 +5,7 @@ import { auth } from '../services/firebase';
 import { signInWithEmail, getUserData, signOut } from '../auth/services/authService';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { isUserProfileComplete } from '../utils/userProfileUtils';
 
 interface UserData {
   id: string;
@@ -62,13 +63,34 @@ export const useAuth = () => {
             localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
           }
           
-          // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
-          // 단, 카카오 새 사용자는 약관동의 페이지로 이동하므로 리다이렉션 방지
+          // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 카카오 새 사용자 체크 (localStorage에서 확인)
-            const kakaoNewUser = localStorage.getItem('kakao_new_user');
-            if (!kakaoNewUser) {
-              router.push('/');
+            if (userData) {
+              const userWithUid = { ...userData, uid: firebaseUser.uid };
+              
+              // 먼저 프로필 완성도 체크
+              if (!isUserProfileComplete(userWithUid)) {
+                // 프로필이 불완전한 경우 정보 입력 페이지로 이동 (약관동의부터 시작)
+                console.log('🔄 프로필 정보가 불완전하여 약관동의 페이지부터 시작');
+                const signupMethod = userData.signupMethod || 'email';
+                router.push(`/auth/signup?method=${signupMethod}&uid=${firebaseUser.uid}&mode=complete`);
+                return;
+              }
+              
+              // 프로필이 완성된 경우, 새 사용자 플래그 확인
+              const kakaoNewUser = localStorage.getItem('kakao_new_user');
+              const googleNewUser = localStorage.getItem('google_new_user');
+              const appleNewUser = localStorage.getItem('apple_new_user');
+              
+              if (!kakaoNewUser && !googleNewUser && !appleNewUser) {
+                // 기존 사용자이고 프로필도 완성된 경우 홈으로 이동
+                router.push('/');
+              }
+              // 새 사용자 플래그가 있으면 회원가입 플로우 계속 진행 (리다이렉트 안 함)
+            } else {
+              // 사용자 데이터가 없는 경우 정보 입력 페이지로 이동
+              console.log('🔄 사용자 데이터가 없어 정보 입력 페이지로 이동');
+              router.push(`/auth/signup?method=email&uid=${firebaseUser.uid}&mode=complete`);
             }
           }
         } catch (error) {
@@ -83,16 +105,35 @@ export const useAuth = () => {
           setUser(defaultUserData);
           localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
           
-          // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
-          // 단, 소셜 새 사용자는 약관동의 페이지로 이동하므로 리다이렉션 방지
+          // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 소셜 새 사용자 체크 (localStorage에서 확인)
+            // 기본 사용자 데이터로 프로필 완성도 체크
+            const defaultUserData = {
+              id: firebaseUser.uid,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+            };
+            
+            // 먼저 프로필 완성도 체크
+            if (!isUserProfileComplete(defaultUserData)) {
+              // 프로필이 불완전한 경우 정보 입력 페이지로 이동 (약관동의부터 시작)
+              console.log('🔄 프로필 정보가 불완전하여 약관동의 페이지부터 시작 (에러 케이스)');
+              // 에러 케이스에서는 signupMethod를 알 수 없으므로 기본값 사용
+              router.push(`/auth/signup?method=email&uid=${firebaseUser.uid}&mode=complete`);
+              return;
+            }
+            
+            // 프로필이 완성된 경우, 새 사용자 플래그 확인
             const kakaoNewUser = localStorage.getItem('kakao_new_user');
             const googleNewUser = localStorage.getItem('google_new_user');
             const appleNewUser = localStorage.getItem('apple_new_user');
+            
             if (!kakaoNewUser && !googleNewUser && !appleNewUser) {
+              // 기존 사용자이고 프로필도 완성된 경우 홈으로 이동
               router.push('/');
             }
+            // 새 사용자 플래그가 있으면 회원가입 플로우 계속 진행 (리다이렉트 안 함)
           }
         }
       } else {

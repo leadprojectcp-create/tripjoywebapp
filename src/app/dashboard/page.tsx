@@ -10,6 +10,8 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { AuthGuard } from "../components/AuthGuard";
+import { useRouter } from "next/navigation";
+import { isUserProfileComplete } from "../utils/userProfileUtils";
 
 import { SignupMethod } from "../auth/signup/types";
 import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
@@ -27,6 +29,7 @@ export default function Dashboard() {
   
   const { t } = useTranslationContext();
   const unreadMessageCount = useUnreadMessageCount();
+  const router = useRouter();
 
   // 게시물 상태 관리
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -78,6 +81,19 @@ export default function Dashboard() {
       }
     }
   }, [authLoading, isAuthenticated]);
+
+  // 사용자 프로필 완성도 체크
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      console.log('🔍 Dashboard에서 프로필 완성도 체크 중...', user);
+      
+      if (!isUserProfileComplete(user)) {
+        console.log('🔄 Dashboard에서 프로필 정보가 불완전함을 감지, 정보 입력 페이지로 이동');
+        const signupMethod = user.signupMethod || 'email';
+        router.push(`/auth/signup?method=${signupMethod}&uid=${user.uid}&mode=complete`);
+      }
+    }
+  }, [authLoading, isAuthenticated, user, router]);
 
   // 사용자 정보 가져오기
   const getUserInfo = async (userId: string) => {
