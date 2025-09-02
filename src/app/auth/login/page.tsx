@@ -11,9 +11,6 @@ import { signInWithGoogle } from "../../services/googleAuthService";
 import { signInWithApple } from "../../services/appleAuthService";
 import { getRedirectResult } from "firebase/auth";
 import { auth } from "../../services/firebase";
-import { saveKakaoUserToFirestore } from "../../services/kakaoAuthService";
-import { saveGoogleUserToFirestore } from "../../services/googleAuthService";
-import { saveAppleUserToFirestore } from "../../services/appleAuthService";
 
 export default function LoginPage(): React.JSX.Element {
   const [email, setEmail] = useState("");
@@ -53,15 +50,7 @@ export default function LoginPage(): React.JSX.Element {
           console.log('🔍 실제 Provider ID:', providerId);
           console.log('🔍 Provider Data 상세:', providerData);
           
-          if (providerId === 'oidc.kakao') {
-            await saveKakaoUserToFirestore(user);
-          } else if (providerId === 'google.com') {
-            await saveGoogleUserToFirestore(user);
-          } else if (providerId === 'apple.com') {
-            await saveAppleUserToFirestore(user);
-          }
-          
-          console.log('✅ 사용자 정보 저장 완료');
+          console.log('✅ 사용자 인증 완료');
           setIsLoading(false);
         } else {
           // 리다이렉트 결과가 없으면 로딩 해제
@@ -176,8 +165,19 @@ export default function LoginPage(): React.JSX.Element {
         if (!result.success) {
           setError(result.error || "카카오 로그인에 실패했습니다.");
           setIsLoading(false);
+          return;
         }
-        // 리다이렉트 방식에서는 페이지를 떠나므로 로딩 상태 유지
+        
+        // 카카오 로그인 성공 - isNewUser 확인
+        if (result.isNewUser) {
+          console.log('🆕 새 사용자 발견 - 약관동의 페이지로 이동');
+          // 약관동의 페이지로 이동 (uid와 함께)
+          router.push(`/auth/signup?method=kakao&uid=${result.uid}`);
+        } else {
+          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
+          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
+        }
+        
       } catch (error: any) {
         console.error('카카오 로그인 오류:', error);
         setError('카카오 로그인 중 오류가 발생했습니다.');
