@@ -46,95 +46,77 @@ if (!getApps().length) {
   console.log('✅ Firebase Admin SDK 이미 초기화됨');
 }
 
-// Firebase Admin SDK를 사용하여 카카오 사용자 인증 및 Custom Token 생성
+// Firebase Admin SDK를 사용하여 카카오 사용자 인증 및 Custom Token 생성 (Python 버전과 동일한 로직)
 async function createFirebaseCustomToken(kakaoUid: string, email: string, profileNickname: string, profileImage?: string) {
   try {
     console.log(`🔄 Firebase Custom Token 생성 시작: ${kakaoUid}, ${email}`);
     
     const auth = getAuth();
-    
-    // Firebase UID 생성 (카카오 숫자 ID 호환)
-    const firebaseUid = `kakao_${kakaoUid}`; // kakao_4425085307 형태로 변환
-    console.log('🔄 Firebase UID 생성:', firebaseUid);
-    
-    // 1. 사용자 검색 (변환된 Firebase UID 우선, 기존 숫자 UID, 이메일 순)
-    let firebaseUser;
+    const db = getFirestore();
     let isNewUser = false;
     
+    // 1. 먼저 카카오 UID로 새 사용자 생성 시도 (Python 로직과 동일)
+    let firebaseUser;
+    
     try {
-      // 1순위: 새 형식 UID로 찾기 (kakao_4425085307)
-      try {
-        firebaseUser = await auth.getUser(firebaseUid);
-        console.log('📝 새 형식 UID로 기존 사용자 발견:', firebaseUser.uid);
-      } catch (newUidError: any) {
-        if (newUidError.code === 'auth/user-not-found') {
-          // 2순위: 기존 숫자 UID로 찾기 (4425085307) - 호환성
-          try {
-            firebaseUser = await auth.getUser(kakaoUid);
-            console.log('📝 기존 숫자 UID로 사용자 발견:', firebaseUser.uid);
-          } catch (oldUidError: any) {
-            if (oldUidError.code === 'auth/user-not-found') {
-              // 3순위: 이메일로 찾기
-              firebaseUser = await auth.getUserByEmail(email);
-              console.log('📝 이메일로 기존 사용자 발견:', firebaseUser.uid);
-            } else {
-              throw oldUidError;
-            }
-          }
-        } else {
-          throw newUidError;
-        }
-      }
-      
-      // 기존 사용자 정보 업데이트
-      await auth.updateUser(firebaseUser.uid, {
+      console.log('📝 새 사용자 생성 시도...');
+      firebaseUser = await auth.createUser({
+        uid: kakaoUid, // 카카오 UID 그대로 사용 (4425085307)
+        email: email,
+        emailVerified: true,
         displayName: profileNickname,
         photoURL: profileImage || '',
       });
       
-      // Firestore DB에 사용자 데이터가 있는지 확인
-      const db = getFirestore();
-      const userDoc = await db.collection('users_test').doc(firebaseUser.uid).get();
+      console.log('✅ 새 사용자 생성됨:', firebaseUser.uid);
+      isNewUser = true;
       
-      if (!userDoc.exists) {
-        console.log('📝 Firebase Auth에는 있지만 Firestore DB에 데이터 없음 - 회원가입 완료 필요');
-        isNewUser = true;
-      } else {
-        console.log('✅ Firebase Auth와 Firestore DB 모두 완료된 사용자');
-        isNewUser = false;
-      }
-      
-    } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
-        console.log('📝 새 사용자 생성...');
-        
-        // 2. 새 사용자 생성 (카카오 UID에 접두사 추가)
-        firebaseUser = await auth.createUser({
-          uid: firebaseUid, // kakao_4425085307 형태로 생성
+    } catch (createError: any) {
+      // 사용자가 이미 존재하면 업데이트 (Python except 로직과 동일)
+      try {
+        console.log('📝 기존 사용자 업데이트 시도...');
+        firebaseUser = await auth.updateUser(kakaoUid, {
           email: email,
+          emailVerified: true,
           displayName: profileNickname,
           photoURL: profileImage || '',
         });
         
-        isNewUser = true;
-        console.log('✅ 새 사용자 생성 완료:', firebaseUser.uid);
+        console.log('✅ 기존 사용자 업데이트됨:', firebaseUser.uid);
         
-      } else {
-        throw error;
+        // Firestore에 데이터가 있는지 확인
+        const userDoc = await db.collection('users_test').doc(kakaoUid).get();
+        isNewUser = !userDoc.exists;
+        
+        if (!userDoc.exists) {
+          console.log('📝 Firebase Auth에는 있지만 Firestore DB에 데이터 없음 - 회원가입 완료 필요');
+        } else {
+          console.log('✅ Firebase Auth와 Firestore DB 모두 완료된 사용자');
+        }
+        
+      } catch (updateError: any) {
+        console.error('❌ 사용자 업데이트 실패:', updateError);
+        throw updateError;
       }
     }
     
-    // 3. Custom Token 생성
-    const customToken = await auth.createCustomToken(firebaseUser.uid, {
+    // 2. Custom Token 생성 (Python claims와 동일)
+    const claims = {
       provider: 'kakao',
-      kakao_uid: kakaoUid,
-    });
+      email: email,
+      displayName: profileNickname,
+      ...(profileImage && { photoURL: profileImage })
+    };
+    
+    console.log('✅ 생성된 claims:', claims);
+    
+    const customToken = await auth.createCustomToken(kakaoUid, claims);
     
     console.log('✅ Custom Token 생성 완료');
     
     return {
-      success: true,
       customToken: customToken,
+      status: 'success',
       uid: firebaseUser.uid,
       isNewUser: isNewUser,
     };
@@ -198,22 +180,25 @@ export async function POST(request: NextRequest) {
     
     console.log('✅ 요청 처리 완료:', result);
     
+    // Python 버전과 동일한 응답 구조
     return NextResponse.json({
-      success: true,
       customToken: result.customToken,
+      status: 'success',
       uid: result.uid,
       isNewUser: result.isNewUser,
-      message: '카카오 인증 및 Custom Token 생성이 완료되었습니다.'
     });
     
   } catch (error: any) {
     console.error('❌ API 오류:', error);
     console.error('❌ 오류 스택:', error.stack);
     
+    // Python 버전과 동일한 에러 응답 구조
+    const errorMessage = `❌ 오류 발생: ${error.message || '알 수 없는 오류'}`;
+    
     return NextResponse.json(
       { 
-        error: '서버 오류가 발생했습니다.',
-        details: error.message || '알 수 없는 오류'
+        error: errorMessage,
+        status: 'error'
       },
       { status: 500 }
     );
