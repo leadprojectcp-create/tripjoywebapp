@@ -41,9 +41,18 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
     
     // 1. 사용자 ID로 Firebase 사용자 검색
     let firebaseUser;
+    let isNewUser = false;
+    
     try {
       firebaseUser = await auth.getUserByEmail(email);
       console.log('📝 기존 사용자 발견:', firebaseUser.uid);
+      
+      // 기존 사용자 정보 업데이트
+      await auth.updateUser(firebaseUser.uid, {
+        displayName: profileNickname,
+        photoURL: profileImage || '',
+      });
+      
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         console.log('📝 새 사용자 생성...');
@@ -56,7 +65,9 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
           uid: `kakao_${kakaoUid}`,
         });
         
+        isNewUser = true;
         console.log('✅ 새 사용자 생성 완료:', firebaseUser.uid);
+        
       } else {
         throw error;
       }
@@ -74,7 +85,7 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
       success: true,
       customToken: customToken,
       uid: firebaseUser.uid,
-      isNewUser: !firebaseUser.metadata.lastSignInTime,
+      isNewUser: isNewUser,
     };
     
   } catch (error) {
