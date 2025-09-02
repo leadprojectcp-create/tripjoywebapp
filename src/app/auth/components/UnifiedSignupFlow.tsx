@@ -8,6 +8,7 @@ import { UserInfoForm } from "./UserInfoForm";
 import { 
   signUpWithEmail,
   updateUserProfile,
+  createSocialUser,
   UserData 
 } from "../services/authService";
 import { UserInfo, SignupMethod } from "../signup/types";
@@ -71,39 +72,38 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
       let userData: UserData;
       
       if (mode === 'complete') {
-        // 프로필 완성 모드: 기존 사용자 정보 업데이트
+        // 프로필 완성 모드: 소셜 로그인 사용자 회원가입 완료
         if (!uid) {
           alert('사용자 ID가 필요합니다.');
           return;
         }
 
-        console.log('🔄 기존 사용자 프로필 업데이트 중...', { uid, userInfo });
+        console.log('🔄 소셜 사용자 회원가입 완료 중...', { uid, method, userInfo });
 
-        // 국가코드에 따른 위치 변환
-        const getLocationByCountryCode = (countryCode: string): string => {
-          switch (countryCode) {
-            case '+82': return 'ko';  // 한국
-            case '+1': return 'en';   // 미국
-            case '+84': return 'vi';  // 베트남
-            case '+86': return 'zh';  // 중국
-            case '+81': return 'ja';  // 일본
-            case '+66': return 'th';  // 태국
-            case '+63': return 'fil'; // 필리핀
-            default: return 'en';     // 기본값
-          }
-        };
-
-        const updateData = {
-          name: userInfo.name,
-          phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
-          gender: userInfo.gender === 'male' ? '남성' : '여성',
-          birthDate: `${userInfo.birthYear}-${userInfo.birthMonth.padStart(2, '0')}-${userInfo.birthDay.padStart(2, '0')}`,
-          location: getLocationByCountryCode(userInfo.countryCode),
-        };
-
-        await updateUserProfile(uid, updateData);
+        // Firebase Auth에서 현재 사용자 정보 가져오기
+        const { auth } = await import('../../services/firebase');
+        const currentUser = auth?.currentUser;
         
-        console.log('✅ 프로필 업데이트 완료');
+        if (!currentUser || !currentUser.email) {
+          alert('로그인된 사용자 정보를 찾을 수 없습니다.');
+          return;
+        }
+
+        // 소셜 사용자 회원가입 완료
+        const socialUserInfo = {
+          name: userInfo.name,
+          phoneNumber: userInfo.phoneNumber,
+          countryCode: userInfo.countryCode,
+          birthYear: userInfo.birthYear,
+          birthMonth: userInfo.birthMonth,
+          birthDay: userInfo.birthDay,
+          gender: userInfo.gender,
+          referralCode: userInfo.referralCode
+        };
+
+        await createSocialUser(uid, currentUser.email, method as 'kakao' | 'google' | 'apple', socialUserInfo);
+        
+        console.log('✅ 소셜 사용자 회원가입 완료');
         
         // 홈으로 이동
         router.push('/');

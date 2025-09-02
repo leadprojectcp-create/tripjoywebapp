@@ -274,6 +274,116 @@ export const signOut = async (): Promise<void> => {
   }
 };
 
+// 소셜 로그인 사용자 회원가입 (정보 완성)
+export const createSocialUser = async (
+  userId: string,
+  email: string,
+  signupMethod: 'kakao' | 'google' | 'apple',
+  userInfo: {
+    name: string;
+    phoneNumber: string;
+    countryCode: string;
+    birthYear: string;
+    birthMonth: string;
+    birthDay: string;
+    gender: string;
+    referralCode?: string;
+  }
+): Promise<UserData> => {
+  try {
+    // 한국 시간대 기준 타임스탬프 포맷팅 함수
+    const formatKoreanTimestamp = (date: Date): string => {
+      const koreaTime = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+      
+      const year = koreaTime.getFullYear();
+      const month = koreaTime.getMonth() + 1;
+      const day = koreaTime.getDate();
+      const hours = koreaTime.getHours();
+      const minutes = koreaTime.getMinutes();
+      const seconds = koreaTime.getSeconds();
+      
+      const period = hours < 12 ? '오전' : '오후';
+      const displayHours = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
+      
+      return `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분 ${seconds}초 UTC+9`;
+    };
+
+    // 생년월일을 타임스탬프로 변환
+    const birthDate = new Date(
+      parseInt(userInfo.birthYear), 
+      parseInt(userInfo.birthMonth) - 1, 
+      parseInt(userInfo.birthDay)
+    );
+    
+    const currentTime = new Date();
+    
+    // 국가코드에 따른 언어 및 위치 설정
+    const getLanguageAndLocationByCountryCode = (countryCode: string): { language: string, location: string } => {
+      switch (countryCode) {
+        case '+82': return { language: 'ko', location: 'ko' };  // 한국
+        case '+1': return { language: 'en', location: 'en' };   // 미국
+        case '+84': return { language: 'vi', location: 'vi' };  // 베트남
+        case '+86': return { language: 'zh', location: 'zh' };  // 중국
+        case '+81': return { language: 'ja', location: 'ja' };  // 일본
+        case '+66': return { language: 'th', location: 'th' };  // 태국
+        case '+63': return { language: 'fil', location: 'fil' }; // 필리핀
+        default: return { language: 'en', location: 'en' };     // 기본값
+      }
+    };
+
+    const { language, location } = getLanguageAndLocationByCountryCode(userInfo.countryCode);
+
+    // Firestore에 사용자 정보 저장
+    const userData: UserData = {
+      id: userId,
+      name: userInfo.name,
+      email: email,
+      phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
+      birthDate: formatKoreanTimestamp(birthDate),
+      gender: userInfo.gender === 'male' ? '남성' : '여성',
+      location: location,
+
+      referralCode: userInfo.referralCode || '',
+      referredBy: null,
+      signupMethod: signupMethod,
+      loginType: signupMethod,
+      photoUrl: '',
+      
+      // 포인트 시스템 기본값
+      points: 3000, // 가입 시 기본 포인트
+      usage_count: 0,
+      
+      // 언어 및 토큰
+      language: language,
+      fcmToken: '',
+      
+      // 동의 관련 (소셜 로그인이므로 기본값으로 설정)
+      consents: {
+        termsOfService: true,
+        personalInfo: true,
+        locationInfo: false,
+        marketing: false,
+        thirdParty: false
+      },
+      
+      // 타임스탬프들
+      createdAt: formatKoreanTimestamp(currentTime),
+      updatedAt: formatKoreanTimestamp(currentTime),
+      lastUpdated: formatKoreanTimestamp(currentTime),
+      lastLoginAt: formatKoreanTimestamp(currentTime),
+      tokenUpdatedAt: formatKoreanTimestamp(currentTime)
+    };
+
+    await setDoc(doc(db, 'users_test', userId), userData);
+    
+    console.log('✅ 소셜 사용자 회원가입 완료:', userData);
+    return userData;
+  } catch (error) {
+    logError(error, 'createSocialUser');
+    throw new Error(getErrorMessage(error));
+  }
+};
+
 // 사용자 프로필 업데이트
 export const updateUserProfile = async (
   userId: string, 
