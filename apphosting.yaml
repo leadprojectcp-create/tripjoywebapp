@@ -83,6 +83,25 @@ env:
       - BUILD
       - RUNTIME
 
+  # Firebase Admin SDK 환경변수
+  - variable: FIREBASE_PROJECT_ID
+    value: tripjoy-d309f
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: firebase-adminsdk-xxxxx@tripjoy-d309f.iam.gserviceaccount.com
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: FIREBASE_PRIVATE_KEY
+    value: "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
+    availability:
+      - BUILD
+      - RUNTIME
+
   # Grant access to secrets in Cloud Secret Manager.
   # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
   # - variable: MY_SECRET
