@@ -4,18 +4,18 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
+  background: white;
 }
 
 .userinfo-container {
-  border-radius: 20px;
+  border-radius: 12px;
   width: 100%;
   max-width: 450px;
-  min-height: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
+  background: white;
+  border: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  animation: pageSlideIn 0.3s ease-out;
+  overflow: hidden;
 }
 
 @keyframes pageSlideIn {

@@ -78,14 +78,14 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = ({
   return (
     <>
       <AppBar showBackButton={true} showLogo={false} />
-      <div className="user-info-form-page page-with-appbar">
-        <div className="user-info-form-container">
-          <div className="form-header">
-            <h2>회원정보 입력</h2>
+      <div className="userinfo-page page-with-appbar">
+        <div className="userinfo-container">
+          <div className="userinfo-header">
+            <h2 className="userinfo-title">회원정보 입력</h2>
             <p>{getMethodText()} 계정으로 가입하기 위한 추가 정보를 입력해주세요.</p>
           </div>
 
-      <form onSubmit={handleSubmit} className="user-info-form">
+              <form onSubmit={handleSubmit} className="userinfo-form">
         <div className="form-group">
           <label htmlFor="name">이름 *</label>
           <input

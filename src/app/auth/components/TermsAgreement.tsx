@@ -23,6 +23,20 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
     thirdParty: false,
   });
 
+  const allConsentsSelected = consents.termsOfService && consents.personalInfo && 
+                              consents.locationInfo && consents.marketing && consents.thirdParty;
+
+  const handleSelectAll = () => {
+    const newValue = !allConsentsSelected;
+    setConsents({
+      termsOfService: newValue,
+      personalInfo: newValue,
+      locationInfo: newValue,
+      marketing: newValue,
+      thirdParty: newValue,
+    });
+  };
+
   const handleConsentChange = (key: keyof typeof consents) => {
     setConsents(prev => ({
       ...prev,
@@ -50,82 +64,104 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
   return (
     <>
       <AppBar showBackButton={true} showLogo={false} />
-      <div className="terms-agreement-page page-with-appbar">
-        <div className="terms-agreement-container">
+      <div className="terms-page page-with-appbar">
+        <div className="terms-container">
           <div className="terms-header">
-            <h2>약관 동의</h2>
-            <p>{getMethodText()} 계정으로 가입하기 위해 약관에 동의해주세요.</p>
+            <h2 className="terms-title">약관 동의</h2>
+            <p className="terms-subtitle">{getMethodText()} 계정으로 가입하기 위해 약관에 동의해주세요.</p>
           </div>
 
-          <div className="terms-content">
-            <div className="terms-section">
-              <h3>필수 약관</h3>
-              
-              <div className="consent-item required">
-                <label>
+                    <div className="terms-content">
+            <div className="select-all-section">
+              <div className="select-all-checkbox" onClick={handleSelectAll}>
+                <input
+                  type="checkbox"
+                  checked={allConsentsSelected}
+                  readOnly
+                />
+                <span className="select-all-label">모두 동의하기</span>
+              </div>
+            </div>
+            
+            <div className="terms-list">
+              <div className="term-item">
+                <div className="term-checkbox">
                   <input
                     type="checkbox"
+                    id="termsOfService"
                     checked={consents.termsOfService}
                     onChange={() => handleConsentChange('termsOfService')}
                   />
-                  <span>서비스 이용약관 동의 (필수)</span>
-                </label>
+                  <label htmlFor="termsOfService" className="term-label">
+                    <span className="required">[필수] 서비스 이용약관</span>
+                  </label>
+                  <span className="term-arrow">&gt;</span>
+                </div>
               </div>
 
-              <div className="consent-item required">
-                <label>
+              <div className="term-item">
+                <div className="term-checkbox">
                   <input
                     type="checkbox"
+                    id="personalInfo"
                     checked={consents.personalInfo}
                     onChange={() => handleConsentChange('personalInfo')}
                   />
-                  <span>개인정보 처리방침 동의 (필수)</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="terms-section">
-              <h3>선택 약관</h3>
-              
-              <div className="consent-item">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={consents.locationInfo}
-                    onChange={() => handleConsentChange('locationInfo')}
-                  />
-                  <span>위치정보 이용 동의 (선택)</span>
-                </label>
+                  <label htmlFor="personalInfo" className="term-label">
+                    <span className="required">[필수] 개인정보수집/이용동의</span>
+                  </label>
+                  <span className="term-arrow">&gt;</span>
+                </div>
               </div>
 
-              <div className="consent-item">
-                <label>
+              <div className="term-item">
+                <div className="term-checkbox">
                   <input
                     type="checkbox"
-                    checked={consents.marketing}
-                    onChange={() => handleConsentChange('marketing')}
-                  />
-                  <span>마케팅 정보 수신 동의 (선택)</span>
-                </label>
-              </div>
-
-              <div className="consent-item">
-                <label>
-                  <input
-                    type="checkbox"
+                    id="thirdParty"
                     checked={consents.thirdParty}
                     onChange={() => handleConsentChange('thirdParty')}
                   />
-                  <span>제3자 정보 제공 동의 (선택)</span>
-                </label>
+                  <label htmlFor="thirdParty" className="term-label">
+                    <span className="required">[필수] 개인정보 제3자 정보제공 동의</span>
+                  </label>
+                  <span className="term-arrow">&gt;</span>
+                </div>
+              </div>
+
+              <div className="term-item">
+                <div className="term-checkbox">
+                  <input
+                    type="checkbox"
+                    id="locationInfo"
+                    checked={consents.locationInfo}
+                    onChange={() => handleConsentChange('locationInfo')}
+                  />
+                  <label htmlFor="locationInfo" className="term-label">
+                    <span className="required">[필수] 위치기반 서비스 이용약관 동의</span>
+                  </label>
+                  <span className="term-arrow">&gt;</span>
+                </div>
+              </div>
+              
+              <div className="term-item">
+                <div className="term-checkbox">
+                  <input
+                    type="checkbox"
+                    id="marketing"
+                    checked={consents.marketing}
+                    onChange={() => handleConsentChange('marketing')}
+                  />
+                  <label htmlFor="marketing" className="term-label">
+                    <span className="optional">[선택] 마케팅 활용 동의</span>
+                  </label>
+                  <span className="term-arrow">&gt;</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="terms-actions">
-            <button type="button" className="back-button" onClick={onBack}>
-              뒤로
-            </button>
+          <div className="terms-footer">
             <button 
               type="button" 
               className="agree-button"
