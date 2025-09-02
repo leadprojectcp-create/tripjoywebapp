@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import "./TermsAgreement.css";
+import "../signup/TermsAgreement.css";
 import { AppBar } from "../../components/AppBar";
 
 interface TermsAgreementProps {

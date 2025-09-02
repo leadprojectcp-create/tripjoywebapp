@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import "./UserInfoForm.css";
+import "../signup/UserInfoForm.css";
 import { UserInfo } from "../signup/types";
 import { AppBar } from "../../components/AppBar";
 

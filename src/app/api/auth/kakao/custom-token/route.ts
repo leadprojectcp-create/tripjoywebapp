@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 
 // Firebase Admin SDK 초기화
 if (!getApps().length) {
@@ -65,6 +66,18 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
         displayName: profileNickname,
         photoURL: profileImage || '',
       });
+      
+      // Firestore DB에 사용자 데이터가 있는지 확인
+      const db = getFirestore();
+      const userDoc = await db.collection('users_test').doc(firebaseUser.uid).get();
+      
+      if (!userDoc.exists) {
+        console.log('📝 Firebase Auth에는 있지만 Firestore DB에 데이터 없음 - 회원가입 완료 필요');
+        isNewUser = true;
+      } else {
+        console.log('✅ Firebase Auth와 Firestore DB 모두 완료된 사용자');
+        isNewUser = false;
+      }
       
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
