@@ -89,7 +89,7 @@ export default function Dashboard() {
     }
 
     try {
-      const userDoc = await getDoc(doc(db, 'users_test', userId));
+      const userDoc = await getDoc(doc(db, 'users', userId));
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const userInfo = {

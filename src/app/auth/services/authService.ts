@@ -186,7 +186,7 @@ export const signUpWithEmail = async (email: string, password: string, userInfo:
       tokenUpdatedAt: formatKoreanTimestamp(currentTime)
     };
 
-    await setDoc(doc(db, 'users_test', user.uid), userData);
+    await setDoc(doc(db, 'users', user.uid), userData);
     
     // Firebase 회원가입 완료 후 localStorage 업데이트
     if (typeof window !== 'undefined') {
@@ -230,7 +230,7 @@ export const getUserDataByEmail = async (email: string): Promise<UserData | null
     
     // 이메일로 사용자 검색
     const { collection, query, where, getDocs } = await import('firebase/firestore');
-    const usersRef = collection(db, 'users_test');
+    const usersRef = collection(db, 'users');
     const q = query(usersRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
     
@@ -255,7 +255,7 @@ export const updateUserUID = async (oldUserId: string, newUserId: string): Promi
     }
     
     // 기존 문서 가져오기
-    const oldUserDoc = await getDoc(doc(db, 'users_test', oldUserId));
+    const oldUserDoc = await getDoc(doc(db, 'users', oldUserId));
     if (!oldUserDoc.exists()) {
       throw new Error('기존 사용자 문서를 찾을 수 없습니다.');
     }
@@ -271,7 +271,7 @@ export const updateUserUID = async (oldUserId: string, newUserId: string): Promi
     };
     
     // 새 문서 생성하고 기존 문서 삭제
-    await setDoc(doc(db, 'users_test', newUserId), updatedUserData);
+    await setDoc(doc(db, 'users', newUserId), updatedUserData);
     
     console.log('✅ 사용자 UID 업데이트 완료:', { old: oldUserId, new: newUserId });
     return updatedUserData;
@@ -289,7 +289,7 @@ export const getUserData = async (userId: string): Promise<UserData | null> => {
       throw new Error('Firebase가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
     }
     
-    const userDoc = await getDoc(doc(db, 'users_test', userId));
+    const userDoc = await getDoc(doc(db, 'users', userId));
     if (userDoc.exists()) {
       return userDoc.data() as UserData;
     }
@@ -443,9 +443,9 @@ export const createSocialUser = async (
       tokenUpdatedAt: formatKoreanTimestamp(currentTime)
     };
 
-    console.log('💾 Firestore 저장 시작 - users_test 컬렉션:', { userId, userData });
+    console.log('💾 Firestore 저장 시작 - users 컬렉션:', { userId, userData });
     
-    await setDoc(doc(db, 'users_test', userId), userData);
+    await setDoc(doc(db, 'users', userId), userData);
     
     console.log('✅ 소셜 사용자 Firestore 저장 성공!');
     console.log('📊 저장된 데이터:', userData);
@@ -478,7 +478,7 @@ export const updateUserProfile = async (
   }
 ) => {
   try {
-    const userRef = doc(db, 'users_test', userId);
+    const userRef = doc(db, 'users', userId);
     
     // 기존 데이터 가져오기
     const userDoc = await getDoc(userRef);

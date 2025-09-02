@@ -196,7 +196,7 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
           }
         );
         
-        console.log('✅ Firestore users_test 컬렉션에 소셜 사용자 저장 완료:', userData);
+        console.log('✅ Firestore users 컬렉션에 소셜 사용자 저장 완료:', userData);
       }
       
       // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)

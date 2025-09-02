@@ -72,8 +72,8 @@ export const createChatRoom = async (
       
       // 기존 채팅방의 이미지 정보도 최신으로 업데이트
       try {
-        const currentUserDoc = await getDoc(doc(db, 'users_test', currentUserId));
-        const targetUserDoc = await getDoc(doc(db, 'users_test', targetUserId));
+        const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+        const targetUserDoc = await getDoc(doc(db, 'users', targetUserId));
         
         const currentUserPhotoUrl = currentUserDoc.exists() ? currentUserDoc.data().photoUrl || '' : '';
         const targetUserPhotoUrl = targetUserDoc.exists() ? targetUserDoc.data().photoUrl || '' : '';
@@ -93,13 +93,13 @@ export const createChatRoom = async (
       return existingChatId;
     }
 
-    // users_test에서 실제 사용자 정보 가져오기
+    // users에서 실제 사용자 정보 가져오기
     let actualCurrentUserImage = currentUserImage || '';
     let actualTargetUserImage = targetUserImage || '';
     
     try {
       // 현재 사용자 정보 가져오기
-      const currentUserDoc = await getDoc(doc(db, 'users_test', currentUserId));
+      const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
       if (currentUserDoc.exists()) {
         const currentUserData = currentUserDoc.data();
         actualCurrentUserImage = currentUserData.photoUrl || '';
@@ -107,7 +107,7 @@ export const createChatRoom = async (
       }
       
       // 대상 사용자 정보 가져오기
-      const targetUserDoc = await getDoc(doc(db, 'users_test', targetUserId));
+      const targetUserDoc = await getDoc(doc(db, 'users', targetUserId));
       if (targetUserDoc.exists()) {
         const targetUserData = targetUserDoc.data();
         actualTargetUserImage = targetUserData.photoUrl || '';
@@ -216,7 +216,7 @@ export const findExistingChatRoom = async (
 // 사용자에게 채팅방 ID 추가
 const addChatIdToUser = async (userId: string, chatId: string): Promise<void> => {
   try {
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     await updateDoc(userDocRef, {
       chatIds: arrayUnion(chatId)
     });
@@ -371,7 +371,7 @@ export const getUserChatRooms = async (userId: string): Promise<ChatRoom[]> => {
     }
     
     // 사용자 문서에서 채팅방 ID 목록 가져오기
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (!userDoc.exists()) {
@@ -494,7 +494,7 @@ export const deleteChatRoom = async (chatId: string, userId: string): Promise<bo
 // 사용자에게서 채팅방 ID 제거
 const removeChatIdFromUser = async (userId: string, chatId: string): Promise<void> => {
   try {
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     await updateDoc(userDocRef, {
       chatIds: arrayRemove(chatId)
     });
@@ -511,7 +511,7 @@ export const blockUser = async (blockerId: string, blockedUserId: string): Promi
     console.log('🚫 사용자 차단 시작:', { blockerId, blockedUserId });
 
     // 차단 목록에 추가
-    const blockerDocRef = doc(db, 'users_test', blockerId);
+    const blockerDocRef = doc(db, 'users', blockerId);
     await updateDoc(blockerDocRef, {
       blockedUsers: arrayUnion(blockedUserId)
     });
@@ -529,7 +529,7 @@ export const unblockUser = async (blockerId: string, blockedUserId: string): Pro
   try {
     console.log('✅ 사용자 차단 해제 시작:', { blockerId, blockedUserId });
 
-    const blockerDocRef = doc(db, 'users_test', blockerId);
+    const blockerDocRef = doc(db, 'users', blockerId);
     await updateDoc(blockerDocRef, {
       blockedUsers: arrayRemove(blockedUserId)
     });
@@ -545,7 +545,7 @@ export const unblockUser = async (blockerId: string, blockedUserId: string): Pro
 // 차단된 사용자 목록 가져오기
 export const getBlockedUsers = async (userId: string): Promise<string[]> => {
   try {
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (!userDoc.exists()) {
@@ -623,7 +623,7 @@ export const updateAllChatRoomImages = async (userId: string): Promise<void> => 
     console.log('🔄 모든 채팅방 이미지 정보 업데이트 시작:', userId);
     
     // 사용자의 채팅방 목록 가져오기
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (!userDoc.exists()) {
@@ -650,7 +650,7 @@ export const updateAllChatRoomImages = async (userId: string): Promise<void> => 
           
           for (const participantId of participants) {
             try {
-              const participantDoc = await getDoc(doc(db, 'users_test', participantId));
+              const participantDoc = await getDoc(doc(db, 'users', participantId));
               if (participantDoc.exists()) {
                 const participantData = participantDoc.data();
                 updatedImages[participantId] = participantData.photoUrl || '';

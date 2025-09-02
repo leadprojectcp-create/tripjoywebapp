@@ -109,7 +109,7 @@ export async function getRequestedCompanions(userId?: string): Promise<Companion
       let receiverName = data.receiverName;
       if (!receiverName && data.receiverId) {
         try {
-          const userDoc = await getDoc(doc(db, 'users_test', data.receiverId));
+          const userDoc = await getDoc(doc(db, 'users', data.receiverId));
           if (userDoc.exists()) {
             receiverName = userDoc.data().name || 'Unknown';
           }

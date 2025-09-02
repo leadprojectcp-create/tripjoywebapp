@@ -85,7 +85,7 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
         console.log('✅ 기존 사용자 업데이트됨:', firebaseUser.uid);
         
         // Firestore에 데이터가 있는지 확인
-        const userDoc = await db.collection('users_test').doc(kakaoUid).get();
+        const userDoc = await db.collection('users').doc(kakaoUid).get();
         isNewUser = !userDoc.exists;
         
         if (!userDoc.exists) {

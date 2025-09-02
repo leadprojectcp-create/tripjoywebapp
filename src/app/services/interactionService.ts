@@ -29,7 +29,7 @@ export const toggleLike = async (postId: string, userId: string): Promise<{ isLi
     const likedBy = postData?.likedBy || {};
     const isCurrentlyLiked = userId in likedBy;
     
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const timestamp = serverTimestamp();
     
     if (isCurrentlyLiked) {
@@ -94,7 +94,7 @@ export const toggleBookmark = async (postId: string, userId: string): Promise<{ 
     const bookmarkedBy = postData?.bookmarkedBy || {};
     const isCurrentlyBookmarked = userId in bookmarkedBy;
     
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const timestamp = serverTimestamp();
     
     if (isCurrentlyBookmarked) {
@@ -243,11 +243,11 @@ export const getPostBookmarkedUsers = async (postId: string): Promise<{ [userId:
 };
 
 /**
- * 사용자가 좋아요한 게시물 목록 가져오기 (users_test 문서에서)
+ * 사용자가 좋아요한 게시물 목록 가져오기 (users 문서에서)
  */
 export const getUserLikedPostIds = async (userId: string): Promise<string[]> => {
   try {
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (userDoc.exists()) {
@@ -265,11 +265,11 @@ export const getUserLikedPostIds = async (userId: string): Promise<string[]> => 
 };
 
 /**
- * 사용자가 북마크한 게시물 목록 가져오기 (users_test 문서에서)
+ * 사용자가 북마크한 게시물 목록 가져오기 (users 문서에서)
  */
 export const getUserBookmarkedPostIds = async (userId: string): Promise<string[]> => {
   try {
-    const userDocRef = doc(db, 'users_test', userId);
+    const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
     if (userDoc.exists()) {

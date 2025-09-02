@@ -109,7 +109,7 @@ export const signInWithApple = async (): Promise<AppleAuthResult> => {
  */
 export const saveAppleUserToFirestore = async (user: User): Promise<boolean> => {
   try {
-    const userRef = doc(db, 'users_test', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userRef);
     
     const isNewUser = !userDoc.exists();

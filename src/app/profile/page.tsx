@@ -282,7 +282,7 @@ function ProfileContent() {
       }
 
       if (Object.keys(updates).length > 0) {
-        await updateDoc(doc(db, 'users_test', user.uid), updates);
+        await updateDoc(doc(db, 'users', user.uid), updates);
         
         // 로컬 상태 업데이트
         setProfileData(prev => ({
@@ -334,7 +334,7 @@ function ProfileContent() {
           return;
         }
 
-        const userDoc = await getDoc(doc(db, 'users_test', targetUserId));
+        const userDoc = await getDoc(doc(db, 'users', targetUserId));
         
         if (userDoc.exists()) {
           const userData = userDoc.data();

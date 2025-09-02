@@ -39,7 +39,7 @@ export interface UserInfo {
  */
 const getUserInfo = async (userId: string): Promise<UserInfo | null> => {
   try {
-    const userDoc = await getDoc(doc(db, 'users_test', userId));
+    const userDoc = await getDoc(doc(db, 'users', userId));
     if (userDoc.exists()) {
       const userData = userDoc.data();
       return {

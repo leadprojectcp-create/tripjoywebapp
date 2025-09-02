@@ -18,11 +18,11 @@ export interface CuratorData {
 }
 
 /**
- * users_test 컬렉션에서 모든 큐레이터 데이터를 가져옵니다
+ * users 컬렉션에서 모든 큐레이터 데이터를 가져옵니다
  */
 export const getCurators = async (): Promise<CuratorData[]> => {
   try {
-    const curatorsRef = collection(db, 'users_test');
+    const curatorsRef = collection(db, 'users');
     const q = query(curatorsRef, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     
@@ -60,7 +60,7 @@ export const getCurators = async (): Promise<CuratorData[]> => {
  */
 export const getCuratorById = async (curatorId: string): Promise<CuratorData | null> => {
   try {
-    const curatorsRef = collection(db, 'users_test');
+    const curatorsRef = collection(db, 'users');
     const querySnapshot = await getDocs(curatorsRef);
     
     let curator: CuratorData | null = null;
