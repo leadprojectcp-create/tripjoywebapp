@@ -348,9 +348,18 @@ export const createSocialUser = async (
     birthDay: string;
     gender: string;
     referralCode?: string;
+    consents?: {
+      termsOfService: boolean;
+      personalInfo: boolean;
+      locationInfo: boolean;
+      marketing: boolean;
+      thirdParty: boolean;
+    };
   }
 ): Promise<UserData> => {
   try {
+    console.log('🚀 createSocialUser 함수 시작:', { userId, email, signupMethod, userInfo });
+    
     // 한국 시간대 기준 타임스탬프 포맷팅 함수
     const formatKoreanTimestamp = (date: Date): string => {
       const koreaTime = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
@@ -417,8 +426,8 @@ export const createSocialUser = async (
       language: language,
       fcmToken: '',
       
-      // 동의 관련 (소셜 로그인이므로 기본값으로 설정)
-      consents: {
+      // 동의 관련 (실제 사용자 동의 정보 사용 - 이메일 회원가입과 동일)
+      consents: userInfo.consents || {
         termsOfService: true,
         personalInfo: true,
         locationInfo: false,
@@ -434,13 +443,22 @@ export const createSocialUser = async (
       tokenUpdatedAt: formatKoreanTimestamp(currentTime)
     };
 
+    console.log('💾 Firestore 저장 시작 - users_test 컬렉션:', { userId, userData });
+    
     await setDoc(doc(db, 'users_test', userId), userData);
     
-    console.log('✅ 소셜 사용자 회원가입 완료:', userData);
+    console.log('✅ 소셜 사용자 Firestore 저장 성공!');
+    console.log('📊 저장된 데이터:', userData);
     return userData;
   } catch (error) {
+    console.error('❌ createSocialUser 에러 발생:', error);
+    console.error('❌ 에러 세부사항:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
     logError(error, 'createSocialUser');
-    throw new Error(getErrorMessage(error));
+    throw new Error(`소셜 사용자 저장 실패: ${getErrorMessage(error)}`);
   }
 };
 

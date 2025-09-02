@@ -145,33 +145,51 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         // 소셜 로그인 회원가입 완료
         console.log(`🆕 ${method} 사용자 회원가입 완료:`, userInfo);
         
-        // TODO: 소셜 사용자 정보를 Firestore에 저장하는 API 호출
-        // 임시로 성공 처리
-        userData = {
-          id: uid || `temp_${method}_user`,
-          name: userInfo.name || '',
-          email: '', // 소셜 사용자는 이메일이 이미 Firebase Auth에 저장됨
-          phoneNumber: userInfo.phoneNumber || '',
-          birthDate: `${userInfo.birthYear}-${userInfo.birthMonth}-${userInfo.birthDay}`,
-          gender: userInfo.gender === 'male' ? '남성' : '여성',
-          location: userInfo.countryCode || '',
-          signupMethod: method,
-          loginType: method,
-          points: 0,
-          usage_count: 0,
-          language: 'ko',
-          consents: {
-            termsOfService: true,
-            personalInfo: true,
-            locationInfo: userInfo.consents?.locationInfo || false,
-            marketing: userInfo.consents?.marketing || false,
-            thirdParty: userInfo.consents?.thirdParty || false,
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          lastUpdated: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-        };
+        if (!uid) {
+          alert('사용자 UID가 없습니다. 다시 시도해주세요.');
+          return;
+        }
+        
+        // Firebase Auth에서 실제 이메일 가져오기
+        const { auth } = await import('../../services/firebase');
+        const currentUser = auth.currentUser;
+        const userEmail = currentUser?.email || '';
+        
+        console.log('🔍 소셜 사용자 저장 준비:', {
+          uid,
+          userEmail,
+          method,
+          currentUser: currentUser ? 'exists' : 'null',
+          userInfo
+        });
+        
+        // Firestore에 소셜 사용자 정보 저장 (이메일 회원가입과 동일한 필드)
+        console.log('🚀 createSocialUser 호출 시작...');
+        userData = await createSocialUser(
+          uid,
+          userEmail, // Firebase Auth에서 가져온 실제 이메일
+          method as 'kakao' | 'google' | 'apple',
+          {
+            name: userInfo.name || '',
+            phoneNumber: userInfo.phoneNumber || '',
+            countryCode: userInfo.countryCode || '',
+            birthYear: userInfo.birthYear || '',
+            birthMonth: userInfo.birthMonth || '',
+            birthDay: userInfo.birthDay || '',
+            gender: userInfo.gender || 'male',
+            referralCode: userInfo.referralCode || '',
+            // 실제 사용자 동의 정보 전달
+            consents: userInfo.consents || {
+              termsOfService: true,
+              personalInfo: true,
+              locationInfo: false,
+              marketing: false,
+              thirdParty: false
+            }
+          }
+        );
+        
+        console.log('✅ Firestore users_test 컬렉션에 소셜 사용자 저장 완료:', userData);
       }
       
       // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)
