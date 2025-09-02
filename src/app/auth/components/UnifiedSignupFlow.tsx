@@ -107,9 +107,22 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         
         // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)
         if (typeof window !== 'undefined') {
+          console.log('🧹 회원가입 완료 - localStorage 플래그 제거 시작');
+          console.log('🔍 제거 전 플래그 상태:', {
+            kakao: localStorage.getItem('kakao_new_user'),
+            google: localStorage.getItem('google_new_user'),
+            apple: localStorage.getItem('apple_new_user')
+          });
+          
           localStorage.removeItem('kakao_new_user');
           localStorage.removeItem('google_new_user');
           localStorage.removeItem('apple_new_user');
+          
+          console.log('🔍 제거 후 플래그 상태:', {
+            kakao: localStorage.getItem('kakao_new_user'),
+            google: localStorage.getItem('google_new_user'),
+            apple: localStorage.getItem('apple_new_user')
+          });
           console.log('🧹 새 사용자 플래그 제거 완료');
         }
         
@@ -163,9 +176,22 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
       
       // localStorage의 새 사용자 플래그 제거 (회원가입 완료됨)
       if (typeof window !== 'undefined') {
+        console.log('🧹 일반 회원가입 완료 - localStorage 플래그 제거 시작');
+        console.log('🔍 제거 전 플래그 상태:', {
+          kakao: localStorage.getItem('kakao_new_user'),
+          google: localStorage.getItem('google_new_user'),
+          apple: localStorage.getItem('apple_new_user')
+        });
+        
         localStorage.removeItem('kakao_new_user');
         localStorage.removeItem('google_new_user');
         localStorage.removeItem('apple_new_user');
+        
+        console.log('🔍 제거 후 플래그 상태:', {
+          kakao: localStorage.getItem('kakao_new_user'),
+          google: localStorage.getItem('google_new_user'),
+          apple: localStorage.getItem('apple_new_user')
+        });
         console.log('🧹 회원가입 완료 후 새 사용자 플래그 제거');
       }
       

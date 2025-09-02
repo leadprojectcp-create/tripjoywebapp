@@ -85,12 +85,20 @@ export default function Dashboard() {
   // 사용자 프로필 완성도 체크
   useEffect(() => {
     if (!authLoading && isAuthenticated && user) {
-      console.log('🔍 Dashboard에서 프로필 완성도 체크 중...', user);
+      console.log('🔍 Dashboard에서 프로필 완성도 체크 중...');
+      console.log('📊 사용자 데이터:', user);
+      console.log('🔍 signupMethod:', user.signupMethod);
       
-      if (!isUserProfileComplete(user)) {
+      const isComplete = isUserProfileComplete(user);
+      console.log('📊 프로필 완성 여부:', isComplete);
+      
+      if (!isComplete) {
         console.log('🔄 Dashboard에서 프로필 정보가 불완전함을 감지, 정보 입력 페이지로 이동');
         const signupMethod = user.signupMethod || 'email';
+        console.log('🔄 리다이렉트할 method:', signupMethod);
         router.push(`/auth/signup?method=${signupMethod}&uid=${user.uid}&mode=complete`);
+      } else {
+        console.log('✅ Dashboard: 프로필 완성됨, 메인 페이지 계속 표시');
       }
     }
   }, [authLoading, isAuthenticated, user, router]);

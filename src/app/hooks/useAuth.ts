@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { auth } from '../services/firebase';
-import { signInWithEmail, getUserData, signOut } from '../auth/services/authService';
+import { signInWithEmail, getUserData, getUserDataByEmail, updateUserUID, signOut } from '../auth/services/authService';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { isUserProfileComplete } from '../utils/userProfileUtils';
@@ -44,8 +44,29 @@ export const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Firestore에서 사용자 정보 가져오기
-          const userData = await getUserData(firebaseUser.uid);
+          // 1단계: 현재 UID로 사용자 정보 조회
+          let userData = await getUserData(firebaseUser.uid);
+          
+          if (!userData && firebaseUser.email) {
+            // 2단계: 이메일로 기존 사용자 찾기
+            console.log('🔍 현재 UID에서 사용자 정보 없음. 이메일로 기존 사용자 찾는 중:', firebaseUser.email);
+            const existingUserData = await getUserDataByEmail(firebaseUser.email);
+            
+            if (existingUserData) {
+              // 3단계: 기존 사용자 발견 - UID 업데이트
+              console.log('📧 기존 사용자 발견! UID 업데이트 중:', { 
+                old: existingUserData.id, 
+                new: firebaseUser.uid 
+              });
+              
+              userData = await updateUserUID(existingUserData.id, firebaseUser.uid);
+              
+              if (userData) {
+                console.log('✅ UID 업데이트 완료. 기존 데이터 보존됨!');
+              }
+            }
+          }
+          
           if (userData) {
             // uid 필드 추가
             const userWithUid = { ...userData, uid: firebaseUser.uid };
@@ -82,9 +103,18 @@ export const useAuth = () => {
               const googleNewUser = localStorage.getItem('google_new_user');
               const appleNewUser = localStorage.getItem('apple_new_user');
               
+              console.log('🔍 localStorage 플래그 상태:', {
+                kakaoNewUser,
+                googleNewUser,
+                appleNewUser
+              });
+              
               if (!kakaoNewUser && !googleNewUser && !appleNewUser) {
                 // 기존 사용자이고 프로필도 완성된 경우 홈으로 이동
+                console.log('✅ 새 사용자 플래그 없음 - 홈으로 이동');
                 router.push('/');
+              } else {
+                console.log('⚠️ 새 사용자 플래그 발견 - 회원가입 플로우 계속');
               }
               // 새 사용자 플래그가 있으면 회원가입 플로우 계속 진행 (리다이렉트 안 함)
             } else {

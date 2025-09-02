@@ -221,6 +221,66 @@ export const signInWithEmail = async (email: string, password: string): Promise<
   }
 };
 
+// 이메일로 기존 사용자 찾기
+export const getUserDataByEmail = async (email: string): Promise<UserData | null> => {
+  try {
+    if (!db) {
+      throw new Error('Firebase가 설정되지 않았습니다.');
+    }
+    
+    // 이메일로 사용자 검색
+    const { collection, query, where, getDocs } = await import('firebase/firestore');
+    const usersRef = collection(db, 'users_test');
+    const q = query(usersRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      console.log('📧 이메일로 기존 사용자 찾음:', userDoc.id);
+      return { ...userDoc.data(), id: userDoc.id } as UserData;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('이메일로 사용자 정보 조회 실패:', error);
+    return null;
+  }
+};
+
+// 기존 사용자 UID 업데이트 (uid 변경 시 사용)
+export const updateUserUID = async (oldUserId: string, newUserId: string): Promise<UserData | null> => {
+  try {
+    if (!db) {
+      throw new Error('Firebase가 설정되지 않았습니다.');
+    }
+    
+    // 기존 문서 가져오기
+    const oldUserDoc = await getDoc(doc(db, 'users_test', oldUserId));
+    if (!oldUserDoc.exists()) {
+      throw new Error('기존 사용자 문서를 찾을 수 없습니다.');
+    }
+    
+    const userData = oldUserDoc.data() as UserData;
+    
+    // 새로운 UID로 문서 생성
+    const updatedUserData = {
+      ...userData,
+      id: newUserId,
+      uid: newUserId,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // 새 문서 생성하고 기존 문서 삭제
+    await setDoc(doc(db, 'users_test', newUserId), updatedUserData);
+    
+    console.log('✅ 사용자 UID 업데이트 완료:', { old: oldUserId, new: newUserId });
+    return updatedUserData;
+  } catch (error) {
+    console.error('사용자 UID 업데이트 실패:', error);
+    throw error;
+  }
+};
+
 // 사용자 정보 가져오기
 export const getUserData = async (userId: string): Promise<UserData | null> => {
   try {

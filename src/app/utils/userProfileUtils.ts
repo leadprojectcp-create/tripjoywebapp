@@ -19,22 +19,30 @@ export interface UserData {
  * 필수 정보: name, phoneNumber, birthDate, gender
  */
 export const isUserProfileComplete = (user: UserData | null): boolean => {
+  console.log('🔍 프로필 완성도 체크 시작:', user);
+  
   if (!user) {
+    console.log('❌ 사용자 데이터가 null입니다.');
     return false;
   }
 
   // 필수 필드들이 모두 존재하고 비어있지 않은지 확인
   const requiredFields = ['name', 'phoneNumber', 'birthDate', 'gender'];
   
+  console.log('📋 체크할 필수 필드들:', requiredFields);
+  
   for (const field of requiredFields) {
     const value = user[field as keyof UserData];
+    console.log(`🔍 ${field} 값:`, value, `(타입: ${typeof value})`);
+    
     if (!value || (typeof value === 'string' && value.trim() === '')) {
-      console.log(`🔍 프로필 미완성: ${field}이(가) 비어있습니다.`);
+      console.log(`❌ 프로필 미완성: ${field}이(가) 비어있습니다.`);
+      console.log('🔍 전체 사용자 데이터:', JSON.stringify(user, null, 2));
       return false;
     }
   }
   
-  console.log('✅ 프로필 완성됨');
+  console.log('✅ 프로필 완성됨! 모든 필수 필드 존재');
   return true;
 };
 
