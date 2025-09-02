@@ -83,9 +83,22 @@ env:
       - BUILD
       - RUNTIME
 
+  # Firebase Admin SDK 환경변수 (Custom Token 생성용)
+  - variable: FIREBASE_PROJECT_ID
+    value: tripjoy-d309f
+    availability:
+      - BUILD
+      - RUNTIME
 
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: firebase-adminsdk-4yo40@tripjoy-d309f.iam.gserviceaccount.com
+    availability:
+      - BUILD
+      - RUNTIME
 
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  - variable: FIREBASE_PRIVATE_KEY
+    value: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDGYnBVNq6QHt+z\nyysPI5LZvS1JiNnKbvvsFCUFkH5bC0u2feIXh6ANd1YqADStzEBUrqEpZ76XB0sC\n250nHKvaFCnxgD/BHRBrjUr3/I5RWtsrw/7ns1pbbOo3mH36pGoRDnjvs4x+uQYh\nAzasFzezpoqSa5/JIZDeaEkfQpkbvr1hE1V79wRQvCF7OUCGn5bSXO1A4sXm056F\nEvRZShnnFJMWZUv0gyG/D+M3BFqYgY886GI6QccExEgMH0iof4aAy2a4vp86ErYr\nYw0Me0Mm9BAFCBogoXR5MYcQ5A4pqr4HyqEQiMi4QSsq/vesdybg3tWMgGfSs46K\n2uiR9i6zAgMBAAECggEAHs5whTsNloHE2UWmdR5gEoHnA3FF6MKdSkbCjP+oL3ks\nk7Uuo9rCxvSOI82OYKLEJqJLkoNyvD88rb/uwoEYSrAw5zi0LcfWoez6BFJqw0Vp\nnX09GzvlvybFpEaA4aggdG+b5hUqrw8KXZwDJGwikTo+cIhX8sLMnUzydfFAl2cb\nuXUg/IaYIjmbxKpneysRyCzLQ87exOw5cm/hcBHEGyh5IIbBF8W8qdpL0UW0Fe0j\nrjRqTFtFgZ7qlWM1ZJPqmgmnmhq9nHEzizJ/ie33xer5aqMocnzXy3BGPXBspzsU\n0xdEwXYeM/1Ey0j9IXmtcluZfusyvwIOena6aUPo4QKBgQD+6lDTvxXUhJFuAohz\nLqcBAMTldnF9siMA2izJqDe5mM21Fzc+lLqukHmlDagOYc6lCblLVk0qGOxzhPaK\nDpDcFVoWJjIkKWgdckBul0JtGs4abeNVEVNw7EauBERIece1im6lSfg/yGol8y8s\nRHlsngrxQ0nE3p7vcySwNgb7cQKBgQDHOosBFHQzH1wuPrRe0woYHT6x30RqpdyA\na81+O14WbZrm7T9eSKUYteumyoOUl922hf2yrfv2LE3Z50fd0t/4hsEW7H5Z1MCh\n63gGqc7Q+BTFLWDppMrMrkvG+GIKRIIChg994gL47FTgBn0Zs4kjIV7mj+F/AImA\n3mD/vGUSYwKBgQCaQF2ilAl4rLN31y6MTFmgQL/kfjSUs/t8Y4kgiZsWwsEPaLn0\nM3l3clM5rjbYZRTvRyAJ13IgHC7QhE/PIJtFoeH+byR+P1QSJXWZtgvrC4JV+dLL\nQg200jS+zjQnixFu6BKmEEmZBwQ8bJhJ+DFlqYjDj00PRQr1qD42Jqs48QKBgGj/\nHoEMMY07ys4Id/C9kkVRLFh7zUfTb9kyd1M+oIB7dTac9FeRO4lBXxdBBYWLX+qw\nxRqk/PQpN0JO1J5AY49MHXkiXBilunvbaB9C4N9azz93gerA0ax7cy5CexDkOAxy\ncLmsIlrj2ntSkB26c9zS2nvyein/s3f6Ou6scCv3AoGBAJYC2GKBKQPvS59tyHBf\n1/7YFyVHEJKUg/smZjM35FwWzHT+jC6kKc+6ABoNmhB7DCqkESG8STOWFiC+rKb8\nF8PzvJ7klWlSbOAAmpJ6Xv76hgx4QzfC8qQruDh5iX7DjOegej2kCd/cGwyBtdJL\nH0ixF0rCU9sEsj54EQBNJQTE\n-----END PRIVATE KEY-----\n"
+    availability:
+      - BUILD
+      - RUNTIME
+
