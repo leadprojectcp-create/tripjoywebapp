@@ -87,40 +87,25 @@ export const useAuth = () => {
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
             if (userData) {
-              const userWithUid = { ...userData, uid: firebaseUser.uid };
+              // 간단한 로직: Firestore에 사용자 데이터가 있으면 → 기존 사용자 → 홈으로 이동
+              console.log('✅ Firestore에 사용자 데이터 존재 - 기존 사용자 → 홈으로 이동');
+              router.push('/');
+            } else {
+              // Firestore에 사용자 데이터가 없으면 → 새 사용자 → 회원가입 플로우
+              console.log('🔄 Firestore에 사용자 데이터 없음 - 새 사용자 → 회원가입 플로우');
               
-              // 먼저 프로필 완성도 체크
-              if (!isUserProfileComplete(userWithUid)) {
-                // 프로필이 불완전한 경우 정보 입력 페이지로 이동 (약관동의부터 시작)
-                console.log('🔄 프로필 정보가 불완전하여 약관동의 페이지부터 시작');
-                const signupMethod = userData.signupMethod || 'email';
-                router.push(`/auth/signup?method=${signupMethod}&uid=${firebaseUser.uid}&mode=complete`);
-                return;
-              }
-              
-              // 프로필이 완성된 경우, 새 사용자 플래그 확인
+              // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
               const kakaoNewUser = localStorage.getItem('kakao_new_user');
               const googleNewUser = localStorage.getItem('google_new_user');
               const appleNewUser = localStorage.getItem('apple_new_user');
               
-              console.log('🔍 localStorage 플래그 상태:', {
-                kakaoNewUser,
-                googleNewUser,
-                appleNewUser
-              });
+              let method = 'email';
+              if (kakaoNewUser) method = 'kakao';
+              else if (googleNewUser) method = 'google';  
+              else if (appleNewUser) method = 'apple';
               
-              if (!kakaoNewUser && !googleNewUser && !appleNewUser) {
-                // 기존 사용자이고 프로필도 완성된 경우 홈으로 이동
-                console.log('✅ 새 사용자 플래그 없음 - 홈으로 이동');
-                router.push('/');
-              } else {
-                console.log('⚠️ 새 사용자 플래그 발견 - 회원가입 플로우 계속');
-              }
-              // 새 사용자 플래그가 있으면 회원가입 플로우 계속 진행 (리다이렉트 안 함)
-            } else {
-              // 사용자 데이터가 없는 경우 정보 입력 페이지로 이동
-              console.log('🔄 사용자 데이터가 없어 정보 입력 페이지로 이동');
-              router.push(`/auth/signup?method=email&uid=${firebaseUser.uid}&mode=complete`);
+              console.log('🔍 회원가입 플로우 진입:', { method, uid: firebaseUser.uid });
+              // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
             }
           }
         } catch (error) {
@@ -137,33 +122,21 @@ export const useAuth = () => {
           
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 기본 사용자 데이터로 프로필 완성도 체크
-            const defaultUserData = {
-              id: firebaseUser.uid,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
-            };
+            // 에러 케이스: Firestore 조회 실패 → 새 사용자로 간주 → 회원가입 플로우
+            console.log('⚠️ Firestore 조회 실패 - 새 사용자로 간주하여 회원가입 플로우 진행');
             
-            // 먼저 프로필 완성도 체크
-            if (!isUserProfileComplete(defaultUserData)) {
-              // 프로필이 불완전한 경우 정보 입력 페이지로 이동 (약관동의부터 시작)
-              console.log('🔄 프로필 정보가 불완전하여 약관동의 페이지부터 시작 (에러 케이스)');
-              // 에러 케이스에서는 signupMethod를 알 수 없으므로 기본값 사용
-              router.push(`/auth/signup?method=email&uid=${firebaseUser.uid}&mode=complete`);
-              return;
-            }
-            
-            // 프로필이 완성된 경우, 새 사용자 플래그 확인
+            // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
             const kakaoNewUser = localStorage.getItem('kakao_new_user');
             const googleNewUser = localStorage.getItem('google_new_user');
             const appleNewUser = localStorage.getItem('apple_new_user');
             
-            if (!kakaoNewUser && !googleNewUser && !appleNewUser) {
-              // 기존 사용자이고 프로필도 완성된 경우 홈으로 이동
-              router.push('/');
-            }
-            // 새 사용자 플래그가 있으면 회원가입 플로우 계속 진행 (리다이렉트 안 함)
+            let method = 'email';
+            if (kakaoNewUser) method = 'kakao';
+            else if (googleNewUser) method = 'google';  
+            else if (appleNewUser) method = 'apple';
+            
+            console.log('🔍 회원가입 플로우 진입 (에러 케이스):', { method, uid: firebaseUser.uid });
+            // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
           }
         }
       } else {
