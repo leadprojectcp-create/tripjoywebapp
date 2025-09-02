@@ -5,9 +5,17 @@ import { getAuth } from 'firebase-admin/auth';
 // Firebase Admin SDK 초기화
 if (!getApps().length) {
   try {
+    console.log('🔄 Firebase Admin SDK 초기화 시작...');
+    
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    console.log('🔍 환경변수 확인:', {
+      projectId: projectId ? '설정됨' : '누락',
+      clientEmail: clientEmail ? '설정됨' : '누락',
+      privateKey: privateKey ? '설정됨' : '누락'
+    });
 
     if (!projectId || !clientEmail || !privateKey) {
       console.error('❌ Firebase Admin SDK 환경변수 누락:', {
@@ -18,6 +26,8 @@ if (!getApps().length) {
       throw new Error('Firebase Admin SDK 환경변수가 설정되지 않았습니다.');
     }
 
+    console.log('🔧 Firebase Admin SDK 앱 초기화...');
+    
     initializeApp({
       credential: cert({
         projectId: projectId,
@@ -27,9 +37,12 @@ if (!getApps().length) {
     });
 
     console.log('✅ Firebase Admin SDK 초기화 완료');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Firebase Admin SDK 초기화 실패:', error);
+    console.error('❌ 초기화 오류 스택:', error.stack);
   }
+} else {
+  console.log('✅ Firebase Admin SDK 이미 초기화됨');
 }
 
 // Firebase Admin SDK를 사용하여 카카오 사용자 인증 및 Custom Token 생성
@@ -96,6 +109,8 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🚀 카카오 Custom Token API 시작');
+    
     const requestData = await request.json();
     
     console.log('📥 수신된 요청 데이터:', requestData);
@@ -138,6 +153,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    console.log('🔄 Firebase Custom Token 생성 시작...');
+    
     // Firebase Custom Token 생성
     const result = await createFirebaseCustomToken(kakaoUid, email, profileNickname, profileImage);
     
@@ -153,6 +170,7 @@ export async function POST(request: NextRequest) {
     
   } catch (error: any) {
     console.error('❌ API 오류:', error);
+    console.error('❌ 오류 스택:', error.stack);
     
     return NextResponse.json(
       { 
