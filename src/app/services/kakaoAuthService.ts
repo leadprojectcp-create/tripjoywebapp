@@ -6,13 +6,7 @@ import {
   signInWithCustomToken,
   User 
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { auth } from './firebase';
 
 // 카카오 SDK 타입 정의
 declare global {
@@ -26,6 +20,7 @@ export interface KakaoAuthResult {
   user?: User;
   error?: string;
   isNewUser?: boolean;
+  uid?: string;
 }
 
 /**
@@ -108,10 +103,10 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     });
 
     // Firebase Custom Token 생성 (백엔드 API 호출)
-    const customToken = await createFirebaseCustomToken((response as any).access_token, userInfo);
+    const tokenResult = await createFirebaseCustomToken((response as any).access_token, userInfo);
     
     // Firebase Custom Token으로 로그인
-    const userCredential = await signInWithCustomToken(auth, customToken);
+    const userCredential = await signInWithCustomToken(auth, tokenResult.customToken);
     const user = userCredential.user;
 
     console.log('✅ Firebase 로그인 성공:', user);
@@ -119,7 +114,8 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
     return {
       success: true,
       user: user,
-      isNewUser: false
+      isNewUser: tokenResult.isNewUser,
+      uid: tokenResult.uid
     };
 
   } catch (error: any) {
@@ -148,7 +144,7 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
 /**
  * Firebase Custom Token 생성 (Next.js API Route 호출)
  */
-const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Promise<string> => {
+const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Promise<{ customToken: string; isNewUser: boolean; uid: string }> => {
   try {
     console.log('🔄 Firebase Custom Token 생성 요청...');
     console.log('Access Token:', accessToken);
@@ -179,13 +175,15 @@ const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Pr
     const responseData = await response.json();
     console.log('✅ Firebase Custom Token 생성 완료:', responseData);
     
-    // 응답에서 customToken이 없으면 다른 필드 확인
-    if (responseData.customToken) {
-      return responseData.customToken;
-    } else if (responseData.firebaseData?.idToken) {
-      return responseData.firebaseData.idToken;
+    // 응답에서 필요한 정보 반환
+    if (responseData.customToken && responseData.uid) {
+      return {
+        customToken: responseData.customToken,
+        isNewUser: responseData.isNewUser || false,
+        uid: responseData.uid
+      };
     } else {
-      throw new Error('Custom Token을 찾을 수 없습니다.');
+      throw new Error('Custom Token 또는 UID를 찾을 수 없습니다.');
     }
     
   } catch (error) {
@@ -194,36 +192,7 @@ const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Pr
   }
 };
 
-/**
- * 카카오 사용자 정보를 Firestore에 저장
- */
-export const saveKakaoUserToFirestore = async (user: User): Promise<void> => {
-  try {
-    const userRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userRef);
-    
-    // Firebase에서 제공하는 사용자 정보 사용
-    const userData = {
-      uid: user.uid,
-      email: user.email,
-      name: user.displayName || '카카오 사용자',
-      photoUrl: user.photoURL,
-      provider: 'kakao',
-      providerId: user.providerId,
-      createdAt: userDoc.exists() ? userDoc.data().createdAt : serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      lastLoginAt: serverTimestamp(),
-      isActive: true
-    };
-    
-    await setDoc(userRef, userData, { merge: true });
-    console.log('✅ 카카오 사용자 정보 Firestore 저장 완료');
-    
-  } catch (error) {
-    console.error('❌ 카카오 사용자 정보 저장 실패:', error);
-    throw error;
-  }
-};
+
 
 /**
  * 카카오 로그아웃
