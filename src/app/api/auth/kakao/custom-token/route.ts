@@ -1,92 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Firebase Auth REST API를 사용하여 카카오 사용자 인증
-async function authenticateWithFirebase(userInfo: any) {
+// Firebase OIDC를 사용하여 카카오 사용자 인증
+async function authenticateWithFirebaseOIDC(accessToken: string) {
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   
-  // 카카오 사용자 정보로 Firebase 사용자 생성/로그인
-  const uid = `kakao_${userInfo.id}`;
-  const email = userInfo.kakao_account?.email;
-  
   try {
-    // 먼저 기존 사용자 확인
-    const signInEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signInWithPassword`;
+    // Firebase OIDC 엔드포인트로 카카오 토큰 검증
+    const oidcEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signInWithIdp`;
     
-    // 임시 비밀번호로 로그인 시도 (실제로는 OIDC 토큰 검증 필요)
-    const signInResponse = await fetch(`${signInEndpoint}?key=${apiKey}`, {
+    const response = await fetch(`${oidcEndpoint}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: email || `${uid}@kakao.temp`,
-        password: `kakao_${userInfo.id}_temp_password`,
+        postBody: `access_token=${accessToken}&providerId=oidc.kakao`,
+        requestUri: 'http://localhost',
+        returnIdpCredential: true,
         returnSecureToken: true,
       }),
     });
 
-    if (signInResponse.ok) {
-      const data = await signInResponse.json();
-      return { success: true, data, uid };
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Firebase OIDC 오류: ${errorData.error?.message || response.statusText}`);
     }
 
-    // 사용자가 없으면 생성
-    const signUpEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signUp`;
-    const signUpResponse = await fetch(`${signUpEndpoint}?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email || `${uid}@kakao.temp`,
-        password: `kakao_${userInfo.id}_temp_password`,
-        returnSecureToken: true,
-      }),
-    });
-
-    if (signUpResponse.ok) {
-      const data = await signUpResponse.json();
-      return { success: true, data, uid };
-    }
-
-    throw new Error('Firebase 사용자 생성/로그인 실패');
+    const data = await response.json();
+    return { success: true, data };
     
   } catch (error) {
-    console.error('Firebase 인증 오류:', error);
+    console.error('Firebase OIDC 인증 오류:', error);
     throw error;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { accessToken, userInfo } = await request.json();
+    const { accessToken } = await request.json();
     
-    console.log('🔄 카카오 사용자 정보로 Firebase 인증 처리:', { userInfo });
+    console.log('🔄 Firebase OIDC를 통한 카카오 인증 처리 시작');
     
-    // Firebase Auth REST API를 사용하여 인증
-    const authResult = await authenticateWithFirebase(userInfo);
+    // Firebase OIDC로 카카오 사용자 인증
+    const authResult = await authenticateWithFirebaseOIDC(accessToken);
     
-    console.log('✅ Firebase 인증 처리 완료');
+    console.log('✅ Firebase OIDC 인증 완료');
     
     return NextResponse.json({ 
       success: true,
-      uid: authResult.uid,
       user: {
-        uid: authResult.uid,
-        email: userInfo.kakao_account?.email,
-        name: userInfo.properties?.nickname,
-        picture: userInfo.properties?.profile_image,
+        uid: authResult.data.localId,
+        email: authResult.data.email,
+        name: authResult.data.displayName,
+        picture: authResult.data.photoUrl,
         provider: 'kakao'
       },
       firebaseData: authResult.data
     });
     
   } catch (error: any) {
-    console.error('❌ Firebase 인증 처리 실패:', error);
+    console.error('❌ Firebase OIDC 인증 실패:', error);
     return NextResponse.json(
       { 
-        error: 'Firebase 인증 처리에 실패했습니다.',
+        error: 'Firebase OIDC 인증에 실패했습니다.',
         details: error.message 
       },
       { status: 500 }
