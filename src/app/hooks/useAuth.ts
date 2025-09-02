@@ -63,8 +63,13 @@ export const useAuth = () => {
           }
           
           // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
+          // 단, 카카오 새 사용자는 약관동의 페이지로 이동하므로 리다이렉션 방지
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            router.push('/');
+            // 카카오 새 사용자 체크 (localStorage에서 확인)
+            const kakaoNewUser = localStorage.getItem('kakao_new_user');
+            if (!kakaoNewUser) {
+              router.push('/');
+            }
           }
         } catch (error) {
           console.error('Failed to get user data:', error);
@@ -79,8 +84,13 @@ export const useAuth = () => {
           localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
           
           // 로그인 성공 시 홈페이지로 리다이렉션 (로그인 페이지에 있을 때만)
+          // 단, 카카오 새 사용자는 약관동의 페이지로 이동하므로 리다이렉션 방지
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            router.push('/');
+            // 카카오 새 사용자 체크 (localStorage에서 확인)
+            const kakaoNewUser = localStorage.getItem('kakao_new_user');
+            if (!kakaoNewUser) {
+              router.push('/');
+            }
           }
         }
       } else {

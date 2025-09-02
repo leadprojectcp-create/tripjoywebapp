@@ -171,6 +171,8 @@ export default function LoginPage(): React.JSX.Element {
         // 카카오 로그인 성공 - isNewUser 확인
         if (result.isNewUser) {
           console.log('🆕 새 사용자 발견 - 약관동의 페이지로 이동');
+          // localStorage에 새 사용자 플래그 설정 (onAuthStateChanged 리다이렉션 방지)
+          localStorage.setItem('kakao_new_user', 'true');
           // 약관동의 페이지로 이동 (uid와 함께)
           router.push(`/auth/signup?method=kakao&uid=${result.uid}`);
         } else {
