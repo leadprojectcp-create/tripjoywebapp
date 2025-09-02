@@ -98,7 +98,14 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
           birthMonth: userInfo.birthMonth,
           birthDay: userInfo.birthDay,
           gender: userInfo.gender,
-          referralCode: userInfo.referralCode
+          referralCode: userInfo.referralCode,
+          consents: userInfo.consents || {
+            termsOfService: true,
+            personalInfo: true,
+            locationInfo: false,
+            marketing: false,
+            thirdParty: false
+          }
         };
 
         await createSocialUser(uid, currentUser.email, method as 'kakao' | 'google' | 'apple', socialUserInfo);

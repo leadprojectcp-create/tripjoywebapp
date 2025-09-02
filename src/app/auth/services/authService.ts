@@ -450,12 +450,12 @@ export const createSocialUser = async (
     console.log('✅ 소셜 사용자 Firestore 저장 성공!');
     console.log('📊 저장된 데이터:', userData);
     return userData;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ createSocialUser 에러 발생:', error);
     console.error('❌ 에러 세부사항:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack
+      message: error?.message || 'Unknown error',
+      code: error?.code || 'NO_CODE',
+      stack: error?.stack || 'No stack trace'
     });
     logError(error, 'createSocialUser');
     throw new Error(`소셜 사용자 저장 실패: ${getErrorMessage(error)}`);
