@@ -1,77 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
-// Firebase Auth REST API를 사용하여 카카오 사용자 인증
-async function authenticateWithFirebase(kakaoUid: string, email: string, profileNickname: string, profileImage?: string) {
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  
-  if (!projectId || !apiKey) {
-    throw new Error('Firebase 환경변수가 설정되지 않았습니다.');
-  }
-  
+// Firebase Admin SDK 초기화
+if (!getApps().length) {
   try {
-    console.log(`🔄 Firebase 사용자 인증 시작: ${kakaoUid}, ${email}`);
-    
-    // 1. 새 사용자 생성 시도
-    const signUpEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signUp`;
-    const tempPassword = `kakao_${kakaoUid}_temp_password`;
-    
-    console.log('📝 새 사용자 생성 시도...');
-    const signUpResponse = await fetch(`${signUpEndpoint}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email,
-        password: tempPassword,
-        displayName: profileNickname,
-        photoUrl: profileImage || '',
-        returnSecureToken: true,
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (!projectId || !clientEmail || !privateKey) {
+      console.error('❌ Firebase Admin SDK 환경변수 누락:', {
+        projectId: !!projectId,
+        clientEmail: !!clientEmail,
+        privateKey: !!privateKey
+      });
+      throw new Error('Firebase Admin SDK 환경변수가 설정되지 않았습니다.');
+    }
+
+    initializeApp({
+      credential: cert({
+        projectId: projectId,
+        clientEmail: clientEmail,
+        privateKey: privateKey.replace(/\\n/g, '\n'),
       }),
     });
 
-    const signUpData = await signUpResponse.json();
-    console.log('📝 signUp 응답:', signUpData);
+    console.log('✅ Firebase Admin SDK 초기화 완료');
+  } catch (error) {
+    console.error('❌ Firebase Admin SDK 초기화 실패:', error);
+  }
+}
 
-    if (signUpResponse.ok) {
-      console.log(`✅ 새 사용자 생성 완료: ${kakaoUid}`);
-      return { success: true, userData: signUpData, isNewUser: true };
-    }
-
-    // 2. 사용자가 이미 존재하는 경우 (EMAIL_EXISTS 에러)
-    if (signUpData.error?.message?.includes('EMAIL_EXISTS')) {
-      console.log('📝 기존 사용자 발견, 로그인 시도...');
-      
-      const signInEndpoint = `https://identitytoolkit.googleapis.com/v1/projects/${projectId}/accounts:signInWithPassword`;
-      
-      const signInResponse = await fetch(`${signInEndpoint}?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+// Firebase Admin SDK를 사용하여 카카오 사용자 인증 및 Custom Token 생성
+async function createFirebaseCustomToken(kakaoUid: string, email: string, profileNickname: string, profileImage?: string) {
+  try {
+    console.log(`🔄 Firebase Custom Token 생성 시작: ${kakaoUid}, ${email}`);
+    
+    const auth = getAuth();
+    
+    // 1. 사용자 ID로 Firebase 사용자 검색
+    let firebaseUser;
+    try {
+      firebaseUser = await auth.getUserByEmail(email);
+      console.log('📝 기존 사용자 발견:', firebaseUser.uid);
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') {
+        console.log('📝 새 사용자 생성...');
+        
+        // 2. 새 사용자 생성
+        firebaseUser = await auth.createUser({
           email: email,
-          password: tempPassword,
-          returnSecureToken: true,
-        }),
-      });
-
-      const signInData = await signInResponse.json();
-      console.log('📝 signIn 응답:', signInData);
-
-      if (signInResponse.ok) {
-        console.log(`✅ 기존 사용자 로그인 성공: ${kakaoUid}`);
-        return { success: true, userData: signInData, isNewUser: false };
+          displayName: profileNickname,
+          photoURL: profileImage || '',
+          uid: `kakao_${kakaoUid}`,
+        });
+        
+        console.log('✅ 새 사용자 생성 완료:', firebaseUser.uid);
       } else {
-        // 로그인 실패 (비밀번호가 다를 수 있음)
-        console.error('❌ 기존 사용자 로그인 실패:', signInData);
-        throw new Error(`기존 사용자 로그인 실패: ${signInData.error?.message || '알 수 없는 오류'}`);
+        throw error;
       }
     }
-
-    // 3. 기타 signUp 에러
-    console.error('❌ 사용자 생성 실패:', signUpData);
-    throw new Error(`사용자 생성 실패: ${signUpData.error?.message || '알 수 없는 오류'}`);
+    
+    // 3. Custom Token 생성
+    const customToken = await auth.createCustomToken(firebaseUser.uid, {
+      provider: 'kakao',
+      kakao_uid: kakaoUid,
+    });
+    
+    console.log('✅ Custom Token 생성 완료');
+    
+    return {
+      success: true,
+      customToken: customToken,
+      uid: firebaseUser.uid,
+      isNewUser: !firebaseUser.metadata.lastSignInTime,
+    };
     
   } catch (error) {
-    console.error('❌ Firebase 사용자 인증 오류:', error);
+    console.error('❌ Firebase Custom Token 생성 오류:', error);
     throw error;
   }
 }
@@ -99,10 +106,7 @@ export async function POST(request: NextRequest) {
     if (!kakaoUid) {
       console.error('❌ kakao_uid 누락:', requestData);
       return NextResponse.json(
-        { 
-          error: 'kakao_uid가 필요합니다.',
-          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
-        },
+        { error: 'kakao_uid가 필요합니다.' },
         { status: 400 }
       );
     }
@@ -110,10 +114,7 @@ export async function POST(request: NextRequest) {
     if (!email) {
       console.error('❌ firebase_identifier 누락:', requestData);
       return NextResponse.json(
-        { 
-          error: 'firebase_identifier가 필요합니다.',
-          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
-        },
+        { error: 'firebase_identifier가 필요합니다.' },
         { status: 400 }
       );
     }
@@ -121,46 +122,31 @@ export async function POST(request: NextRequest) {
     if (!profileNickname) {
       console.error('❌ profile_nickname 누락:', requestData);
       return NextResponse.json(
-        { 
-          error: 'profile_nickname이 필요합니다.',
-          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
-        },
+        { error: 'profile_nickname이 필요합니다.' },
         { status: 400 }
       );
     }
     
-    console.log('🔄 카카오 사용자 Firebase 인증 처리 시작:', { kakao_uid: kakaoUid, firebase_identifier: email, profile_nickname: profileNickname });
+    // Firebase Custom Token 생성
+    const result = await createFirebaseCustomToken(kakaoUid, email, profileNickname, profileImage);
     
-    // Firebase 사용자 인증
-    const authResult = await authenticateWithFirebase(
-      kakaoUid, 
-      email, 
-      profileNickname, 
-      profileImage
-    );
+    console.log('✅ 요청 처리 완료:', result);
     
-    console.log('✅ Firebase 사용자 인증 처리 완료');
-    
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      status: 'success',
-      isNewUser: authResult.isNewUser,
-      user: {
-        uid: authResult.userData.localId,
-        email: authResult.userData.email,
-        name: authResult.userData.displayName,
-        picture: authResult.userData.photoUrl,
-        provider: 'kakao'
-      },
-      firebaseData: authResult.userData
+      customToken: result.customToken,
+      uid: result.uid,
+      isNewUser: result.isNewUser,
+      message: '카카오 인증 및 Custom Token 생성이 완료되었습니다.'
     });
     
   } catch (error: any) {
-    console.error('❌ Firebase 사용자 인증 실패:', error);
+    console.error('❌ API 오류:', error);
+    
     return NextResponse.json(
       { 
-        error: `Firebase 사용자 인증에 실패했습니다: ${error.message}`,
-        status: 'error'
+        error: '서버 오류가 발생했습니다.',
+        details: error.message || '알 수 없는 오류'
       },
       { status: 500 }
     );
