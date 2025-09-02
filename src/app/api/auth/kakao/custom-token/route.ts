@@ -70,12 +70,11 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
       if (error.code === 'auth/user-not-found') {
         console.log('📝 새 사용자 생성...');
         
-        // 2. 새 사용자 생성
+        // 2. 새 사용자 생성 (uid는 Firebase가 자동 생성)
         firebaseUser = await auth.createUser({
           email: email,
           displayName: profileNickname,
           photoURL: profileImage || '',
-          uid: kakaoUid, // 접두사 제거
         });
         
         isNewUser = true;
