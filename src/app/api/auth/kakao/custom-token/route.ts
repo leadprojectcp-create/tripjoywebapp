@@ -148,6 +148,14 @@ export async function POST(request: NextRequest) {
       profile_image: profileImage 
     });
     
+    // UID 유효성 검사 (Firebase Admin SDK 호출 전)
+    console.log('🔍 카카오 UID 검증:', {
+      value: kakaoUid,
+      type: typeof kakaoUid,
+      length: kakaoUid ? kakaoUid.toString().length : 0,
+      isEmpty: !kakaoUid || kakaoUid.toString().trim() === ''
+    });
+    
     // 필수 필드 검증
     if (!kakaoUid) {
       console.error('❌ kakao_uid 누락:', requestData);

@@ -93,6 +93,9 @@ export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
         url: '/v2/user/me',
         success: (res: any) => {
           console.log('✅ 카카오 사용자 정보:', res);
+          console.log('🔍 카카오 사용자 ID:', res.id);
+          console.log('🔍 ID 타입:', typeof res.id);
+          console.log('🔍 ID 길이:', res.id ? res.id.toString().length : 'undefined');
           resolve(res);
         },
         fail: (err: any) => {
@@ -150,10 +153,25 @@ const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Pr
     console.log('Access Token:', accessToken);
     console.log('User Info:', userInfo);
     
+    // UID 유효성 검사
+    if (!userInfo.id) {
+      console.error('❌ 카카오 사용자 ID가 없습니다:', userInfo);
+      throw new Error('카카오에서 사용자 ID를 가져올 수 없습니다.');
+    }
+    
+    const kakaoUid = userInfo.id.toString(); // 숫자를 문자열로 변환
+    
+    if (kakaoUid.length === 0 || kakaoUid.length > 128) {
+      console.error('❌ 카카오 UID 길이 오류:', { uid: kakaoUid, length: kakaoUid.length });
+      throw new Error('카카오 사용자 ID 형식이 올바르지 않습니다.');
+    }
+    
+    console.log('✅ 카카오 UID 검증 완료:', kakaoUid);
+    
     // 서버가 기대하는 필드명으로 데이터 변환
     const requestData = {
-      kakao_uid: userInfo.id,
-      firebase_identifier: userInfo.kakao_account?.email || `kakao_${userInfo.id}@kakao.temp`,
+      kakao_uid: kakaoUid, // 문자열로 변환된 UID 사용
+      firebase_identifier: userInfo.kakao_account?.email || `kakao_${kakaoUid}@kakao.temp`,
       profile_nickname: userInfo.properties?.nickname || '카카오 사용자',
       profile_image: userInfo.properties?.profile_image || ''
     };
