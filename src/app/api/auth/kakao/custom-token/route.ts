@@ -62,7 +62,7 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
           email: email,
           displayName: profileNickname,
           photoURL: profileImage || '',
-          uid: `kakao_${kakaoUid}`,
+          uid: kakaoUid, // 접두사 제거
         });
         
         isNewUser = true;
