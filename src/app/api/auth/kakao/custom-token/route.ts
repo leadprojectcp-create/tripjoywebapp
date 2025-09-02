@@ -53,13 +53,24 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
     
     const auth = getAuth();
     
-    // 1. 사용자 ID로 Firebase 사용자 검색
+    // 1. 사용자 검색 (카카오 UID 우선, 이메일은 후보)
     let firebaseUser;
     let isNewUser = false;
     
     try {
-      firebaseUser = await auth.getUserByEmail(email);
-      console.log('📝 기존 사용자 발견:', firebaseUser.uid);
+      // 먼저 카카오 숫자 ID로 사용자 찾기 (기존 사용자 호환)
+      try {
+        firebaseUser = await auth.getUser(kakaoUid);
+        console.log('📝 카카오 UID로 기존 사용자 발견:', firebaseUser.uid);
+      } catch (uidError: any) {
+        if (uidError.code === 'auth/user-not-found') {
+          // UID로 못 찾으면 이메일로 찾기
+          firebaseUser = await auth.getUserByEmail(email);
+          console.log('📝 이메일로 기존 사용자 발견:', firebaseUser.uid);
+        } else {
+          throw uidError;
+        }
+      }
       
       // 기존 사용자 정보 업데이트
       await auth.updateUser(firebaseUser.uid, {
@@ -83,8 +94,9 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
       if (error.code === 'auth/user-not-found') {
         console.log('📝 새 사용자 생성...');
         
-        // 2. 새 사용자 생성 (uid는 Firebase가 자동 생성)
+        // 2. 새 사용자 생성 (카카오 숫자 ID를 그대로 Firebase UID로 사용)
         firebaseUser = await auth.createUser({
+          uid: kakaoUid, // ← 카카오 숫자 ID (4425085307)를 Firebase UID로 사용
           email: email,
           displayName: profileNickname,
           photoURL: profileImage || '',
