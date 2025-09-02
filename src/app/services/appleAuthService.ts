@@ -67,14 +67,14 @@ export const signInWithApple = async (): Promise<AppleAuthResult> => {
       
       console.log('✅ 애플 로그인 성공:', user);
       
-      // 사용자 정보를 Firestore에 저장/업데이트
-      await saveAppleUserToFirestore(user);
+      // 사용자 정보를 Firestore에 저장/업데이트 및 새 사용자 확인
+      const isNewUser = await saveAppleUserToFirestore(user);
       
       console.log('✅ 애플 로그인 완료');
       return {
         success: true,
         user: user,
-        isNewUser: false
+        isNewUser: isNewUser
       };
     }
     
@@ -105,12 +105,14 @@ export const signInWithApple = async (): Promise<AppleAuthResult> => {
 };
 
 /**
- * 애플 사용자 정보를 Firestore에 저장
+ * 애플 사용자 정보를 Firestore에 저장 및 새 사용자 확인
  */
-export const saveAppleUserToFirestore = async (user: User): Promise<void> => {
+export const saveAppleUserToFirestore = async (user: User): Promise<boolean> => {
   try {
-    const userRef = doc(db, 'users', user.uid);
+    const userRef = doc(db, 'users_test', user.uid);
     const userDoc = await getDoc(userRef);
+    
+    const isNewUser = !userDoc.exists();
     
     // Firebase에서 제공하는 사용자 정보 사용
     const userData = {
@@ -129,9 +131,12 @@ export const saveAppleUserToFirestore = async (user: User): Promise<void> => {
     await setDoc(userRef, userData, { merge: true });
     console.log('✅ 애플 사용자 정보 Firestore 저장 완료');
     
+    return isNewUser;
+    
   } catch (error) {
     console.error('❌ 애플 사용자 정보 저장 실패:', error);
-    throw error;
+    // 에러가 발생해도 로그인은 성공으로 처리하되, 새 사용자로 간주
+    return true;
   }
 };
 

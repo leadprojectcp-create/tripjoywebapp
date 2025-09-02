@@ -31,6 +31,8 @@ export default function LoginPage(): React.JSX.Element {
         console.log('🔄 리다이렉트 결과 확인 중...');
         console.log('🌐 현재 URL:', window.location.href);
         console.log('🔍 URL 파라미터:', window.location.search);
+        
+
         setIsLoading(true); // 리다이렉트 결과 처리 중 로딩 표시
         const result = await getRedirectResult(auth);
         
@@ -64,7 +66,7 @@ export default function LoginPage(): React.JSX.Element {
         
         // 에러가 있으면 사용자에게 표시
         if (error.code === 'auth/invalid-credential') {
-          setError('카카오 로그인 인증에 실패했습니다. 다시 시도해주세요.');
+          setError('로그인 인증에 실패했습니다. 다시 시도해주세요.');
         } else if (error.code) {
           setError('로그인 중 오류가 발생했습니다: ' + error.message);
         }
@@ -192,10 +194,18 @@ export default function LoginPage(): React.JSX.Element {
         
         const result = await signInWithGoogle();
         
-        if (!result.success) {
+        if (result.success && result.isNewUser) {
+          console.log('🆕 구글 새 사용자 - 약관동의 페이지로 이동');
+          localStorage.setItem('google_new_user', 'true');
+          router.push(`/auth/signup?method=google&uid=${result.user?.uid}`);
+        } else if (!result.success) {
           setError(result.error || "구글 로그인에 실패했습니다.");
+          setIsLoading(false);
+        } else {
+          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
+          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
         }
-        // 성공 시에는 로딩 상태를 유지하고 onAuthStateChanged에서 리다이렉션 처리
+        
       } catch (error: any) {
         console.error('구글 로그인 오류:', error);
         setError('구글 로그인 중 오류가 발생했습니다.');
@@ -208,10 +218,18 @@ export default function LoginPage(): React.JSX.Element {
         
         const result = await signInWithApple();
         
-        if (!result.success) {
+        if (result.success && result.isNewUser) {
+          console.log('🆕 애플 새 사용자 - 약관동의 페이지로 이동');
+          localStorage.setItem('apple_new_user', 'true');
+          router.push(`/auth/signup?method=apple&uid=${result.user?.uid}`);
+        } else if (!result.success) {
           setError(result.error || "애플 로그인에 실패했습니다.");
+          setIsLoading(false);
+        } else {
+          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
+          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
         }
-        // 성공 시에는 로딩 상태를 유지하고 onAuthStateChanged에서 리다이렉션 처리
+        
       } catch (error: any) {
         console.error('애플 로그인 오류:', error);
         setError('애플 로그인 중 오류가 발생했습니다.');
