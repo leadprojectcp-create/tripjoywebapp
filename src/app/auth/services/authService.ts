@@ -368,12 +368,15 @@ export const createSocialUser = async (
       return `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분 ${seconds}초 UTC+9`;
     };
 
-    // 생년월일을 타임스탬프로 변환
-    const birthDate = new Date(
-      parseInt(userInfo.birthYear), 
-      parseInt(userInfo.birthMonth) - 1, 
-      parseInt(userInfo.birthDay)
-    );
+    // 생년월일을 간단한 YYYY-MM-DD 형식으로 저장
+    const birthDateString = `${userInfo.birthYear}-${userInfo.birthMonth.padStart(2, '0')}-${userInfo.birthDay.padStart(2, '0')}`;
+    
+    console.log('📅 생년월일 처리:', {
+      birthYear: userInfo.birthYear,
+      birthMonth: userInfo.birthMonth,
+      birthDay: userInfo.birthDay,
+      formatted: birthDateString
+    });
     
     const currentTime = new Date();
     
@@ -399,7 +402,7 @@ export const createSocialUser = async (
       name: userInfo.name,
       email: email,
       phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
-      birthDate: formatKoreanTimestamp(birthDate),
+      birthDate: birthDateString,
       gender: userInfo.gender === 'male' ? '남성' : '여성',
       location: location,
 
