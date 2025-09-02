@@ -10,7 +10,7 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { AuthGuard } from "../components/AuthGuard";
-import { SignupFlow } from "../auth/signup/SignupFlow";
+
 import { SignupMethod } from "../auth/signup/types";
 import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
 import { doc, getDoc } from 'firebase/firestore';
@@ -22,10 +22,7 @@ export default function Dashboard() {
   const { 
     user,
     isAuthenticated,
-    isLoading: authLoading,
-    showSignupModal,
-    closeSignupModal,
-    openSignupModal
+    isLoading: authLoading
   } = useAuthContext();
   
   const { t } = useTranslationContext();
@@ -40,10 +37,7 @@ export default function Dashboard() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-  const handleSignupComplete = (userData: any) => {
-    console.log('회원가입 완료:', userData);
-    closeSignupModal();
-  };
+
 
   // 웹뷰 환경에서 로그인 상태 확인
   useEffect(() => {
@@ -300,12 +294,7 @@ export default function Dashboard() {
         <BottomNavigator />
       </AuthGuard>
       
-      <SignupFlow 
-        isOpen={showSignupModal} 
-        onClose={closeSignupModal} 
-        onSignupComplete={handleSignupComplete}
-        initialMethod="email"
-      />
+
     </>
   );
 }

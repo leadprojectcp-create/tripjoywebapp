@@ -9,22 +9,18 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { AuthGuard } from "../components/AuthGuard";
-import { SignupFlow } from "../auth/signup/SignupFlow";
+
 import './style.css';
 
 export default function TripTourPage() {
   const { 
-    showSignupModal,
-    closeSignupModal
+    
   } = useAuthContext();
   
   const { t } = useTranslationContext();
   const unreadMessageCount = useUnreadMessageCount();
 
-  const handleSignupComplete = (userData: any) => {
-    console.log('회원가입 완료:', userData);
-    closeSignupModal();
-  };
+
 
   return (
     <>
@@ -67,12 +63,7 @@ export default function TripTourPage() {
         <BottomNavigator />
       </AuthGuard>
       
-      <SignupFlow 
-        isOpen={showSignupModal} 
-        onClose={closeSignupModal} 
-        onSignupComplete={handleSignupComplete}
-        initialMethod="email"
-      />
+
     </>
   );
 }
