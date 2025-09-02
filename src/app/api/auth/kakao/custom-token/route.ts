@@ -79,21 +79,63 @@ async function createOrUpdateUserAndToken(kakaoUid: string, email: string, profi
 
 export async function POST(request: NextRequest) {
   try {
-    const { kakaoUid, firebaseIdentifier, profileNickname, profileImage } = await request.json();
+    const requestData = await request.json();
     
-    console.log('🔄 카카오 사용자 Firebase 인증 처리 시작:', { kakaoUid, firebaseIdentifier, profileNickname });
+    console.log('📥 수신된 요청 데이터:', requestData);
     
-    if (!kakaoUid || !firebaseIdentifier || !profileNickname) {
+    // 파이썬 코드와 정확히 동일한 필드명 사용
+    const kakaoUid = requestData.kakao_uid;
+    const email = requestData.firebase_identifier;
+    const profileNickname = requestData.profile_nickname;
+    const profileImage = requestData.profile_image;
+    
+    console.log('🔍 추출된 데이터:', { 
+      kakao_uid: kakaoUid, 
+      firebase_identifier: email, 
+      profile_nickname: profileNickname, 
+      profile_image: profileImage 
+    });
+    
+    // 필수 필드 검증
+    if (!kakaoUid) {
+      console.error('❌ kakao_uid 누락:', requestData);
       return NextResponse.json(
-        { error: '필수 필드가 누락되었습니다: kakaoUid, firebaseIdentifier, profileNickname' },
+        { 
+          error: 'kakao_uid가 필요합니다.',
+          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
+        },
         { status: 400 }
       );
     }
     
+    if (!email) {
+      console.error('❌ firebase_identifier 누락:', requestData);
+      return NextResponse.json(
+        { 
+          error: 'firebase_identifier가 필요합니다.',
+          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (!profileNickname) {
+      console.error('❌ profile_nickname 누락:', requestData);
+      return NextResponse.json(
+        { 
+          error: 'profile_nickname이 필요합니다.',
+          required: ['kakao_uid', 'firebase_identifier', 'profile_nickname']
+        },
+        { status: 400 }
+      );
+    }
+    
+    console.log('🔄 카카오 사용자 Firebase 인증 처리 시작:', { kakao_uid: kakaoUid, firebase_identifier: email, profile_nickname: profileNickname });
+    
     // Firebase 사용자 생성/업데이트 및 인증
     const authResult = await createOrUpdateUserAndToken(
       kakaoUid, 
-      firebaseIdentifier, 
+      email, 
       profileNickname, 
       profileImage
     );

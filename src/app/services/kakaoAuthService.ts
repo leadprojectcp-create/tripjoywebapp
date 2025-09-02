@@ -154,20 +154,39 @@ const createFirebaseCustomToken = async (accessToken: string, userInfo: any): Pr
     console.log('Access Token:', accessToken);
     console.log('User Info:', userInfo);
     
+    // 서버가 기대하는 필드명으로 데이터 변환
+    const requestData = {
+      kakao_uid: userInfo.id,
+      firebase_identifier: userInfo.kakao_account?.email || `kakao_${userInfo.id}@kakao.temp`,
+      profile_nickname: userInfo.properties?.nickname || '카카오 사용자',
+      profile_image: userInfo.properties?.profile_image || ''
+    };
+    
+    console.log('📤 서버로 전송할 데이터:', requestData);
+    
     const response = await fetch('/api/auth/kakao/custom-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accessToken, userInfo })
+      body: JSON.stringify(requestData)
     });
     
     if (!response.ok) {
-      throw new Error(`API 요청 실패: ${response.status}`);
+      const errorData = await response.json();
+      console.error('❌ API 응답 오류:', errorData);
+      throw new Error(`API 요청 실패: ${response.status} - ${errorData.error || '알 수 없는 오류'}`);
     }
     
-    const { customToken } = await response.json();
-    console.log('✅ Firebase Custom Token 생성 완료');
+    const responseData = await response.json();
+    console.log('✅ Firebase Custom Token 생성 완료:', responseData);
     
-    return customToken;
+    // 응답에서 customToken이 없으면 다른 필드 확인
+    if (responseData.customToken) {
+      return responseData.customToken;
+    } else if (responseData.firebaseData?.idToken) {
+      return responseData.firebaseData.idToken;
+    } else {
+      throw new Error('Custom Token을 찾을 수 없습니다.');
+    }
     
   } catch (error) {
     console.error('❌ Custom Token 생성 실패:', error);
