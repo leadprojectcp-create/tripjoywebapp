@@ -12,6 +12,9 @@ export const Footer: React.FC = () => {
   // 채팅 페이지에서는 footer 숨기기
   const isChatPage = pathname?.startsWith('/chat');
   
+  // 앱에서 접속한 경우 감지 (React Native WebView)
+  const isApp = typeof window !== 'undefined' && (window as any).ReactNativeWebView;
+  
   if (isChatPage) {
     return null;
   }
@@ -32,17 +35,20 @@ export const Footer: React.FC = () => {
             </div>
           </div>
           
-          <div className="footer-column">
-            <h3 className="footer-title">앱다운로드 바로가기</h3>
-            <div className="app-download-links">
-              <a href="#" className="app-link google-play" onClick={(e) => e.preventDefault()}>
-                <img src="/assets/store/google_btn.png" alt="Google Play" />
-              </a>
-              <a href="#" className="app-link app-store" onClick={(e) => e.preventDefault()}>
-                <img src="/assets/store/apple_btn.png" alt="App Store" />
-              </a>
+          {/* 앱에서 접속한 경우 앱다운로드 섹션 숨기기 */}
+          {!isApp && (
+            <div className="footer-column">
+              <h3 className="footer-title">앱다운로드 바로가기</h3>
+              <div className="app-download-links">
+                <a href="#" className="app-link google-play" onClick={(e) => e.preventDefault()}>
+                  <img src="/assets/store/google_btn.png" alt="Google Play" />
+                </a>
+                <a href="#" className="app-link app-store" onClick={(e) => e.preventDefault()}>
+                  <img src="/assets/store/apple_btn.png" alt="App Store" />
+                </a>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </footer>
