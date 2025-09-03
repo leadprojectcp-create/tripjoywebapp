@@ -278,7 +278,7 @@ function ProfileContent() {
       
       // 한줄소개가 변경되었거나 비어있던 경우
       if (editData.introduction !== profileData.introduction) {
-        updates.introduction = editData.introduction.trim();
+        updates.bio = editData.introduction.trim();
       }
 
       if (Object.keys(updates).length > 0) {
@@ -339,6 +339,9 @@ function ProfileContent() {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           console.log('✅ 사용자 데이터 로드 성공:', userData);
+          console.log('🔍 bio 필드:', userData.bio);
+          console.log('🔍 bio 타입:', typeof userData.bio);
+          console.log('🔍 bio 길이:', userData.bio ? userData.bio.length : 'undefined/null');
           console.log('📊 팔로워 배열:', userData.followers);
           console.log('📊 팔로잉 배열:', userData.following);
           console.log('📊 팔로워 수:', userData.followers?.length || 0);
@@ -348,7 +351,7 @@ function ProfileContent() {
             uid: targetUserId,
             name: userData.name || '사용자',
             photoUrl: userData.photoUrl || '',
-            introduction: userData.introduction || '',
+            introduction: userData.bio || '',
             location: userData.location || '',
             gender: userData.gender || '',
             birthDate: userData.birthDate || '',

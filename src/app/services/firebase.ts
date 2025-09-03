@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getDatabase } from 'firebase/database';
+import { getMessaging, isSupported } from 'firebase/messaging';
 import { getFirebaseConfig } from '../utils/env';
 
 // Firebase 설정 - 클라이언트 사이드에서만 실행
@@ -117,4 +118,40 @@ export const getFirebaseDatabase = () => {
     initializeFirebase();
   }
   return realtimeDb;
+};
+
+// Firebase Messaging 가져오기 (브라우저 환경에서만)
+export const getFirebaseMessaging = async () => {
+  if (typeof window === 'undefined') {
+    console.log('🚫 서버 환경에서는 Firebase Messaging을 사용할 수 없습니다.');
+    return null;
+  }
+
+  try {
+    // 브라우저에서 FCM 지원 여부 확인
+    const supported = await isSupported();
+    if (!supported) {
+      console.log('🚫 현재 브라우저는 Firebase Messaging을 지원하지 않습니다.');
+      return null;
+    }
+
+    // Firebase 앱 초기화 확인
+    if (!app) {
+      initializeFirebase();
+    }
+
+    if (!app) {
+      console.error('❌ Firebase 앱이 초기화되지 않았습니다.');
+      return null;
+    }
+
+    // Messaging 인스턴스 생성
+    const messaging = getMessaging(app);
+    console.log('✅ Firebase Messaging 초기화 완료');
+    return messaging;
+
+  } catch (error) {
+    console.error('❌ Firebase Messaging 초기화 실패:', error);
+    return null;
+  }
 };

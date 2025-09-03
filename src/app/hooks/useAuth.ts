@@ -69,12 +69,18 @@ export const useAuth = () => {
             const realUserData = await getUserData(firebaseUser.uid);
             
             if (realUserData) {
-              // 간단한 로직: Firestore에 실제 사용자 데이터가 있으면 → 기존 사용자 → 홈으로 이동
-              console.log('✅ Firestore에 실제 사용자 데이터 존재 - 기존 사용자 → 홈으로 이동');
+              
+              // 앱에 로그인 알림 (앱에서 FCM 토큰 처리)
+              console.log('🚀 로그인 성공 - 앱에 사용자 정보 전달');
+              try {
+                const { notifyAppUserLogin } = await import('../services/fcmService');
+                notifyAppUserLogin(firebaseUser.uid);
+              } catch (error) {
+                console.log('📝 앱 알림 실패 (웹 브라우저일 수 있음)');
+              }
+              
               router.push('/');
             } else {
-              // Firestore에 사용자 데이터가 없으면 → 새 사용자 → 회원가입 플로우
-              console.log('🔄 Firestore에 사용자 데이터 없음 - 새 사용자 → 회원가입 플로우');
               
               // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
               const kakaoNewUser = localStorage.getItem('kakao_new_user');
@@ -109,7 +115,16 @@ export const useAuth = () => {
               const realUserData = await getUserData(firebaseUser.uid);
               
               if (realUserData) {
-                console.log('✅ 에러 후 재확인: Firestore에 실제 사용자 데이터 존재 - 홈으로 이동');
+                
+                // 앱에 로그인 알림 (에러 케이스)
+                console.log('🔄 에러 케이스 로그인 성공 - 앱에 사용자 정보 전달');
+                try {
+                  const { notifyAppUserLogin } = await import('../services/fcmService');
+                  notifyAppUserLogin(firebaseUser.uid);
+                } catch (error) {
+                  console.log('📝 에러 케이스 앱 알림 실패 (웹 브라우저일 수 있음)');
+                }
+                
                 router.push('/');
               } else {
                 console.log('🔄 에러 후 재확인: Firestore에 사용자 데이터 없음 - 회원가입 플로우');

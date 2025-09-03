@@ -221,7 +221,15 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
       }
       
       // 회원가입 완료 후 홈으로 이동
-      console.log('회원가입 완료:', userData);
+      
+      // 앱에 회원가입 완료 알림
+      console.log('🎉 회원가입 성공 - 앱에 사용자 정보 전달');
+      try {
+        const { notifyAppUserLogin } = await import('../../services/fcmService');
+        notifyAppUserLogin(userData.id);
+      } catch (error) {
+        console.log('📝 회원가입 앱 알림 실패 (웹 브라우저일 수 있음)');
+      }
       
       // 회원가입 완료 알림
       alert('🎉 회원가입이 완료되었습니다!\nTRIPJOY에 오신 것을 환영합니다!');

@@ -102,5 +102,12 @@ env:
       - BUILD
       - RUNTIME
 
+  # FCM은 이미 설정된 MESSAGING_SENDER_ID를 사용 (VAPID 키 불필요)
+  # - variable: NEXT_PUBLIC_FIREBASE_VAPID_KEY
+  #   value: BAPxRiOF2azNwIHH4rf-70TIsVOy5p5MrnNIF6ZI47HndhNH0DFy4ddBKRQR-ehFXQ-n9jZ0DJhjZtHnAfGikFQ
+  #   availability:
+  #     - BUILD
+  #     - RUNTIME
+
 
 
