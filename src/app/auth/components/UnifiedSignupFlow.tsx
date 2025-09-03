@@ -220,9 +220,10 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         console.log('🧹 회원가입 완료 후 새 사용자 플래그 제거');
       }
       
-      // 회원가입 완료 후 홈으로 이동
+      // 회원가입 완료 알림을 먼저 보여주기
+      alert('🎉 회원가입이 완료되었습니다!\nTRIPJOY에 오신 것을 환영합니다!');
       
-      // 앱에 회원가입 완료 알림
+      // 사용자가 확인한 후에 FCM 처리 (앱에서만)
       console.log('🎉 회원가입 성공 - 앱에 사용자 정보 전달');
       try {
         const { notifyAppUserLogin } = await import('../../services/fcmService');
@@ -231,9 +232,7 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         console.log('📝 회원가입 앱 알림 실패 (웹 브라우저일 수 있음)');
       }
       
-      // 회원가입 완료 알림
-      alert('🎉 회원가입이 완료되었습니다!\nTRIPJOY에 오신 것을 환영합니다!');
-      
+      // 회원가입 완료 후 홈으로 이동
       router.push('/');
       
     } catch (error) {
