@@ -11,6 +11,17 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+/* 앱에서 터치할 때 나타나는 파란색 하이라이트 제거 */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* 텍스트 입력이 필요한 요소는 선택 가능하도록 복원 */
+input, textarea {
+  -webkit-user-select: auto;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
