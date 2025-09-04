@@ -1,31 +1,30 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
-import { RightSidebar } from "../components/RightSidebar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { PostCard } from "../components/PostCard";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { AuthGuard } from "../components/AuthGuard";
-
-import { SignupMethod } from "../auth/signup/types";
 import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../services/firebase";
 import CountryAndCitySelector from "../components/CountryAndCitySelector";
-import "./style.css";
+import styles from "./style.module.css";
 
 export default function Dashboard() {
+  const router = useRouter();
   const { 
     user,
     isAuthenticated,
     isLoading: authLoading
   } = useAuthContext();
   
-  const { t } = useTranslationContext();
+  const { t, currentLanguage } = useTranslationContext();
   const unreadMessageCount = useUnreadMessageCount();
 
   // 게시물 상태 관리
@@ -37,138 +36,84 @@ export default function Dashboard() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
 
-
-
   // 웹뷰 환경에서 로그인 상태 확인
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       // 웹뷰 환경 감지
-      const isWebView = () => {
-        if (typeof window === 'undefined') return false;
-        
-        const userAgent = window.navigator.userAgent.toLowerCase();
-        
-        // iOS WebView 감지
-        const isIOSWebView = /iphone|ipad|ipod/.test(userAgent) && 
-                            /webkit/.test(userAgent) && 
-                            !/safari/.test(userAgent);
-        
-        // Android WebView 감지
-        const isAndroidWebView = /android/.test(userAgent) && 
-                                /webkit/.test(userAgent) && 
-                                !/chrome/.test(userAgent);
-        
-        // React Native WebView 감지
-        const isReactNativeWebView = /react-native/.test(userAgent);
-        
-        // 기타 WebView 감지
-        const isOtherWebView = /wv/.test(userAgent) || 
-                              /mobile/.test(userAgent) && /safari/.test(userAgent);
-        
-        return isIOSWebView || isAndroidWebView || isReactNativeWebView || isOtherWebView;
-      };
-
-      if (isWebView()) {
-        // 웹뷰에서는 로그인 페이지로 리다이렉트하지 않고 로그인 모달 표시
-        console.log('웹뷰 환경에서 로그인 필요');
-        // 로그인 모달을 자동으로 열거나 적절한 처리
+      const userAgent = window.navigator.userAgent;
+      const isWebView = /wv|WebView/i.test(userAgent) || (window as any).ReactNativeWebView;
+      
+      if (isWebView) {
+        // 네이티브 앱에 로그인 필요 메시지 전송
+        if ((window as any).ReactNativeWebView) {
+          (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'NEED_LOGIN'
+          }));
+        }
+        console.log('🔄 웹뷰 환경: 로그인 필요');
       } else {
-        // 일반 브라우저에서는 로그인 페이지로 리다이렉트
-        window.location.href = '/auth/login';
+        // 일반 브라우저 환경에서는 로그인 페이지로 리다이렉트
+        console.log('🔄 브라우저 환경: 로그인 페이지로 이동');
+        router.push('/auth/login');
       }
     }
   }, [authLoading, isAuthenticated]);
 
-  // Dashboard에서는 더 이상 프로필 완성도 체크하지 않음
-  // useAuth에서 Firestore 문서 존재 여부로 이미 체크함
+  // 게시물 데이터 로드
+  useEffect(() => {
+    const loadPosts = async () => {
+      setIsLoading(true);
+      try {
+        let postsData: PostData[];
+        
+        if (selectedCity) {
+          console.log('🔍 도시별 게시물 로드 중...', selectedCountry, selectedCity);
+          postsData = await getPostsByCity(selectedCountry, selectedCity);
+        } else if (selectedCountry) {
+          console.log('🔍 국가별 게시물 로드 중...', selectedCountry);
+          postsData = await getPostsByCountry(selectedCountry);  
+        } else {
+          console.log('🔍 전체 게시물 로드 중...');
+          postsData = await getPosts();
+        }
+        
+        console.log('✅ 게시물 데이터 로드 완료:', postsData.length);
+        setPosts(postsData);
+      } catch (error) {
+        console.error('❌ 게시물 로드 실패:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // 사용자 정보 가져오기
-  const getUserInfo = async (userId: string) => {
-    if (userInfoCache[userId]) {
-      return userInfoCache[userId];
+    if (!authLoading) {
+      loadPosts();
     }
+  }, [selectedCountry, selectedCity, authLoading]);
 
+  // 국가/도시 선택 핸들러
+  const handleCountryCitySelect = (countryCode: string, cityCode: string) => {
+    console.log('🔄 필터 변경:', { countryCode, cityCode });
+    setSelectedCountry(countryCode);
+    setSelectedCity(cityCode);
+  };
+
+  // 사용자 정보 캐시
+  const getUserInfo = async (userId: string) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', userId));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        const userInfo = {
-          name: userData.name || '사용자',
-          location: userData.location || '위치 미상',
-          profileImage: userData.profileImage || null,
-          photoUrl: userData.photoUrl || null,
-          gender: userData.gender || '',
-          birthDate: userData.birthDate || ''
-        };
-        
-        // 캐시에 저장
         setUserInfoCache(prev => ({
           ...prev,
-          [userId]: userInfo
+          [userId]: userData
         }));
-        
-        return userInfo;
+        return userData;
       }
     } catch (error) {
-      console.error('사용자 정보 조회 실패:', error);
+      console.error('❌ 사용자 정보 로드 실패:', error);
     }
-    
-    return { name: '사용자', location: '위치 미상', gender: '', birthDate: '' };
-  };
-
-  // 게시물 목록 가져오기
-  const fetchPosts = async (countryCode?: string, cityCode?: string) => {
-    try {
-      setIsLoading(true);
-      console.log('🔄 게시물 목록 가져오는 중...', { countryCode, cityCode });
-      
-      let postsData: PostData[];
-      
-      if (cityCode && countryCode) {
-        // 도시별 게시물 조회
-        postsData = await getPostsByCity(countryCode, cityCode, 20);
-        console.log(`🏙️ ${countryCode}-${cityCode} 도시 게시물 조회`);
-      } else if (countryCode) {
-        // 국가별 게시물 조회
-        postsData = await getPostsByCountry(countryCode, 20);
-        console.log(`🌍 ${countryCode} 국가 게시물 조회`);
-      } else {
-        // 전체 게시물 조회
-        postsData = await getPosts(20);
-        console.log('📋 전체 게시물 조회');
-      }
-      
-      console.log('📋 가져온 게시물 수:', postsData.length);
-      setPosts(postsData);
-    } catch (error) {
-      console.error('❌ 게시물 목록 조회 실패:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 컴포넌트 마운트 시 게시물 가져오기
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  // 국가/도시 선택 변경 시 게시물 다시 가져오기
-  useEffect(() => {
-    if (selectedCountry !== '' || selectedCity !== '') {
-      fetchPosts(selectedCountry || undefined, selectedCity || undefined);
-    }
-  }, [selectedCountry, selectedCity]);
-
-  // 국가/도시 선택 핸들러
-  const handleCountryCitySelect = (countryCode: string, cityCode: string) => {
-    console.log('🌍 필터 선택됨:', { countryCode, cityCode });
-    setSelectedCountry(countryCode);
-    setSelectedCity(cityCode);
-    
-    // 선택이 모두 해제된 경우 전체 게시물 다시 로드
-    if (!countryCode && !cityCode) {
-      fetchPosts();
-    }
+    return null;
   };
 
   // 사용자 정보가 아직 캐시되지 않은 게시물들에 대해 비동기로 가져오기
@@ -195,7 +140,7 @@ export default function Dashboard() {
   return (
     <>
       <AuthGuard>
-        <div className="dashboard-container">
+        <div className={styles['dashboard-container']}>
           {/* Top AppBar */}
           <AppBar 
             showBackButton={false}
@@ -204,100 +149,100 @@ export default function Dashboard() {
           />
           
           {/* Body Content */}
-          <div className="body-content">
+          <div className={styles['body-content']}>
             {/* Left Sidebar */}
             <Sidebar unreadMessageCount={unreadMessageCount} />
 
             {/* Main Content */}
-            <div className="main-content">
+            <div className={styles['main-content']}>
               {/* Top Section */}
-              <div className="top-section">
-                <h1 className="main-title">{t('whereToGo')}</h1>
-                
-                {/* 국가/도시 필터 선택 */}
-                <div className="location-filter">
-                  <CountryAndCitySelector
-                    selectedCountry={selectedCountry}
-                    selectedCity={selectedCity}
-                    onSelectionChange={handleCountryCitySelect}
-                    className="dashboard-country-city-selector"
-                  />
+              <div className={styles['top-section']}>
+                <CountryAndCitySelector
+                  selectedCountry={selectedCountry}
+                  selectedCity={selectedCity}
+                  onSelectionChange={handleCountryCitySelect}
+                />
+              </div>
+
+              {/* Popular Destinations */}
+              <div className={styles['popular-destinations']}>
+                <h2 className={styles['section-title']}>
+                  <img src="/icons/real-check.svg" alt="실시간" width="24" height="24" />
+                  {t('realtimePopularAreas')}
+                </h2>
+                <div className={styles['destinations-grid']}>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/danang.png" alt="다낭" className={styles['circle-image']} />
+                    <span>다낭</span>
+                  </div>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/hanoi.png" alt="하노이" className={styles['circle-image']} />
+                    <span>하노이</span>
+                  </div>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/dalat.png" alt="달랏" className={styles['circle-image']} />
+                    <span>달랏</span>
+                  </div>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/hocimin.png" alt="호치민" className={styles['circle-image']} />
+                    <span>호치민</span>
+                  </div>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/puckuok.png" alt="푸꾸옥" className={styles['circle-image']} />
+                    <span>푸꾸옥</span>
+                  </div>
+                  <div className={styles['destination-circle']}>
+                    <img src="/assets/popular-curator/nattrang.png" alt="나트랑" className={styles['circle-image']} />
+                    <span>나트랑</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Mobile Popular Areas Section */}
-              <div className="mobile-popular-areas">
-                <h3>{t('popularAreas')}</h3>
-                <div className="mobile-destination-circles">
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🌊</div>
-                    <span>{t('destinations.danang')}</span>
-                  </div>
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🌅</div>
-                    <span>{t('destinations.hanoi')}</span>
-                  </div>
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🌻</div>
-                    <span>{t('destinations.dalat')}</span>
-                  </div>
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🌃</div>
-                    <span>{t('destinations.hochiminh')}</span>
-                  </div>
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🚠</div>
-                    <span>{t('destinations.phuquoc')}</span>
-                  </div>
-                  <div className="mobile-destination-circle">
-                    <div className="mobile-circle-image">🏖️</div>
-                    <span>{t('destinations.nhatrang')}</span>
-                  </div>
-                </div>
-              </div>
+              {/* Posts Section */}
+              <div className={styles['trending-section']}>
+                <h2>
+                  {selectedCountry || selectedCity ? (
+                    t('filteredPosts')
+                  ) : (
+                    <>
+                      <img src="/icons/popular-bolt.svg" alt="인기" width="24" height="24" />
+                      {t('popularPosts')}
+                    </>
+                  )}
+                </h2>
 
-            {/* Posts Section */}
-            <div className="trending-section">
-              <h2>
-                {selectedCountry || selectedCity 
-                  ? t('filteredPosts') 
-                  : t('recentPosts')
-                }
-              </h2>
-              <div className="content-grid">
+                {/* Post Content */}
                 {isLoading ? (
-                  <div className="loading-container">
-                    <div className="loading-spinner">🔄</div>
-                    {t('loadingPosts')}
-                  </div>
-                ) : posts.length === 0 ? (
-                  <div className="no-posts">
-                    <h3>{t('noPosts')}</h3>
-                    <p>{t('createFirstPost')}</p>
+                  <div className={styles['loading-container']}>
+                    <div className={styles['loading-spinner']}></div>
                   </div>
                 ) : (
-                  posts.map((post) => (
-                    <PostCard 
-                      key={post.id} 
-                      post={post}
-                      userInfo={userInfoCache[post.userId]}
-                    />
-                  ))
+                  <div className={styles['content-grid']}>
+                    {posts.length > 0 ? (
+                      posts.map((post) => (
+                        <PostCard
+                          key={post.id}
+                          post={post}
+                          userInfo={userInfoCache[post.userId]}
+                          showUserInfo={true}
+                          cardClassName={styles['content-card']}
+                        />
+                      ))
+                    ) : (
+                      <div className={styles['no-posts']}>
+                        <p>{t('noPosts')}</p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
-                      </div>
-
-            {/* Right Sidebar */}
-            <RightSidebar />
           </div>
-        </div>
         
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
+        </div>
       </AuthGuard>
-      
-
     </>
   );
 }

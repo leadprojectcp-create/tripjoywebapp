@@ -1,0 +1,29 @@
+{
+  "companionRequest": {
+    "ko": "동생 신청",
+    "en": "Request Companion",
+    "vi": "Yêu cầu đồng hành",
+    "zh": "申请同行",
+    "ja": "同行申請",
+    "th": "ขอเพื่อนร่วมเดินทาง",
+    "fil": "Humiling ng Kasama"
+  },
+  "companionRequestTooltip": {
+    "ko": "동생 신청",
+    "en": "Request Companion",
+    "vi": "Yêu cầu đồng hành",
+    "zh": "申请同行",
+    "ja": "同行申請",
+    "th": "ขอเพื่อนร่วมเดินทาง",
+    "fil": "Humiling ng Kasama"
+  },
+  "companionRequestAlert": {
+    "ko": "동생 신청 기능은 추후 구현될 예정입니다.",
+    "en": "Companion request feature will be implemented soon.",
+    "vi": "Tính năng yêu cầu đồng hành sẽ được triển khai sớm.",
+    "zh": "同行申请功能将在稍后实现。",
+    "ja": "同行申請機能は後で実装される予定です。",
+    "th": "ฟีเจอร์ขอเพื่อนร่วมเดินทางจะถูกพัฒนาภายหลัง",
+    "fil": "Ang feature ng paghingi ng kasama ay maipapatupad sa hinaharap."
+  }
+}

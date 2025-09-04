@@ -1,0 +1,1192 @@
+/* PostCard 전용 스타일 */
+
+/* 메인 카드 컨테이너 */
+.contentCard {
+  padding: 0;
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  box-sizing: border-box;
+  flex-shrink: 0; /* 크기 고정 */
+}
+
+/* 카드 헤더 */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+/* 사용자 정보 */
+.userInfo {
+  display: flex;
+  align-items: center;
+}
+
+/* 사용자 아바타 */
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.userAvatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* profile 페이지에서 사용되는 post-avatar 스타일들 */
+.postAvatarImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.postAvatarPlaceholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+}
+
+/* 사용자 상세 정보 */
+.userDetails {
+  flex: 1;
+}
+
+/* 채팅 버튼 */
+.chatBtn {
+  background: #007bff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.chatBtn:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+/* 카드 이미지 - 기본 스타일 */
+.cardImage {
+  min-width: 300px; /* 최소 너비 300px */
+  min-height: 300px; /* 최소 높이 300px */
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  position: relative;
+  margin: 0; /* 왼쪽 정렬 - auto 제거 */
+  box-sizing: border-box;
+  overflow: hidden; /* 넘치는 이미지 잘리기 */
+  flex-shrink: 0; /* 크기 고정 */
+}
+
+/* 단일 이미지 스타일 - 정방형 (1:1 비율) */
+.cardImage.singleImage {
+  width: 300px;
+  height: 300px;
+  aspect-ratio: 1;
+  overflow: hidden; /* 이미지가 컨테이너를 넘지 않도록 */
+  flex-shrink: 0; /* 크기 고정 */
+  position: relative; /* 절대 위치 이미지를 위한 기준점 */
+  border-radius: 5px;
+}
+
+.cardImage.singleImage img {
+  width: 300px; /* 가로 300px로 고정 */
+  height: auto; /* 세로는 비율대로 자동 */
+  min-height: 300px; /* 최소 세로 300px 보장 */
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+/* 이미지 슬라이더 스타일 - 300x300 정방형 */
+.cardImage.imageSlider {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  gap: 0; /* gap 제거해서 이미지가 딱 맞게 스냅되도록 */
+  overflow-x: auto;
+  overflow-y: hidden; /* 세로 넘침 잘리기 */
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory; /* 가로 스크롤 스냅 강제 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: white;
+  justify-content: flex-start; 
+  align-items: flex-start;
+  margin: 0; /* 왼쪽 정렬 */
+  flex-shrink: 0; /* 크기 고정 */
+}
+
+.cardImage.imageSlider::-webkit-scrollbar {
+  display: none;
+}
+
+.cardImage.imageSlider .imageItem {
+  flex: 0 0 auto;
+  width: 300px;
+  height: 300px;
+  aspect-ratio: 1 / 1; /* 1:1 정방형 비율 */
+  display: block;
+  background: #f0f0f0;
+  overflow: hidden; /* 이미지가 컨테이너를 넘지 않도록 */
+  scroll-snap-align: start; /* 시작점에 스냅되도록 변경 */
+  position: relative; /* 절대 위치 이미지를 위한 기준점 */
+}
+
+.cardImage.imageSlider .imageItem img {
+  width: 300px; /* 가로 300px로 고정 */
+  height: auto; /* 세로는 비율대로 자동 */
+  min-height: 300px; /* 최소 세로 300px 보장 */
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+.cardImage.imageSlider .imageItem:last-child {
+  margin-right: 0;
+}
+
+/* 다중 이미지 컨테이너 - 그리드 레이아웃 (사용하지 않음 - 슬라이더로 대체) */
+.cardImage.multipleImages {
+  max-width: none;
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  width: 300px;
+  height: 300px;
+}
+
+/* 2장 이미지 레이아웃 */
+.cardImage.multipleImages.twoImages {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.cardImage.multipleImages.twoImages .imageItem {
+  min-width: 148px; /* 300px / 2 - gap */
+  max-width: 148px;
+}
+
+/* 이미지 슬라이더 컨테이너 */
+.imageSliderContainer {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  padding: 0;
+  margin: 0;
+  display: block;
+  flex-shrink: 0; /* 크기 고정 */
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+/* 다중 이미지 그리드용 이미지 아이템 */
+.cardImage.multipleImages .imageItem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative; /* 절대 위치 이미지를 위한 기준점 */
+  overflow: hidden; /* 넘치는 이미지 잘리기 */
+}
+
+/* 기본 이미지 아이템 스타일 (슬라이더 외 용도) */
+.imageItem {
+  display: block;
+  background: #f0f0f0;
+  object-fit: cover;
+  position: relative; /* 절대 위치 이미지를 위한 기준점 */
+  overflow: hidden; /* 넘치는 이미지 잘리기 */
+}
+
+.imageItem img {
+  width: 300px; /* 가로 300px로 고정 */
+  height: auto; /* 세로는 비율대로 자동 */
+  min-height: 300px; /* 최소 세로 300px 보장 */
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+/* Dot Indicator 스타일 */
+.dotIndicator {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  position: relative;
+  z-index: 10;
+}
+
+/* 단일 이미지와 다중 이미지 모두에 dot indicator 표시 */
+.cardImage.singleImage .dotIndicator,
+.imageSliderContainer .dotIndicator {
+  display: flex;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+/* 모바일에서 dot indicator 크기 조정 */
+@media (max-width: 480px) {
+  .dot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Slider Arrow 스타일 */
+.sliderArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sliderArrow:hover {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.sliderArrow.left {
+  left: 8px;
+}
+
+.sliderArrow.right {
+  right: 8px;
+}
+
+.sliderArrow.hidden {
+  display: none;
+}
+
+/* 모바일에서 슬라이더 화살표 숨김 */
+@media (max-width: 480px) {
+  .contentCard .sliderArrow {
+    display: none !important;
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f0f0f0; /* 매우 연한 회색 (흰색에 가까움) */
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dot.active {
+  background-color: #d0d0d0; /* 중간 회색 */
+  transform: scale(1.2);
+}
+
+.dot:hover {
+  background-color: #e8e8e8; /* 연한 회색 */
+}
+
+/* image-placeholder는 아래쪽에 완전한 버전으로 통합됨 */
+
+/* 카드 푸터 */
+.cardFooter {
+  position: relative;
+  padding: 8px 0;
+}
+
+/* 액션 버튼들 */
+.engagementActions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 왼쪽 버튼 그룹 (좋아요, 스크랩) */
+.leftActions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 0 !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 20px;
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+  transition: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-decoration: none;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn:active,
+.actionBtn:focus,
+.actionBtn:hover,
+.actionBtn:visited {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.actionBtn:active {
+  background: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+.actionBtn:hover {
+  background: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn.active,
+.actionBtn.liked {
+  color: #1976d2;
+}
+
+.actionBtn.liked {
+  color: #d32f2f;
+}
+
+/* 북마크 버튼 스타일 */
+.actionBtn.bookmarked {
+  color: #f57c00;
+}
+
+.actionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actionIcon {
+  font-size: 20px;
+  line-height: 1;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionIcon img {
+  width: 20px;
+  height: 20px;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.actionCount {
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+  color: #1B1C1F;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.actionLabel {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* 공유 버튼 특별 스타일 */
+.shareBtn {
+  /* justify-content: space-between으로 자동으로 오른쪽 끝에 배치됨 */
+}
+
+/* 공유 메뉴 */
+.shareMenu {
+  position: absolute;
+  top: -8px;
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 160px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.shareOption {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shareOption:hover {
+  background-color: #f8f9fa;
+}
+
+.locationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #666;
+}
+
+.hashtags {
+  font-size: 14px;
+  color: #1877f2;
+  line-height: 1.4;
+}
+
+.headerPlaceName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 사용자 위치 정보 */
+.userLocation {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 위치 아이콘 */
+.locationIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* 게시물 내용 */
+.postContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* 텍스트가 없을 때 날짜를 오른쪽 정렬 */
+.postContent.dateOnly {
+  justify-content: flex-end;
+}
+
+/* 게시물 텍스트 */
+.postText {
+  color: #333;
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* 날짜 배지 */
+.dateBadge {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 이미지 슬라이더 화살표 - PostCard 전용 */
+.contentCard .sliderArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.contentCard .sliderArrow:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  opacity: 1;
+}
+
+.contentCard .sliderArrow.left {
+  left: -20px;
+  z-index: 2000;
+}
+
+.contentCard .sliderArrow.right {
+  right: -20px;
+  z-index: 2000;
+}
+
+.contentCard .sliderArrow.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 모바일에서는 화살표 숨기기 */
+@media (max-width: 480px) {
+  .contentCard .sliderArrow {
+    display: none !important;
+  }
+}
+
+.contentCard .cardImage img {
+  width: 300px; /* 가로 300px로 고정 */
+  height: auto; /* 세로는 비율대로 자동 */
+  min-height: 300px; /* 최소 세로 300px 보장 */
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+.contentCard .imageItem img {
+  width: 300px; /* 가로 300px로 고정 */
+  height: auto; /* 세로는 비율대로 자동 */
+  min-height: 300px; /* 최소 세로 300px 보장 */
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+/* .image-placeholder 통합 버전 - 기존 것과 병합 */
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: #adb5bd; /* 기존 색상 유지 */
+  border-radius: 8px;
+}
+
+.cardImage.singleImage .imagePlaceholder {
+  font-size: 72px;
+  border-radius: 5px;
+}
+
+/* 중복 스타일 제거됨 - 위쪽에 이미 정의되어 있음 */
+
+/* 로딩 상태 스타일 */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #666;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.noPosts {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.noPosts h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.noPosts p {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ===== 반응형 미디어 쿼리 ===== */
+
+/* 1200px 이하 - 우측 사이드바 숨겨질 때 */
+@media (max-width: 1200px) {
+  /* 300px 유지 */
+  .contentCard {
+    width: 300px;
+    max-width: 300px;
+  }
+}
+
+/* 768px 이하 - 태블릿 */
+@media (max-width: 768px) {
+  .contentCard {
+    width: 300px; /* 태블릿에서도 300px 유지 */
+    max-width: 300px;
+  }
+  
+  .cardImage {
+    font-size: 64px; /* placeholder 크기만 조정 */
+  }
+  
+  .cardImage.singleImage {
+    aspect-ratio: 1 / 1; /* 정방형 유지 */
+    max-width: 500px; /* 최대 크기 유지 */
+  }
+}
+
+/* 480px 이하 - 모바일: 화면 크기에 맞게 반응형으로 커짐 */
+@media (max-width: 480px) {
+  .contentCard,
+  .profilePostCard,
+  .dashboardPostCard {
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    min-width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0; /* 좌우 패딩 제거 */
+    box-sizing: border-box;
+  }
+  
+  .actionBtn {
+    padding: 4px 8px 4px 0 !important; /* 모바일에서도 왼쪽 여백 제거 */
+  }
+  
+  .imageSliderContainer {
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    height: auto; /* 정방형 비율 유지 */
+    min-width: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .cardImage.singleImage {
+    width: 100%;
+    height: auto;
+    min-width: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    margin: 0;
+    position: relative;
+    border-radius: 5px;
+  }
+  
+  .cardImage.imageSlider {
+    width: 100%;
+    height: auto;
+    min-width: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  
+  .cardImage.multipleImages {
+    width: 100%;
+    height: auto;
+    min-width: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+    margin: 0;
+    position: relative;
+  }
+  
+  .cardImage.imageSlider .imageItem {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+  }
+  
+  .cardImage.singleImage img,
+  .cardImage.imageSlider .imageItem img,
+  .contentCard .cardImage img,
+  .contentCard .imageItem img,
+  .imageItem img {
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    height: auto;
+    min-height: 0;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+  
+  /* 모바일에서도 이미지가 컨테이너를 넘어서 표시되도록 */
+  .cardImage.singleImage,
+  .imageSliderContainer {
+    overflow: hidden;
+    border-radius: 5px;
+  }
+  
+  /* 모바일에서 슬라이더 스크롤 활성화 */
+  .cardImage.imageSlider {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* iOS 터치 스크롤 최적화 */
+  }
+  
+  .cardImage.imageSlider .imageItem {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+  }
+  
+  /* 모바일에서 슬라이더 화살표 위치 조정 */
+  .contentCard .sliderArrow.left {
+    left: 8px;
+  }
+  
+  .contentCard .sliderArrow.right {
+    right: 8px;
+  }
+  
+  /* 모바일에서 dot indicator는 이미지 밖에 배치되므로 별도 조정 불필요 */
+  
+  .cardImage {
+    min-width: 100%; /* 모바일 최소 너비 */
+    min-height: 0; /* 모바일 최소 높이 */
+    font-size: 48px; /* placeholder 크기 조정 */
+  }
+  
+  .cardHeader, .cardFooter {
+    padding: 12px 0;
+  }
+  
+  .actionBtn {
+    padding: 6px 10px 6px 0;
+    font-size: 13px;
+  }
+  
+  .actionIcon {
+    font-size: 14px;
+  }
+  
+  .engagementActions {
+    gap: 8px;
+  }
+  
+  
+  .placeName {
+    font-size: 14px;
+  }
+  
+  .hashtags {
+    font-size: 13px;
+  }
+}
+
+/* ===== 이미지 모달 스타일 ===== */
+.imageModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.imageModalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.modalCloseBtn {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  z-index: 10000;
+}
+
+.modalCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modalImageContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: calc(90vh - 80px);
+}
+
+.modalImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.modalNavigation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.modalNavBtn {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 28px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+}
+
+.modalNavBtn.prev {
+  margin-left: -30px;
+}
+
+.modalNavBtn.next {
+  margin-right: -30px;
+}
+
+.modalNavBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.modalNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.modalImageCounter {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* 모바일에서 이미지 모달 최적화 */
+@media (max-width: 768px) {
+  .imageModalContent {
+    max-width: 95vw;
+    max-height: 95vh;
+    gap: 15px;
+  }
+
+  .modalCloseBtn {
+    top: -40px;
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .modalImageContainer {
+    max-height: calc(95vh - 60px);
+  }
+
+  .modalNavBtn {
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .modalNavBtn.prev {
+    margin-left: -25px;
+  }
+
+  .modalNavBtn.next {
+    margin-right: -25px;
+  }
+
+  .modalImageCounter {
+    font-size: 14px;
+    padding: 6px 12px;
+    bottom: -40px;
+  }
+}
+
+/* 동생 신청 버튼 스타일 */
+.companionRequestBtn {
+  border-radius: 5px;
+  border: 1px solid #237AF2;
+  color: #237AF2;
+  font-size: 14px;
+  font-weight: 600;
+  background: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-decoration: none;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.companionRequestBtn:active,
+.companionRequestBtn:focus,
+.companionRequestBtn:hover,
+.companionRequestBtn:visited {
+  background: none !important;
+  border: 1px solid #237AF2 !important;
+  color: #237AF2 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  text-decoration: none !important;
+}
+
+/* 설정 메뉴 스타일 */
+.settingsMenuContainer {
+  position: relative;
+  margin-left: auto;
+}
+
+.settingsBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  color: #657786;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settingsBtn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #14171a;
+}
+
+.settingsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.settingsOption {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #14171a;
+  transition: background-color 0.2s ease;
+}
+
+.settingsOption:hover {
+  background-color: #f7f9fa;
+}
+
+.settingsOption.delete {
+  color: #e0245e;
+}
+
+.settingsOption.delete:hover {
+  background-color: #ffeef2;
+}

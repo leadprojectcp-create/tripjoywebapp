@@ -678,6 +678,7 @@ const ChatMainContent: React.FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const processedUserIdRef = useRef<string | null>(null); // 이미 처리된 userId 추적 (useRef 사용)
 
   // 화면 크기 감지
   useEffect(() => {
@@ -694,6 +695,14 @@ const ChatMainContent: React.FC = () => {
   // URL에서 chatId 파라미터 확인
   useEffect(() => {
     const chatId = searchParams.get('chatId');
+    const userId = searchParams.get('userId');
+    
+    // userId가 변경되면 처리된 userId 리셋 (새로운 채팅 요청)
+    if (userId && userId !== processedUserIdRef.current) {
+      console.log('🔄 새로운 userId 감지, processedUserId 리셋:', { userId, processedUserId: processedUserIdRef.current });
+      processedUserIdRef.current = null;
+    }
+    
     if (chatId) {
       setSelectedChatId(chatId);
     }
@@ -702,16 +711,40 @@ const ChatMainContent: React.FC = () => {
   useEffect(() => {
     const targetUserId = searchParams.get('userId');
     
-    if (targetUserId && user?.uid) {
-      handleCreateChat(targetUserId);
+    // 기본 조건 체크
+    if (!targetUserId || !user?.uid || isCreating) {
+      console.log('🚫 채팅방 생성 스킵 (기본 조건):', { 
+        targetUserId, 
+        hasUser: !!user?.uid, 
+        isCreating
+      });
+      return;
     }
-  }, [searchParams, user?.uid]);
+    
+    // 이미 처리 중인 같은 userId인 경우에만 스킵 (중복 방지)
+    if (processedUserIdRef.current === targetUserId) {
+      console.log('🚫 채팅방 생성 스킵 (중복 처리):', { 
+        targetUserId, 
+        processedUserId: processedUserIdRef.current,
+        isAlreadyProcessed: true
+      });
+      return;
+    }
+    
+    console.log('🚀 채팅방 생성 시작:', { targetUserId, currentUserId: user.uid });
+    processedUserIdRef.current = targetUserId; // 처리 중임을 표시
+    handleCreateChat(targetUserId);
+  }, [searchParams, user?.uid, isCreating]);
 
   const handleCreateChat = async (targetUserId: string) => {
-    if (!user?.uid || isCreating) return;
+    if (!user?.uid || isCreating) {
+      console.log('🚫 채팅방 생성 중복 방지:', { user: user?.uid, isCreating });
+      return;
+    }
 
     try {
       setIsCreating(true);
+      console.log('🚀 채팅방 생성 시작:', { currentUserId: user.uid, targetUserId });
       
       // 현재 사용자 정보 가져오기
       const currentUserInfo = await getUserInfo(user.uid);
@@ -745,6 +778,7 @@ const ChatMainContent: React.FC = () => {
       router.replace('/chat');
     } finally {
       setIsCreating(false);
+      processedUserIdRef.current = null; // 처리 완료 후 리셋
     }
   };
 

@@ -8,14 +8,14 @@
     "th": "คุณจะไปที่ไหน?",
     "fil": "Saan ka pupunta?"
   },
-  "popularAreas": {
-    "ko": "인기 지역",
-    "en": "Popular Areas",
-    "vi": "Khu vực phổ biến",
-    "zh": "热门地区",
-    "ja": "人気エリア",
-    "th": "พื้นที่ยอดนิยม",
-    "fil": "Mga Sikat na Lugar"
+  "realtimePopularAreas": {
+    "ko": "실시간 인기 많은 지역",
+    "en": "Real-time Popular Areas",
+    "vi": "Khu vực phổ biến theo thời gian thực",
+    "zh": "实时热门地区",
+    "ja": "リアルタイム人気エリア",
+    "th": "พื้นที่ยอดนิยมแบบเรียลไทม์",
+    "fil": "Real-time na Mga Sikat na Lugar"
   },
   "createFirstPost": {
     "ko": "첫 번째 게시물을 작성해보세요!",
@@ -107,14 +107,14 @@
     "th": "โพสต์จากสถานที่ที่เลือก",
     "fil": "Mga post mula sa napiling lokasyon"
   },
-  "recentPosts": {
-    "ko": "최근 게시물",
-    "en": "Recent Posts", 
-    "vi": "Bài đăng gần đây",
-    "zh": "最新帖子",
-    "ja": "最近の投稿",
-    "th": "โพสต์ล่าสุด",
-    "fil": "Mga kamakailang post"
+  "popularPosts": {
+    "ko": "인기 게시물",
+    "en": "Popular Posts", 
+    "vi": "Bài đăng phổ biến",
+    "zh": "热门帖子",
+    "ja": "人気投稿",
+    "th": "โพสต์ยอดนิยม",
+    "fil": "Mga sikat na post"
   },
   "allCountries": {
     "ko": "전체 국가",

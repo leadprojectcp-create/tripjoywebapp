@@ -18,34 +18,31 @@
 
 /* Main Content */
 .main-content {
-  width: 100%;
-  padding: 30px;
-  margin-top: 60px; /* AppBar 높이만큼 아래로 (사이드바는 fixed라서 별도 처리) */
-  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
-  margin-right: 400px; /* 오른쪽 사이드바 너비 + 여백 (360px + 40px) */
+  flex: 1; /* 남은 공간 모두 사용 */
+  margin-left: 300px; /* 왼쪽 사이드바 너비만큼 여백 */
+  padding: 30px 0; /* 좌우 패딩 추가 */
+  margin-top: 60px; /* AppBar 높이만큼 아래로 */
   min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
   display: flex;
   flex-direction: column;
-  align-items: center; /* 내부 요소들을 가운데 정렬 */
   box-sizing: border-box; /* 패딩 포함한 너비 계산 */
 }
 
 /* Top Section */
 .top-section {
-  width: 740px; /* PC에서는 고정 740px */
+  width: 800px; /* 800px로 고정 */
+  max-width: 100%; /* 반응형을 위한 최대 너비 */
   text-align: left; /* 왼쪽 정렬 */
+  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
 }
 
 .main-title {
-  font-size: 32px;
+  font-size: 16px;
   font-weight: bold;
-  color: #333;
   margin-bottom: 24px;
-}
-
-/* 위치 필터 섹션 */
-.location-filter {
-  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .dashboard-country-city-selector {
@@ -67,75 +64,63 @@
 }
 
 .trending-section h2 {
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  width: 740px; /* PC에서는 고정 740px */
+  color: #1B1C1F;
+  width: 100%;
   text-align: left; /* 왼쪽 정렬 */
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+
 
 .content-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
   gap: 24px;
-  align-items: center; /* 카드들을 가운데 정렬 */
+  justify-items: start; /* 카드들을 왼쪽 정렬 */
+  width: 100%;
 }
-
-/* Content Cards */
-/* PostCard 관련 CSS는 PostCard.css로 이동됨 */
-
-
-
-
-
-/* 첫 번째 미디어 쿼리 제거 - 아래 메인 미디어 쿼리로 통합 */
-
-/* 제거: 불필요한 복잡한 클래스 */
-
-
-
-/* 여러장 슬라이더는 전체 너비 사용! */
-
-
-
-
 
 /* Responsive Design */
 @media (max-width: 1200px) {
   .main-content {
-    margin-right: 0; /* 오른쪽 사이드바가 숨겨지므로 마진 제거 */
+    width: calc(100% - 250px); /* 오른쪽 사이드바가 숨겨지므로 왼쪽 사이드바만 고려 */
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
+    width: calc(100% - 200px); /* 사이드바가 200px로 줄어듦 */
     padding: 20px;
     margin-top: 60px;
-    margin-right: 0; /* 오른쪽 사이드바가 숨겨지므로 마진 제거 */
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .content-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
     gap: 20px;
   }
-  
-
 }
 
 @media (max-width: 480px) {
   .main-content {
-    padding: 15px 8px; /* 좌우 패딩 8px */
-    margin-top: 60px;
-    padding-bottom: 80px;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    max-width: 450px; /* 모바일에서는 최대 450px */
+    width: 100%; /* 사이드바가 숨겨지므로 전체 너비 */
+    padding: 15px 16px; /* 좌우 패딩 16px 추가 */
+    margin: 60px auto 80px auto; /* 상단 60px, 하단 80px, 좌우 auto로 가운데 정렬 */
     align-items: center; /* 카드들을 가운데 정렬 */
-    width: 100%; /* 부모 너비에 맞춤 */
     box-sizing: border-box; /* 패딩 포함한 너비 계산 */
   }
   
   .location-filter {
-    margin-bottom: 20px;
+    display: none; /* 모바일에서는 숨김 */
+  }
+  
+  .main-title {
+    cursor: pointer; /* 클릭 가능하게 표시 */
   }
   
   .content-card {
@@ -145,21 +130,22 @@
   }
   
   .content-grid {
-    align-items: stretch; /* 카드들이 전체 너비 사용 */
+    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
+    justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
   }
   
   .top-section {
-    width: 100% !important; /* 모바일에서는 전체 너비 */
+    width: 100%;
   }
   
   .trending-section {
     align-items: stretch; /* 카드들이 전체 너비 사용 */
-    width: 100%; /* 전체 너비 */
+    width: 100%;
   }
   
   .trending-section h2 {
-    width: 100% !important; /* 모바일에서는 전체 너비 */
+    width: 100%;
   }
   
   /* 모바일에서만 인기 지역 표시 */
@@ -237,15 +223,113 @@
   }
   
   .content-grid {
-    align-items: stretch; /* 카드들이 전체 너비 사용 */
+    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
+    justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
     gap: 16px;
   }
   
   .main-title {
     font-size: 24px;
+    /* PC에서는 클릭 불가 */
   }
   
+  /* 모바일 모달 스타일은 CountryAndCitySelector.css로 이동됨 */
+}
 
+/* Popular Destinations - 공통 스타일 */
+.popular-destinations {
+  margin: 30px 0;
+  width: 800px; /* 800px로 고정 */
+  max-width: 100%; /* 반응형을 위한 최대 너비 */
+  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left; /* 왼쪽 정렬 */
+  color: #1B1C1F;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* PC와 모바일 공통 슬라이드 레이아웃 */
+.destinations-grid {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.destinations-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.destination-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.destination-circle:hover {
+  transform: scale(1.05);
+}
+
+.circle-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.destination-circle span {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 480px) {
+  .main-content {
+    margin-left: 0; /* 모바일에서는 사이드바 없음 */
+    padding: 16px;
+  }
+  
+  .popular-destinations {
+    margin: 20px 0;
+  }
+  
+  .section-title {
+    /* 모바일에서도 제목 표시 */
+    font-size: 16px;
+    font-weight: bold;
+    color: #1B1C1F;
+  }
+  
+  .destinations-grid {
+    padding: 16px 0; /* 모바일에서는 패딩 제거 */
+  }
+  
+  .destination-circle {
+    gap: 8px; /* 모바일에서 간격 줄임 */
+  }
+  
+  .destination-circle span {
+    font-size: 12px; /* 모바일에서 폰트 크기 줄임 */
+  }
 }
   

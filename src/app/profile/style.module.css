@@ -589,7 +589,7 @@
 @media (max-width: 480px) {
   .profileMainContent {
     width: 100% !important; /* 소형 모바일에서는 강제로 전체 너비 사용 */
-    padding: 15px 8px; /* 좌우 패딩 8px */
+    padding: 15px 16px; /* 좌우 패딩 16px 추가 */
     margin-top: 60px;
     padding-bottom: 80px;
     margin-left: 0 !important;

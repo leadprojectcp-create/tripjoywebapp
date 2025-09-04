@@ -1,7 +1,6 @@
 .country-city-selector {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.5rem;
 }
 
 .selector-group {
@@ -24,8 +23,9 @@
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   font-size: 16px;
+  font-weight: 500;
   background-color: white;
-  color: #333;
+  color: #1B1C1F;
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -71,7 +71,7 @@
 .country-with-flag {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   line-height: 1.2;
 }
 
@@ -112,7 +112,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -122,8 +122,9 @@
   padding: 12px 16px;
   border: none;
   background: none;
-  color: #333;
+  color: #1B1C1F;
   font-size: 16px;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -143,12 +144,23 @@
 }
 
 .dropdown-item.selected {
-  background-color: #007bff;
-  color: white;
+  color: #237AF2;
+  justify-content: space-between;
 }
 
 .dropdown-item.selected:hover {
-  background-color: #0056b3;
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.selected::after {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background-image: url('/icons/check.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  flex-shrink: 0;
 }
 
 /* 첫 번째와 마지막 아이템 모서리 처리 */
@@ -175,20 +187,247 @@
   
   /* 모바일에서 드롭다운 메뉴 더 넓게 */
   .dropdown-menu {
-    max-height: 180px;
+    max-height: 250px;
   }
   
   /* 모바일에서 터치하기 쉽게 패딩 증가 */
   .dropdown-item {
     padding: 14px 16px;
     font-size: 16px;
+    font-weight: 500;
     min-height: 50px;
   }
   
   .dropdown-trigger {
     padding: 14px 16px;
     font-size: 16px;
+    font-weight: 500;
     min-height: 58px;
     height: 58px;
   }
+}
+
+/* 모바일 전용 모달 (480px 이하) */
+@media (max-width: 480px) {
+  /* 기존 드롭다운 숨기기 */
+  .country-city-selector {
+    display: none;
+  }
+  
+  /* 모바일 모달 오버레이 */
+  .location-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+  }
+  
+  .location-modal {
+    width: 100%;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  .location-modal.open {
+    transform: translateY(0);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px 16px 24px;
+    margin: 0 -24px 0 -24px;
+    border-bottom: 2px solid #eeeeee;
+  }
+  
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B1C1F;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: background-color 0.2s;
+  }
+  
+  .modal-close:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .modal-content {
+    display: flex;
+    gap: 0;
+    height: 100%;
+  }
+  
+  .modal-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+  }
+  
+  .modal-section:first-child {
+    border-right: 2px solid #eeeeee;
+  }
+  
+  .modal-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1B1C1F;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9ecef;
+    display: none !important;
+  }
+  
+  .modal-list {
+    flex: 1;
+    max-height: 55vh;
+    overflow-y: auto;
+    background: white;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .modal-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .modal-list-item {
+    width: 100%;
+    padding: 8px 0 !important;
+    border: none;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px !important;
+    position: relative;
+  }
+  
+  .modal-list-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .modal-list-item.selected {
+    background-color: transparent !important;
+  }
+  
+  .modal-list-item-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-right: 0;
+  }
+  
+  .modal-list-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #1B1C1F;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .modal-list-right {
+    color: #666;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  
+  .check-icon {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  
+  .modal-list-item.selected .check-icon {
+    opacity: 1;
+  }
+  
+  .modal-loading,
+  .modal-placeholder {
+    padding: 40px 24px;
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+  }
+  
+  .modal-buttons {
+    padding: 20px 24px;
+    border-top: 1px solid #e9ecef;
+    background: white;
+  }
+  
+  .modal-button {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  
+  .apply-button {
+    background-color: #237AF2;
+    color: white;
+  }
+  
+  .apply-button:hover {
+    background-color: #1c6bd4;
+  }
+  
+  /* 모바일용 타이틀 */
+  .mobile-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1B1C1F;
+  }
+}
+
+/* PC용 메인 타이틀 */
+.pc-main-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #1B1C1F;
 }

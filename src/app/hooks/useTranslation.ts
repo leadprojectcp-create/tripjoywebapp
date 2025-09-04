@@ -87,7 +87,7 @@ export const useTranslation = () => {
     const loadTranslations = async () => {
       try {
         // 여러 번역 파일 로드
-        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse] = await Promise.all([
+        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse, postcardResponse] = await Promise.all([
           fetch('/translations/sidebar.json'),
           fetch('/translations/auth.json'),
           fetch('/translations/signup.json'),
@@ -104,7 +104,8 @@ export const useTranslation = () => {
           fetch('/translations/alert.json'),
           fetch('/translations/notice.json'),
           fetch('/translations/faq.json'),
-          fetch('/translations/footer.json')
+          fetch('/translations/footer.json'),
+          fetch('/translations/postcard.json')
         ]);
         
         const sidebarData = await sidebarResponse.json();
@@ -124,6 +125,8 @@ export const useTranslation = () => {
         const noticeData = await noticeResponse.json();
         const faqData = await faqResponse.json();
         const footerData = await footerResponse.json();
+        const postcardData = await postcardResponse.json();
+        console.log('🎴 Postcard data loaded:', postcardData);
         
         // 번역 데이터 병합
         const mergedTranslations = { 
@@ -143,9 +146,11 @@ export const useTranslation = () => {
           ...alertData,
           ...noticeData,
           ...faqData,
-          ...footerData
+          ...footerData,
+          ...postcardData
         };
         console.log('📚 Loaded translations:', mergedTranslations);
+        console.log('🎴 Postcard keys in merged translations:', Object.keys(mergedTranslations).filter(key => key.startsWith('postcard')));
         setTranslations(mergedTranslations);
         
         // 저장된 언어 또는 브라우저 언어 감지

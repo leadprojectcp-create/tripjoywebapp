@@ -5,6 +5,7 @@
   border-right: 1px solid #e9ecef;
   padding: 20px 0;
   position: fixed;
+  left: 0; /* 왼쪽에 고정 */
   height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
   margin-top: 60px; /* AppBar 높이만큼 아래로 */
   overflow-y: auto;

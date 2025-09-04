@@ -124,6 +124,7 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
           localStorage.removeItem('kakao_new_user');
           localStorage.removeItem('google_new_user');
           localStorage.removeItem('apple_new_user');
+          localStorage.removeItem('email_new_user');
           
           console.log('🔍 제거 후 플래그 상태:', {
             kakao: localStorage.getItem('kakao_new_user'),
@@ -211,6 +212,7 @@ export const UnifiedSignupFlow: React.FC<UnifiedSignupFlowProps> = ({
         localStorage.removeItem('kakao_new_user');
         localStorage.removeItem('google_new_user');
         localStorage.removeItem('apple_new_user');
+        localStorage.removeItem('email_new_user');
         
         console.log('🔍 제거 후 플래그 상태:', {
           kakao: localStorage.getItem('kakao_new_user'),

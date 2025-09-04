@@ -82,18 +82,22 @@ export const useAuth = () => {
               router.push('/');
             } else {
               
-              // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
+              // 새 사용자 플래그 확인해서 로그인 방법 판단
               const kakaoNewUser = localStorage.getItem('kakao_new_user');
               const googleNewUser = localStorage.getItem('google_new_user');
               const appleNewUser = localStorage.getItem('apple_new_user');
+              const emailNewUser = localStorage.getItem('email_new_user');
               
               let method = 'email';
               if (kakaoNewUser) method = 'kakao';
               else if (googleNewUser) method = 'google';  
               else if (appleNewUser) method = 'apple';
+              else if (emailNewUser) method = 'email';
               
               console.log('🔍 회원가입 플로우 진입:', { method, uid: firebaseUser.uid });
-              // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
+              
+              // 새 사용자는 회원가입 플로우로 이동
+              router.push(`/auth/signup?method=${method}&uid=${firebaseUser.uid}`);
             }
           }
         } catch (error) {
@@ -169,7 +173,17 @@ export const useAuth = () => {
         };
       }
       
-      await signInWithEmail(email, password);
+      const result = await signInWithEmail(email, password);
+      
+      // 이메일 로그인 후 Firestore에서 사용자 정보 확인
+      const userData = await getUserData((result as any).uid);
+      
+      if (!userData) {
+        // 새 사용자인 경우 플래그 설정
+        console.log('🆕 이메일 새 사용자 감지 - 회원가입 플로우로 이동');
+        localStorage.setItem('email_new_user', 'true');
+      }
+      
       // Firebase Auth의 onAuthStateChanged가 자동으로 사용자 상태를 업데이트
       // 리다이렉션은 onAuthStateChanged에서 처리하도록 제거
       return { success: true };

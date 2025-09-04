@@ -32,6 +32,8 @@ export const getAuthErrorMessage = (error: { code: string; message?: string }): 
       return '비밀번호가 너무 약합니다. 6자 이상으로 설정해주세요.';
     case AuthErrorCodes.INVALID_PASSWORD:
       return '잘못된 비밀번호입니다.';
+    case AuthErrorCodes.INVALID_CREDENTIAL:
+      return '이메일 또는 비밀번호가 올바르지 않습니다.';
     case AuthErrorCodes.INVALID_APP_CREDENTIAL:
       return '잘못된 로그인 정보입니다.';
     case AuthErrorCodes.POPUP_CLOSED_BY_USER:
