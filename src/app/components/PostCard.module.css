@@ -598,7 +598,8 @@
 
 /* 게시물 텍스트 */
 .postText {
-  color: #333;
+  color: #1B1C1F;
+  font-size: 14px;
   flex: 1;
   line-height: 1.4;
 }

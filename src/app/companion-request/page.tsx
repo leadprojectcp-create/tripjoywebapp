@@ -33,9 +33,26 @@ const CompanionRequestContent: React.FC = () => {
   const [targetUser, setTargetUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
+  // URL 파라미터에서 location 정보 가져오기
+  const locationName = searchParams.get('locationName');
+  const locationAddress = searchParams.get('locationAddress');
+  const locationLat = searchParams.get('locationLat');
+  const locationLng = searchParams.get('locationLng');
+  const locationPlaceId = searchParams.get('locationPlaceId');
+  const locationDescription = searchParams.get('locationDescription');
+  
   // 폼 데이터
-  const [selectedPlace, setSelectedPlace] = useState('');
-  const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState(locationName || '');
+  const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(
+    locationName && locationAddress && locationLat && locationLng ? {
+      name: locationName,
+      address: locationAddress,
+      lat: parseFloat(locationLat),
+      lng: parseFloat(locationLng),
+      placeId: locationPlaceId || '',
+      description: locationDescription || ''
+    } : null
+  );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   
@@ -236,6 +253,15 @@ const CompanionRequestContent: React.FC = () => {
             onLocationSelect={handleLocationSelect}
             className="companion-request-location-picker"
           />
+          {locationDetails && (
+            <div className="location-info">
+              <p><strong>선택된 장소:</strong> {locationDetails.name}</p>
+              <p><strong>주소:</strong> {locationDetails.address}</p>
+              {locationDetails.description && (
+                <p><strong>설명:</strong> {locationDetails.description}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 날짜 선택 */}

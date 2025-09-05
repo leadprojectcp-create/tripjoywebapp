@@ -13,7 +13,7 @@ import { AuthGuard } from "../components/AuthGuard";
 import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../services/firebase";
-import CountryAndCitySelector from "../components/CountryAndCitySelector";
+import CountryAndCitySelector, { CountryAndCitySelectorRef } from "../components/CountryAndCitySelector";
 import styles from "./style.module.css";
 
 export default function Dashboard() {
@@ -35,6 +35,25 @@ export default function Dashboard() {
   // 필터링 상태 관리
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  
+  // 모바일 감지
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // 모바일 모달 상태
+  const [locationText, setLocationText] = useState('');
+  const countryCitySelectorRef = useRef<CountryAndCitySelectorRef>(null);
+
+  // 모바일 감지 useEffect
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // 웹뷰 환경에서 로그인 상태 확인
   useEffect(() => {
@@ -98,6 +117,18 @@ export default function Dashboard() {
     setSelectedCity(cityCode);
   };
 
+  // CountryAndCitySelector로부터 location text 받기
+  const handleLocationTextChange = (text: string) => {
+    setLocationText(text);
+  };
+
+  // 모바일 타이틀 클릭 핸들러 (CountryAndCitySelector의 모달을 열기 위해)
+  const handleMobileTitleClick = () => {
+    if (!isMobile) return;
+    countryCitySelectorRef.current?.openMobileModal();
+  };
+
+
   // 사용자 정보 캐시
   const getUserInfo = async (userId: string) => {
     try {
@@ -157,10 +188,28 @@ export default function Dashboard() {
             <div className={styles['main-content']}>
               {/* Top Section */}
               <div className={styles['top-section']}>
+                {/* 어디로 떠나세요? 텍스트 */}
+                {isMobile ? (
+                  // 모바일: 클릭 가능한 타이틀
+                  <div className={styles['mobile-title']} onClick={handleMobileTitleClick}>
+                    <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
+                    <span>{locationText || t('whereToGo')}</span>
+                    <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
+                  </div>
+                ) : (
+                  // PC: 일반 타이틀
+                  <div className={styles['where-to-go-title']}>
+                    <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
+                    <span>{t('whereToGo')}</span>
+                  </div>
+                )}
+                
                 <CountryAndCitySelector
+                  ref={countryCitySelectorRef}
                   selectedCountry={selectedCountry}
                   selectedCity={selectedCity}
                   onSelectionChange={handleCountryCitySelect}
+                  onLocationTextChange={handleLocationTextChange}
                 />
               </div>
 

@@ -1,7 +1,7 @@
 {
   "companionRequest": {
     "ko": "동생 신청",
-    "en": "Request Companion",
+    "en": "Go with",
     "vi": "Yêu cầu đồng hành",
     "zh": "申请同行",
     "ja": "同行申請",
@@ -10,7 +10,7 @@
   },
   "companionRequestTooltip": {
     "ko": "동생 신청",
-    "en": "Request Companion",
+    "en": "Go with",
     "vi": "Yêu cầu đồng hành",
     "zh": "申请同行",
     "ja": "同行申請",

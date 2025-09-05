@@ -8,36 +8,45 @@
   padding: 0;
 }
 
+/* Body Content (AppBar 아래의 Sidebar + Main Content) */
+.post-upload-body-content {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  justify-content: flex-start; /* 왼쪽부터 정렬 */
+}
+
 
 
 /* Post Upload Main Content */
 .post-upload-main-content {
-  width: calc(100% - 650px); /* 전체 너비에서 좌측(250px) + 우측(400px) 마진 제외 */
-  padding: 30px;
+  flex: 1; /* 남은 공간 모두 사용 */
+  margin-left: 300px; /* 왼쪽 사이드바 너비만큼 여백 */
+  padding: 30px 0; /* 좌우 패딩 추가 */
   margin-top: 60px; /* AppBar 높이만큼 아래로 */
-  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
-  margin-right: 0;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
+  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
 }
 
 /* Post Upload Form */
 .post-upload-form {
-  width: 740px;
+  width: 800px; /* 800px로 고정 */
+  max-width: 100%; /* 반응형을 위한 최대 너비 */
+  text-align: left; /* 왼쪽 정렬 */
   background: white;
-  padding: 32px 0;
+  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
 }
 
 /* 페이지 제목 */
 .page-title {
   font-size: 24px;
   font-weight: 700;
-  color: #333;
+  color: #1B1C1F;
   margin-bottom: 30px;
-  text-align: center;
+  text-align: left; /* 왼쪽 정렬 */
+  width: 100%; /* 전체 너비 사용 */
 }
 
 /* 폼 그룹 */
@@ -168,7 +177,11 @@
   line-height: 1.4;
 }
 
-/* 선택된 위치 정보는 GoogleMapsLocationPicker.css에서 관리 */
+/* 위치 선택기 */
+.location-picker {
+  width: 100%;
+  margin-bottom: 25px;
+}
 
 /* 위치 설명 */
 .location-description-group {
@@ -256,14 +269,6 @@
   font-weight: 500;
 }
 
-/* Page Title */
-.page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin: 0 0 32px 0;
-  text-align: center;
-}
 
 /* Form Section */
 .form-section {
@@ -430,359 +435,6 @@
   margin-bottom: 8px;
 }
 
-/* Location Input Styles */
-.location-input-container {
-  position: relative;
-}
-
-.location-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  color: #666;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.location-input {
-  width: 100%;
-  padding-left: 42px !important;
-  padding-right: 40px !important;
-}
-
-.location-input:disabled {
-  background: #f5f5f5;
-  color: #999;
-  cursor: not-allowed;
-}
-
-.clear-location-btn {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px;
-  border-radius: 50%;
-  z-index: 2;
-  transition: background-color 0.2s;
-}
-
-.clear-location-btn:hover {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.search-examples {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.search-examples span {
-  font-size: 12px;
-  color: #666;
-  font-weight: 500;
-}
-
-.example-btn {
-  padding: 4px 8px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  font-size: 12px;
-  color: #495057;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.example-btn:hover {
-  background: #e9ecef;
-  border-color: #dee2e6;
-}
-
-.map-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  margin-bottom: 12px;
-}
-
-.map-toggle-btn:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-.map-toggle-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.map-toggle-btn svg {
-  flex-shrink: 0;
-}
-
-.location-input-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: #666;
-}
-
-.location-input-hint svg {
-  color: #007bff;
-  flex-shrink: 0;
-}
-
-/* Google Maps Container */
-.google-map-container {
-  margin-top: 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative !important;
-  width: 100% !important;
-  background-color: #f5f5f5 !important;
-}
-
-
-
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  font-weight: 600;
-  color: #333;
-}
-
-.map-close-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  color: #666;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.map-close-btn:hover {
-  background: #e9ecef;
-  color: #333;
-}
-
-.google-map {
-  width: 100% !important;
-  height: 300px !important;
-  min-height: 300px !important;
-  background: #f5f5f5 !important;
-  position: relative !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.map-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f9fa;
-  border: 2px dashed #dee2e6;
-}
-
-.loading-content {
-  text-align: center;
-  color: #666;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 16px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.debug-info {
-  padding: 8px 16px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  font-size: 11px;
-  color: #666;
-  text-align: center;
-}
-
-.map-controls {
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-}
-
-.geocoding-toggle {
-  margin-bottom: 12px;
-}
-
-.geocoding-toggle label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #333;
-}
-
-.geocoding-toggle input[type="checkbox"] {
-  margin: 0;
-}
-
-.geocoding-toggle small {
-  display: block;
-  color: #666;
-  font-size: 11px;
-  margin-top: 4px;
-  margin-left: 20px;
-}
-
-.debug-btn {
-  padding: 8px 16px;
-  background: #ffc107;
-  color: #333;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.debug-btn:hover {
-  background: #e0a800;
-}
-
-.map-hint {
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  font-size: 13px;
-  color: #666;
-  text-align: center;
-}
-
-.selected-location {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
-}
-
-.location-name {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.location-address {
-  display: block;
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 4px;
-}
-
-.location-coords {
-  display: block;
-  font-size: 12px;
-  color: #999;
-  font-family: monospace;
-}
-
-/* Google Maps Autocomplete Styling */
-.pac-container {
-  border-radius: 8px !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  z-index: 10000 !important;
-  margin-top: 2px !important;
-}
-
-.pac-item {
-  padding: 12px 16px !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  cursor: pointer !important;
-  font-size: 14px !important;
-}
-
-.pac-item:hover {
-  background-color: #f8f9fa !important;
-}
-
-.pac-item-selected {
-  background-color: #007bff !important;
-  color: white !important;
-}
-
-.pac-matched {
-  font-weight: 600 !important;
-}
-
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-  .google-map {
-    height: 250px;
-    min-height: 250px;
-  }
-  
-  .google-map-container {
-    margin-left: -12px;
-    margin-right: -12px;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-  }
-  
-  .map-toggle-btn {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .selected-location {
-    margin-left: -12px;
-    margin-right: -12px;
-    border-radius: 0;
-  }
-}
 
 
 
@@ -901,24 +553,35 @@ input:checked + .toggle-slider:before {
   transform: translateY(0);
 }
 
+/* Tablet Responsive */
+@media (max-width: 1200px) and (min-width: 769px) {
+  .post-upload-main-content {
+    margin-left: 250px; /* 오른쪽 사이드바가 숨겨지므로 왼쪽 사이드바만 고려 */
+  }
+
+  .post-upload-form {
+    width: 100%;
+    max-width: 800px;
+  }
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .post-upload-main-content {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 60px;
+    margin-left: 0; /* 모바일에서는 사이드바 없음 */
     padding: 16px;
     margin-bottom: 80px; /* BottomNavigator 높이만큼 여백 추가 */
   }
 
   .post-upload-form {
     width: 100%;
-    padding: 24px 16px;
   }
 
   .page-title {
     font-size: 24px;
     margin-bottom: 24px;
+    text-align: left; /* 모바일에서도 왼쪽 정렬 유지 */
+    width: 100%; /* 전체 너비 사용 */
   }
 
   .section-title {
@@ -942,10 +605,37 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Tablet Responsive */
-@media (max-width: 1024px) and (min-width: 769px) {
+/* Small Mobile Responsive */
+@media (max-width: 480px) {
+  .post-upload-body-content {
+    flex-direction: column;
+    width: 100%; /* 부모 너비에 맞춤 */
+    box-sizing: border-box;
+  }
+
   .post-upload-main-content {
-    width: calc(100% - 250px);
-    margin-right: 0;
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: left; /* 모바일에서도 왼쪽 정렬 유지 */
+    width: 100%; /* 전체 너비 사용 */
+  }
+
+  .form-input, .form-textarea {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .image-upload-container {
+    gap: 10px;
+  }
+
+  .image-preview-wrapper,
+  .add-image-btn {
+    width: 100px;
+    height: 100px;
   }
 }

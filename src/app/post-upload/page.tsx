@@ -11,10 +11,9 @@ import { db } from '../services/firebase';
 import { AuthGuard } from '../components/AuthGuard';
 import { AppBar } from '../components/AppBar';
 import { Sidebar } from '../components/Sidebar';
-import { RightSidebar } from '../components/RightSidebar';
 import GoogleMapsLocationPicker, { LocationDetails } from '../components/GoogleMapsLocationPicker';
 import CountryAndCitySelector from '../components/CountryAndCitySelector';
-import './page.css';
+import styles from './page.module.css';
 
 interface PostData {
   content: string;
@@ -373,43 +372,56 @@ const PostUploadContent: React.FC = () => {
 
   return (
     <AuthGuard>
-      <div className="post-upload-container">
+      <div className={styles['post-upload-container']}>
         <AppBar />
-        <Sidebar />
         
-        <div className="post-upload-main-content">
-          <form onSubmit={handleSubmit} className="post-upload-form">
+        <div className={styles['post-upload-body-content']}>
+          <Sidebar />
+          
+          <div className={styles['post-upload-main-content']}>
+            <form onSubmit={handleSubmit} className={styles['post-upload-form']}>
             
             {/* 페이지 제목 */}
-            <h1 className="page-title">
+            <h1 className={styles['page-title']}>
               {isEditMode ? '게시물 수정' : t('createPost')}
             </h1>
 
+            {/* 국가/도시 선택 */}
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>{t('countryAndCitySelection')}</label>
+              <CountryAndCitySelector
+                selectedCountry={postData.countryCode}
+                selectedCity={postData.cityCode}
+                onSelectionChange={handleCountryCitySelect}
+                className={styles['country-city-selector-wrapper']}
+              />
+            </div>
+
             {/* 이미지 업로드 */}
-            <div className="form-group">
-              <label className="form-label">{t('uploadImages')}</label>
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>{t('uploadImages')}</label>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
-                className="file-input"
+                className={styles['file-input']}
                 style={{ display: 'none' }}
               />
               
               {/* 이미지 미리보기 */}
-              <div className="image-upload-container">
+              <div className={styles['image-upload-container']}>
                 {previewImages.map((preview, index) => (
-                  <div key={index} className="image-preview-wrapper">
+                  <div key={index} className={styles['image-preview-wrapper']}>
                     <img
                       src={preview.url}
                       alt={`미리보기 ${index + 1}`}
-                      className="image-preview"
+                      className={styles['image-preview']}
                     />
                     <button
                       type="button"
-                      className="remove-image-btn"
+                      className={styles['remove-image-btn']}
                       onClick={() => handleImageRemove(index)}
                     >
                       ✕
@@ -421,7 +433,7 @@ const PostUploadContent: React.FC = () => {
                 {postData.images.length < 10 && (
                   <button
                     type="button"
-                    className="add-image-btn"
+                    className={styles['add-image-btn']}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -433,23 +445,23 @@ const PostUploadContent: React.FC = () => {
                   </button>
                 )}
               </div>
-              <div className="image-count-info">
+              <div className={styles['image-count-info']}>
                 {postData.images.length}/10 {t('uploadImages')}
               </div>
             </div>
 
             {/* 게시글 내용 */}
-            <div className="form-group">
-              <label className="form-label">{t('postContent')}</label>
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>{t('postContent')}</label>
               <textarea
                 value={postData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 placeholder={t('contentPlaceholder')}
-                className="form-textarea"
+                className={styles['form-textarea']}
                 rows={6}
                 maxLength={1000}
               />
-              <div className="char-count">
+              <div className={styles['char-count']}>
                 {postData.content.length}/1000
               </div>
             </div>
@@ -459,90 +471,81 @@ const PostUploadContent: React.FC = () => {
               initialLocation={postData.location}
               locationDetails={postData.locationDetails}
               onLocationSelect={handleLocationSelect}
-              className="location-picker"
+              className={styles['location-picker']}
             />
 
             {/* 선택된 위치 표시는 GoogleMapsLocationPicker 내부에서 처리 */}
 
             {/* 위치 설명 (위치가 선택된 경우에만 표시) */}
             {postData.locationDetails && (
-              <div className="form-group location-description-group">
-                <label className="form-label">{t('locationDescriptionLabel')}</label>
+              <div className={`${styles['form-group']} ${styles['location-description-group']}`}>
+                <label className={styles['form-label']}>{t('locationDescriptionLabel')}</label>
                 <textarea
                   value={postData.locationDescription}
                   onChange={(e) => handleInputChange('locationDescription', e.target.value)}
                   placeholder={t('locationDescriptionPlaceholder')}
-                  className="form-textarea location-description-textarea"
+                  className={`${styles['form-textarea']} ${styles['location-description-textarea']}`}
                   rows={3}
                   maxLength={200}
                 />
-                <div className="char-count">
+                <div className={styles['char-count']}>
                   {postData.locationDescription.length}/200
                 </div>
-                <div className="location-description-hint">
+                <div className={styles['location-description-hint']}>
                   {t('locationDescriptionHint')}
                 </div>
               </div>
             )}
 
-            {/* 국가/도시 선택 */}
-            <div className="form-group">
-              <CountryAndCitySelector
-                selectedCountry={postData.countryCode}
-                selectedCity={postData.cityCode}
-                onSelectionChange={handleCountryCitySelect}
-                className="country-city-selector-wrapper"
-              />
-            </div>
 
             {/* 해시태그 */}
-            <div className="form-group">
-              <label className="form-label">{t('hashtags')}</label>
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>{t('hashtags')}</label>
               <input
                 type="text"
                 value={postData.hashtags}
                 onChange={(e) => handleInputChange('hashtags', e.target.value)}
                 placeholder={t('hashtagsPlaceholder')}
-                className="form-input hashtags-input"
+                className={`${styles['form-input']} ${styles['hashtags-input']}`}
                 maxLength={200}
               />
-              <div className="hashtags-hint">
+              <div className={styles['hashtags-hint']}>
                 {t('hashtagsHint')}
               </div>
             </div>
 
             {/* 동행 가능 여부 */}
-            <div className="form-group">
-              <div className="notification-section">
+            <div className={styles['form-group']}>
+              <div className={styles['notification-section']}>
                 <h3>🤝 동행 가능 여부</h3>
-                <div className="notification-item">
-                  <div className="notification-info">
-                    <div className="notification-title">
+                <div className={styles['notification-item']}>
+                  <div className={styles['notification-info']}>
+                    <div className={styles['notification-title']}>
                       동행 가능 여부
                     </div>
-                    <div className="notification-description">
+                    <div className={styles['notification-description']}>
                       {postData.companionAvailable 
                         ? '다른 여행자들과 함께 여행할 수 있습니다.' 
                         : '혼자 여행하거나 동행을 원하지 않습니다.'}
                     </div>
                   </div>
-                  <label className="toggle-switch">
+                  <label className={styles['toggle-switch']}>
                     <input
                       type="checkbox"
                       checked={postData.companionAvailable}
                       onChange={(e) => setPostData(prev => ({ ...prev, companionAvailable: e.target.checked }))}
                     />
-                    <span className="toggle-slider"></span>
+                    <span className={styles['toggle-slider']}></span>
                   </label>
                 </div>
               </div>
             </div>
 
             {/* 제출 버튼 */}
-            <div className="submit-section">
+            <div className={styles['submit-section']}>
               <button
                 type="submit"
-                className="submit-btn"
+                className={styles['submit-btn']}
                 disabled={isUploading}
               >
                 {isUploading 
@@ -553,14 +556,14 @@ const PostUploadContent: React.FC = () => {
               
               {/* 업로드 진행률 표시 */}
               {isUploading && (
-                <div className="upload-progress">
-                  <div className="progress-bar">
+                <div className={styles['upload-progress']}>
+                  <div className={styles['progress-bar']}>
                     <div 
-                      className="progress-fill"
+                      className={styles['progress-fill']}
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
-                  <div className="progress-text">
+                  <div className={styles['progress-text']}>
                     {uploadProgress < 80 
                       ? '이미지 업로드 중...' 
                       : uploadProgress < 95 
@@ -571,9 +574,8 @@ const PostUploadContent: React.FC = () => {
               )}
             </div>
           </form>
+          </div>
         </div>
-        
-        <RightSidebar />
       </div>
     </AuthGuard>
   );

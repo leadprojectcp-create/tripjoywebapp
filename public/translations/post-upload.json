@@ -1,12 +1,12 @@
 {
   "createPost": {
-    "ko": "게시물 작성",
-    "en": "Create Post",
-    "vi": "Tạo bài viết",
-    "zh": "创建帖子",
-    "ja": "投稿作成",
-    "th": "สร้างโพสต์",
-    "fil": "Gumawa ng Post"
+    "ko": "게시물 업로드",
+    "en": "Upload Post",
+    "vi": "Tải lên bài viết",
+    "zh": "上传帖子",
+    "ja": "投稿アップロード",
+    "th": "อัปโหลดโพสต์",
+    "fil": "Mag-upload ng Post"
   },
   "uploadImages": {
     "ko": "사진 업로드",
@@ -323,5 +323,14 @@
     "ja": "すべて",
     "th": "ทั้งหมด",
     "fil": "Lahat"
+  },
+  "countryAndCitySelection": {
+    "ko": "국가 및 도시 선택",
+    "en": "Country and City Selection",
+    "vi": "Lựa chọn quốc gia và thành phố",
+    "zh": "国家和城市选择",
+    "ja": "国と都市の選択",
+    "th": "การเลือกประเทศและเมือง",
+    "fil": "Pagpili ng Bansa at Lungsod"
   }
 }

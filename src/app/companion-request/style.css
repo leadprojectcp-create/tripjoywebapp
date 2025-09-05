@@ -177,6 +177,26 @@
   display: none;
 }
 
+/* 위치 정보 표시 */
+.location-info {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+}
+
+.location-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.location-info strong {
+  color: #4a90e2;
+  font-weight: 600;
+}
+
 /* 날짜 선택 */
 .date-section {
   margin-bottom: 25px;

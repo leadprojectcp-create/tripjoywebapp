@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
-import './GoogleMapsLocationPicker.css';
+import styles from './GoogleMapsLocationPicker.module.css';
 import { GOOGLE_MAPS_API_KEY } from '../utils/googleMaps';
 import {
   Language,
@@ -46,7 +46,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   
   // States
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const [isMapVisible, setIsMapVisible] = useState(true); // 기본적으로 지도 보이도록 변경
+  const [isMapVisible, setIsMapVisible] = useState(isPostUploadPage); // post-upload 페이지에서는 지도 표시
   const [autocomplete, setAutocomplete] = useState<any>(null);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
@@ -234,7 +234,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
 
   // 🗺️ Map 초기화 (완전 새로 생성)
   useEffect(() => {
-    if (!isGoogleMapsLoaded || !mapRef.current) {
+    if (!isGoogleMapsLoaded || !mapRef.current || !isMapVisible) {
       return;
     }
 
@@ -276,7 +276,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         }
       }
     };
-  }, [isGoogleMapsLoaded, currentLanguage]);
+  }, [isGoogleMapsLoaded, currentLanguage, isMapVisible]);
 
   // 🛡️ 지도 위치 업데이트 (안정한 의존성 배열)
   useEffect(() => {
@@ -356,19 +356,28 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     }
   };
 
+  // 디버깅을 위한 로그
+  console.log('🗺️ GoogleMapsLocationPicker 렌더링:', {
+    isGoogleMapsLoaded,
+    isMapVisible,
+    isPostUploadPage,
+    map: !!map,
+    pathname
+  });
+
   return (
-    <div className={`google-maps-location-picker ${className}`}>
-      <div className="location-input-group">
-        <label className="form-label">
+    <div className={`${styles['google-maps-location-picker']} ${className}`}>
+      <div className={styles['location-input-group']}>
+        <label className={styles['form-label']}>
           📍 {t('location')} (선택사항)
         </label>
         
-        <div className="search-input-wrapper">
+        <div className={styles['search-input-wrapper']}>
           {/* 게시물 업로드 페이지가 아닐 때만 토글 버튼 표시 */}
           {!isPostUploadPage && (
             <button
               type="button"
-              className="map-toggle-btn"
+              className={styles['map-toggle-btn']}
               onClick={toggleMapVisibility}
             >
               {isMapVisible ? '지도 숨기기' : '지도 보기'}
@@ -378,7 +387,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           {locationDetails && (
             <button
               type="button"
-              className="remove-location-btn"
+              className={styles['remove-location-btn']}
               onClick={handleRemoveLocation}
             >
               ✕
@@ -386,13 +395,13 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           )}
         </div>
         
-        <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+        <div className={styles['search-input-wrapper']}>
+          <span className={styles['search-icon']}>🔍</span>
           <input
             ref={locationInputRef}
             type="text"
             placeholder={getLocationHintByLanguage(currentLanguage as Language)}
-            className="location-input"
+            className={styles['location-input']}
             defaultValue={initialLocation}
           />
         </div>
@@ -400,46 +409,48 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
 
       {/* 선택된 위치 정보 */}
       {locationDetails && (
-        <div className="selected-location-info">
-          <div className="location-icon">📍</div>
-          <div className="location-text">
-            <div className="location-name">{locationDetails.name}</div>
-            <div className="location-address">{locationDetails.address}</div>
+        <div className={styles['selected-location-info']}>
+          <div className={styles['location-icon']}>📍</div>
+          <div className={styles['location-text']}>
+            <div className={styles['location-name']}>{locationDetails.name}</div>
+            <div className={styles['location-address']}>{locationDetails.address}</div>
           </div>
         </div>
       )}
 
       {/* 지도 */}
-      <div className="map-container">
-        {isGoogleMapsLoaded ? (
-          <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-            {!map && (
-              <div className="map-loading" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
-                <div className="loading-spinner"></div>
-                <p>🗺️ 새 지도 생성 중...</p>
-              </div>
-            )}
-            <div
-              ref={mapRef}
-              className="google-map"
-              style={{ 
-                display: 'block',
-                height: '100%',
-                width: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: map ? 2 : 0
-              }}
-            />
-          </div>
-        ) : (
-          <div className="map-loading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <div className="loading-spinner"></div>
-            <p>📡 Google Maps API 로딩 중...</p>
-          </div>
-        )}
-      </div>
+      {isMapVisible && (
+        <div className={styles['map-container']}>
+          {isGoogleMapsLoaded ? (
+            <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+              {!map && (
+                <div className={styles['map-loading']} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
+                  <div className={styles['loading-spinner']}></div>
+                  <p>🗺️ 새 지도 생성 중...</p>
+                </div>
+              )}
+              <div
+                ref={mapRef}
+                className={styles['google-map']}
+                style={{ 
+                  display: 'block',
+                  height: '100%',
+                  width: '100%',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: map ? 2 : 0
+                }}
+              />
+            </div>
+          ) : (
+            <div className={styles['map-loading']} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <div className={styles['loading-spinner']}></div>
+              <p>📡 Google Maps API 로딩 중...</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

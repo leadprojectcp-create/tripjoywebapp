@@ -36,6 +36,38 @@
   box-sizing: border-box; /* 패딩 포함한 너비 계산 */
 }
 
+/* 어디로 떠나세요? 타이틀 */
+.where-to-go-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #1B1C1F;
+}
+
+/* 모바일 타이틀 */
+.mobile-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1B1C1F;
+}
+
+.mobile-title:hover {
+  color: #4a90e2;
+}
+
+.mobile-title:active {
+  transform: scale(0.98);
+}
+
+
+
 .main-title {
   font-size: 16px;
   font-weight: bold;

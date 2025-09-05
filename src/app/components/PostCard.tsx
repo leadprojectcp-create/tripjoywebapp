@@ -607,8 +607,27 @@ export const PostCard: React.FC<PostCardProps> = ({
           <button 
             className={styles.companionRequestBtn}
             onClick={() => {
-              // 동생 신청 페이지로 이동
-              router.push(`/companion-request?postId=${post.id}&userId=${post.userId}`);
+              // 동생 신청 페이지로 이동 (location 정보 포함)
+              if (!post.id) return; // post.id가 없으면 리턴
+              
+              const params = new URLSearchParams({
+                postId: post.id,
+                userId: post.userId
+              });
+              
+              // post의 location 정보가 있으면 URL 파라미터로 전달
+              if (post.location) {
+                params.append('locationName', post.location.name || '');
+                params.append('locationAddress', post.location.address || '');
+                params.append('locationLat', post.location.coordinates.lat.toString());
+                params.append('locationLng', post.location.coordinates.lng.toString());
+                params.append('locationPlaceId', post.location.placeId || '');
+                if (post.location.description) {
+                  params.append('locationDescription', post.location.description);
+                }
+              }
+              
+              router.push(`/companion-request?${params.toString()}`);
             }}
             title={t('companionRequestTooltip') || '동생 신청'}
           >

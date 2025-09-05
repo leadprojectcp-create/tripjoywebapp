@@ -222,7 +222,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 9999;
     display: flex;
     align-items: flex-end;
   }
@@ -424,7 +424,7 @@
 /* PC용 메인 타이틀 */
 .pc-main-title {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 24px;
   display: flex;
   align-items: center;

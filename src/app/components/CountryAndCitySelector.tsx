@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useTranslationContext } from '../contexts/TranslationContext';
-import './CountryAndCitySelector.css';
+import styles from './CountryAndCitySelector.module.css';
 
 interface Country {
   code: string;
@@ -19,15 +19,21 @@ interface CountryAndCitySelectorProps {
   selectedCountry?: string;
   selectedCity?: string;
   onSelectionChange: (countryCode: string, cityCode: string) => void;
+  onLocationTextChange?: (text: string) => void;
   className?: string;
 }
 
-const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
+export interface CountryAndCitySelectorRef {
+  openMobileModal: () => void;
+}
+
+const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndCitySelectorProps>(({
   selectedCountry = '',
   selectedCity = '',
   onSelectionChange,
+  onLocationTextChange,
   className = ''
-}) => {
+}, ref) => {
   const { t, currentLanguage } = useTranslationContext();
   
   // States
@@ -220,6 +226,7 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
     }
   };
 
+
   const loadModalCountries = async () => {
     setLoadingModalCountries(true);
     try {
@@ -311,60 +318,74 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
     }
   };
 
+  // 선택이 변경될 때마다 dashboard로 location text 전달
+  useEffect(() => {
+    if (onLocationTextChange) {
+      onLocationTextChange(getSelectedLocationText());
+    }
+  }, [currentCountry, currentCity, countries, cities, currentLanguage, t]);
+
+  // 외부에서 모달을 열 수 있도록 ref 노출
+  useImperativeHandle(ref, () => ({
+    openMobileModal: () => {
+      if (isMobile) {
+        handleTitleClick();
+      }
+    }
+  }));
+
   return (
     <>
       {isMobile ? (
-        // 모바일: 클릭 가능한 타이틀
-        <div className="mobile-title" onClick={handleTitleClick}>
-          <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
-          {getSelectedLocationText()}
-          <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
+        // 모바일: 숨겨진 컴포넌트 (모든 기능은 유지하되 UI는 숨김)
+        <div style={{ display: 'none' }}>
+          <div className={styles['mobile-title']} onClick={handleTitleClick}>
+            <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
+            {getSelectedLocationText()}
+            <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
+          </div>
         </div>
       ) : (
-        // PC: 제목 + 드롭다운
+        // PC: 드롭다운만 (제목은 dashboard에서 처리)
         <div>
-          <h1 className="pc-main-title">
-            <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
-            {t('whereToGo')}
-          </h1>
-          <div className={`country-city-selector ${className}`}>
+          <div className={`${styles['country-city-selector']} ${className}`}>
             {/* Country Selector */}
-            <div className="selector-group" ref={countryDropdownRef}>
-              <div className="custom-dropdown">
+            <div className={styles['selector-group']} ref={countryDropdownRef}>
+              <div className={styles['custom-dropdown']}>
                 <button
                   type="button"
-                  className={`dropdown-trigger ${isCountryDropdownOpen ? 'open' : ''}`}
+                  className={`${styles['dropdown-trigger']} ${isCountryDropdownOpen ? styles['open'] : ''}`}
                   onClick={() => !loadingCountries && setIsCountryDropdownOpen(!isCountryDropdownOpen)}
                   disabled={loadingCountries}
                 >
-                  <span className="dropdown-text">
+                  <span className={styles['dropdown-text']}>
                     {currentCountry && getSelectedCountryName() 
                       ? (
-                        <span className="country-with-flag">
+                        <span className={styles['country-with-flag']}>
                           <span>{getCountryFlag(currentCountry)}</span>
                           <span>{getSelectedCountryName()}</span>
                         </span>
                       )
                       : (
-                        <span className="all-option">
+                        <span className={styles['all-option']}>
                           {loadingCountries ? t('loading') : t('allCountries')}
                         </span>
                       )
                     }
                   </span>
-                  <svg className="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <svg className={styles['dropdown-arrow']} width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
                 
                 {isCountryDropdownOpen && !loadingCountries && (
-                  <div className="dropdown-menu">
+                  <div className={styles['dropdown-menu']}>
                     <button
                       type="button"
-                      className={`dropdown-item ${currentCountry === '' ? 'selected' : ''}`}
+                      className={`${styles['dropdown-item']} ${currentCountry === '' ? styles['selected'] : ''}`}
                       onClick={() => handleCountrySelect('')}
                     >
-                      <span className="all-option">
+                      <span className={styles['all-option']}>
                         {t('allCountries')}
                       </span>
                     </button>
@@ -372,10 +393,10 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
                       <button
                         key={country.code}
                         type="button"
-                        className={`dropdown-item ${currentCountry === country.code ? 'selected' : ''}`}
+                        className={`${styles['dropdown-item']} ${currentCountry === country.code ? styles['selected'] : ''}`}
                         onClick={() => handleCountrySelect(country.code)}
                       >
-                        <span className="country-with-flag">
+                        <span className={styles['country-with-flag']}>
                           <span>{getCountryFlag(country.code)}</span>
                           <span>{country.names[currentLanguage] || country.names['en']}</span>
                         </span>
@@ -387,19 +408,19 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
             </div>
 
             {/* City Selector */}
-            <div className="selector-group" ref={cityDropdownRef}>
-              <div className="custom-dropdown">
+            <div className={styles['selector-group']} ref={cityDropdownRef}>
+              <div className={styles['custom-dropdown']}>
                 <button
                   type="button"
-                  className={`dropdown-trigger ${isCityDropdownOpen ? 'open' : ''}`}
+                  className={`${styles['dropdown-trigger']} ${isCityDropdownOpen ? styles['open'] : ''}`}
                   onClick={() => (!currentCountry || loadingCities) ? null : setIsCityDropdownOpen(!isCityDropdownOpen)}
                   disabled={!currentCountry || loadingCities}
                 >
-                  <span className="dropdown-text">
+                  <span className={styles['dropdown-text']}>
                     {currentCity && getSelectedCityName()
                       ? getSelectedCityName()
                       : (
-                        <span className="all-option">
+                        <span className={styles['all-option']}>
                           {!currentCountry 
                             ? t('selectCountryFirst') 
                             : loadingCities 
@@ -410,19 +431,19 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
                       )
                     }
                   </span>
-                  <svg className="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <svg className={styles['dropdown-arrow']} width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
                 
                 {isCityDropdownOpen && currentCountry && !loadingCities && (
-                  <div className="dropdown-menu">
+                  <div className={styles['dropdown-menu']}>
                     <button
                       type="button"
-                      className={`dropdown-item ${currentCity === '' ? 'selected' : ''}`}
+                      className={`${styles['dropdown-item']} ${currentCity === '' ? styles['selected'] : ''}`}
                       onClick={() => handleCitySelect('')}
                     >
-                      <span className="all-option">
+                      <span className={styles['all-option']}>
                         {t('allCities')}
                       </span>
                     </button>
@@ -430,7 +451,7 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
                       <button
                         key={city.code}
                         type="button"
-                        className={`dropdown-item ${currentCity === city.code ? 'selected' : ''}`}
+                        className={`${styles['dropdown-item']} ${currentCity === city.code ? styles['selected'] : ''}`}
                         onClick={() => handleCitySelect(city.code)}
                       >
                         {city.names[currentLanguage] || city.names['en']}
@@ -446,45 +467,45 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
 
       {/* 모바일 모달 */}
       {isMobile && isLocationModalOpen && (
-        <div className="location-modal-overlay" onClick={handleCancelSelection}>
-          <div className={`location-modal ${isLocationModalOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">
+        <div className={styles['location-modal-overlay']} onClick={handleCancelSelection}>
+          <div className={`${styles['location-modal']} ${isLocationModalOpen ? styles['open'] : ''}`} onClick={(e) => e.stopPropagation()}>
+            <div className={styles['modal-header']}>
+              <h3 className={styles['modal-title']}>
                 <img src="/icons/location_pin.svg" alt="location" width={20} height={20} />
                 {t('whereToGo')}
               </h3>
-              <button className="modal-close" onClick={handleCancelSelection}>×</button>
+              <button className={styles['modal-close']} onClick={handleCancelSelection}>×</button>
             </div>
             
-            <div className="modal-content">
-              <div className="modal-section">
-                <h4 className="modal-section-title">{t('allCountries')}</h4>
-                <div className="modal-list">
+            <div className={styles['modal-content']}>
+              <div className={styles['modal-section']}>
+                <h4 className={styles['modal-section-title']}>{t('allCountries')}</h4>
+                <div className={styles['modal-list']}>
                   {loadingModalCountries ? (
-                    <div className="modal-loading">{t('loading')}</div>
+                    <div className={styles['modal-loading']}>{t('loading')}</div>
                   ) : (
                     <>
                       <button
-                        className={`modal-list-item ${tempSelectedCountry === '' ? 'selected' : ''}`}
+                        className={`${styles['modal-list-item']} ${tempSelectedCountry === '' ? styles['selected'] : ''}`}
                         onClick={() => handleTempCountrySelect('')}
                       >
-                        <div className="modal-list-item-content">
-                          <span className="modal-list-left">전체</span>
+                        <div className={styles['modal-list-item-content']}>
+                          <span className={styles['modal-list-left']}>전체</span>
                         </div>
-                        <img src="/icons/check.svg" alt="selected" width={24} height={24} className="check-icon"/>
+                        <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
                       </button>
                       {modalCountries.map((country) => (
                         <button
                           key={country.code}
-                          className={`modal-list-item ${tempSelectedCountry === country.code ? 'selected' : ''}`}
+                          className={`${styles['modal-list-item']} ${tempSelectedCountry === country.code ? styles['selected'] : ''}`}
                           onClick={() => handleTempCountrySelect(country.code)}
                         >
-                          <div className="modal-list-item-content">
-                            <span className="modal-list-left">
+                          <div className={styles['modal-list-item-content']}>
+                            <span className={styles['modal-list-left']}>
                               {getCountryFlag(country.code)} {country.names[currentLanguage] || country.names['en']}
                             </span>
                           </div>
-                          <img src="/icons/check.svg" alt="selected" width={24} height={24} className="check-icon"/>
+                          <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
                         </button>
                       ))}
                     </>
@@ -492,34 +513,34 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
                 </div>
               </div>
               
-              <div className="modal-section">
-                <h4 className="modal-section-title">{t('allCities')}</h4>
-                <div className="modal-list">
+              <div className={styles['modal-section']}>
+                <h4 className={styles['modal-section-title']}>{t('allCities')}</h4>
+                <div className={styles['modal-list']}>
                   {!tempSelectedCountry ? (
-                    <div className="modal-placeholder">{t('selectCountryFirst')}</div>
+                    <div className={styles['modal-placeholder']}>{t('selectCountryFirst')}</div>
                   ) : loadingModalCities ? (
-                    <div className="modal-loading">{t('loading')}</div>
+                    <div className={styles['modal-loading']}>{t('loading')}</div>
                   ) : (
                     <>
                       <button
-                        className={`modal-list-item ${tempSelectedCity === '' && tempSelectedCountry ? 'selected' : ''}`}
+                        className={`${styles['modal-list-item']} ${tempSelectedCity === '' && tempSelectedCountry ? styles['selected'] : ''}`}
                         onClick={() => handleTempCitySelect('')}
                       >
-                        <div className="modal-list-item-content">
-                          <span className="modal-list-left">전체</span>
+                        <div className={styles['modal-list-item-content']}>
+                          <span className={styles['modal-list-left']}>전체</span>
                         </div>
-                        <img src="/icons/check.svg" alt="selected" width={24} height={24} className="check-icon"/>
+                        <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
                       </button>
                       {modalCities.map((city) => (
                         <button
                           key={city.code}
-                          className={`modal-list-item ${tempSelectedCity === city.code ? 'selected' : ''}`}
+                          className={`${styles['modal-list-item']} ${tempSelectedCity === city.code ? styles['selected'] : ''}`}
                           onClick={() => handleTempCitySelect(city.code)}
                         >
-                          <div className="modal-list-item-content">
-                            <span className="modal-list-left">{city.names[currentLanguage] || city.names['en']}</span>
+                          <div className={styles['modal-list-item-content']}>
+                            <span className={styles['modal-list-left']}>{city.names[currentLanguage] || city.names['en']}</span>
                           </div>
-                          <img src="/icons/check.svg" alt="selected" width={24} height={24} className="check-icon"/>
+                          <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
                         </button>
                       ))}
                     </>
@@ -528,14 +549,16 @@ const CountryAndCitySelector: React.FC<CountryAndCitySelectorProps> = ({
               </div>
             </div>
             
-            <div className="modal-buttons">
-              <button className="modal-button apply-button" onClick={handleApplySelection}>적용</button>
+            <div className={styles['modal-buttons']}>
+              <button className={`${styles['modal-button']} ${styles['apply-button']}`} onClick={handleApplySelection}>적용</button>
             </div>
           </div>
         </div>
       )}
     </>
   );
-};
+});
+
+CountryAndCitySelector.displayName = 'CountryAndCitySelector';
 
 export default CountryAndCitySelector;
