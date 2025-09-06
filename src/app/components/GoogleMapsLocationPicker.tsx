@@ -47,8 +47,10 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   
   // 현재 위치 관련 훅들
   const { 
-    location: currentLocation, 
-    error: locationError,
+    location: currentLocation,
+    loading,
+    error,
+    permissionGranted,
     getCurrentLocation,
     isAppEnvironment 
   } = useGeolocation();
@@ -438,6 +440,12 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const handleCurrentLocationClick = () => {
     console.log('🎯 현재 위치 버튼 클릭됨');
     
+    // 위치 권한 확인
+    if (!permissionGranted) {
+      console.log('🎯 위치 권한이 없음, 권한 요청');
+      // 권한 요청을 위해 getCurrentLocation 호출 (브라우저에서 권한 요청 다이얼로그 표시)
+    }
+    
     // 모든 환경에서 웹 Geolocation API 사용 (단순하고 확실한 방법)
     console.log('🎯 웹 Geolocation API로 현재 위치 가져오기');
     getCurrentLocation();
@@ -477,10 +485,20 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
             type="button"
             className={styles['current-location-btn']}
             onClick={handleCurrentLocationClick}
-            title="현재 위치로 이동"
+            title={permissionGranted ? "현재 위치로 이동" : "위치 권한 허용 후 현재 위치로 이동"}
+            disabled={loading}
           >
-            📍
+            {loading ? '⏳' : permissionGranted ? '📍' : '📍❓'}
           </button>
+          
+          {/* 위치 권한 에러 메시지 */}
+          {error && (
+            <div className={styles['location-error']}>
+              <small style={{ color: '#e74c3c' }}>
+                {error.includes('denied') ? '위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요.' : error}
+              </small>
+            </div>
+          )}
           
           {locationDetails && (
             <button
