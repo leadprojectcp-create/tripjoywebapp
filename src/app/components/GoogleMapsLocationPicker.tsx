@@ -13,8 +13,6 @@ import {
   getLocationHintByLanguage
 } from '../utils/locationUtils';
 import { useGeolocation } from '../../hooks/useGeolocation';
-import { useAppBridge } from '../../hooks/useAppBridge';
-import { LocationData } from '../../types/appBridge';
 
 export interface LocationDetails {
   placeId: string;
@@ -63,76 +61,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const [marker, setMarker] = useState<any>(null);
   const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
 
-  // 지도 업데이트 함수
-  const updateMapWithLocation = useCallback((location: LocationData) => {
-    if (!map) return;
-    
-    console.log('🎯 지도 업데이트 시작:', location);
-    
-    const position = { 
-      lat: location.latitude, 
-      lng: location.longitude 
-    };
-    
-    // 지도 중심 이동
-    map.setCenter(position);
-    map.setZoom(15);
-    
-    // 기존 마커 제거
-    if (currentLocationMarker) {
-      currentLocationMarker.setMap(null);
-    }
-    
-    // 현재 위치 마커 생성
-    const marker = new window.google.maps.Marker({
-      position: position,
-      map: map,
-      title: '현재 위치',
-      icon: {
-        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" fill="#4285F4" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4" fill="#ffffff"/>
-          </svg>
-        `),
-        scaledSize: new window.google.maps.Size(24, 24),
-        anchor: new window.google.maps.Point(12, 12)
-      }
-    });
-    
-    setCurrentLocationMarker(marker);
-    console.log('🎯 현재 위치 마커 생성 완료');
-    
-    // 주소 정보 가져오기
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: position }, (results: any, status: any) => {
-      if (status === 'OK' && results[0]) {
-        const address = results[0].formatted_address;
-        console.log('📍 현재 위치 주소:', address);
-        
-        const locationDetails = {
-          lat: position.lat,
-          lng: position.lng,
-          address: address,
-          placeId: results[0].place_id,
-          name: '현재 위치'
-        };
-        
-        onLocationSelect(address, locationDetails);
-        
-        // 입력 필드에 주소 표시
-        if (locationInputRef.current) {
-          locationInputRef.current.value = address;
-        }
-      }
-    });
-  }, [map, currentLocationMarker, onLocationSelect]);
 
-  const { 
-    appEnvironment, 
-    locationFromApp, 
-    requestLocation: requestLocationFromApp 
-  } = useAppBridge(updateMapWithLocation);
   
   // Refs
   const locationInputRef = useRef<HTMLInputElement>(null);
@@ -581,15 +510,11 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const handleCurrentLocationClick = () => {
     console.log('🎯 현재 위치 버튼 클릭됨');
     
-    if (appEnvironment.isApp) {
-      console.log('🎯 앱 환경: 앱에 위치 요청');
-      // 앱에 위치 요청 - 콜백으로 자동 처리됨
-      requestLocationFromApp();
-    } else {
-      console.log('🎯 웹 환경: 웹 Geolocation API 사용');
-      getCurrentLocation();
-    }
+    // 모든 환경에서 웹 Geolocation API 사용 (단순하고 확실한 방법)
+    console.log('🎯 웹 Geolocation API로 현재 위치 가져오기');
+    getCurrentLocation();
   };
+
 
   // 디버깅을 위한 로그
   console.log('🗺️ GoogleMapsLocationPicker 렌더링:', {
@@ -619,17 +544,15 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
             </button>
           )}
           
-          {/* 현재 위치 버튼 (앱 환경에서만 표시) */}
-          {appEnvironment.isApp && (
-            <button
-              type="button"
-              className={styles['current-location-btn']}
-              onClick={handleCurrentLocationClick}
-              title="현재 위치로 이동"
-            >
-              📍
-            </button>
-          )}
+          {/* 현재 위치 버튼 */}
+          <button
+            type="button"
+            className={styles['current-location-btn']}
+            onClick={handleCurrentLocationClick}
+            title="현재 위치로 이동"
+          >
+            📍
+          </button>
           
           {locationDetails && (
             <button
