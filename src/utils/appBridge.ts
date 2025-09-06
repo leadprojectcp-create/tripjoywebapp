@@ -96,6 +96,8 @@ export const setupMessageListener = (
       console.log('📥 웹앱에서 메시지 이벤트 수신:', event.data);
       console.log('📥 이벤트 데이터 타입:', typeof event.data);
       console.log('📥 이벤트 데이터 내용:', event.data);
+      console.log('📥 이벤트 origin:', event.origin);
+      console.log('📥 이벤트 source:', event.source);
       
       // 데이터가 문자열인 경우 JSON 파싱 시도
       let message: BridgeMessage;
@@ -122,11 +124,29 @@ export const setupMessageListener = (
     }
   };
 
+  // 여러 이벤트 리스너 등록
   window.addEventListener('message', handleMessage);
+  
+  // ReactNativeWebView 메시지 리스너도 추가
+  if ((window as any).ReactNativeWebView) {
+    console.log('📥 ReactNativeWebView 메시지 리스너 등록');
+    (window as any).ReactNativeWebView.onMessage = (data: string) => {
+      console.log('📥 ReactNativeWebView.onMessage 수신:', data);
+      try {
+        const message = JSON.parse(data);
+        callback(message);
+      } catch (error) {
+        console.error('❌ ReactNativeWebView 메시지 파싱 실패:', error);
+      }
+    };
+  }
   
   // cleanup 함수 반환
   return () => {
     window.removeEventListener('message', handleMessage);
+    if ((window as any).ReactNativeWebView) {
+      (window as any).ReactNativeWebView.onMessage = null;
+    }
   };
 };
 
