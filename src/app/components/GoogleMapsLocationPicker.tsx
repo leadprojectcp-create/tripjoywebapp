@@ -463,6 +463,9 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     console.log('🎯 appEnvironment:', appEnvironment);
     console.log('🎯 appEnvironment.isApp:', appEnvironment.isApp);
     console.log('🎯 locationFromApp:', locationFromApp);
+    console.log('🎯 locationFromApp 타입:', typeof locationFromApp);
+    console.log('🎯 locationFromApp.latitude:', locationFromApp?.latitude);
+    console.log('🎯 locationFromApp.longitude:', locationFromApp?.longitude);
     
     if (appEnvironment.isApp) {
       if (locationFromApp) {

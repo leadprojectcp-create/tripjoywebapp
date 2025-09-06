@@ -37,6 +37,8 @@ export const useAppBridge = (): UseAppBridgeReturn => {
     setIsWebViewAvailable(environment.isApp);
     
     console.log('🔍 앱 환경 감지:', environment);
+    console.log('🔍 WebView 사용 가능:', environment.isApp);
+    console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   }, []);
 
   // 앱에서 메시지 수신 처리
@@ -55,11 +57,27 @@ export const useAppBridge = (): UseAppBridgeReturn => {
         console.log('📥 앱에서 메시지 수신:', message);
 
         // 위치 업데이트 메시지 처리
-        if (isLocationUpdateMessage(message)) {
-          const locationData = message.data as LocationData;
+        if (isLocationUpdateMessage(message) || message.type === 'LOCATION_DATA') {
+          let locationData: LocationData;
+          
+          if (message.type === 'LOCATION_DATA') {
+            // 새로운 형식의 위치 데이터
+            locationData = {
+              latitude: (message as any).latitude,
+              longitude: (message as any).longitude,
+              accuracy: (message as any).accuracy
+            };
+          } else {
+            // 기존 형식의 위치 데이터
+            locationData = message.data as LocationData;
+          }
+          
           setLocationFromApp(locationData);
           setError(null);
           console.log('📍 앱에서 위치 정보 수신:', locationData);
+          console.log('📍 locationData.latitude:', locationData.latitude);
+          console.log('📍 locationData.longitude:', locationData.longitude);
+          console.log('📍 locationData.accuracy:', locationData.accuracy);
         }
 
       } catch (error) {
