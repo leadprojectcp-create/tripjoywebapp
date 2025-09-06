@@ -522,87 +522,9 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     console.log('🎯 locationFromApp.longitude:', locationFromApp?.longitude);
     
     if (appEnvironment.isApp) {
-      if (locationFromApp) {
-        console.log('🎯 앱 환경: 이미 받은 위치 정보로 지도 이동');
-        // 이미 받은 위치 정보로 지도 이동
-        const position = { 
-          lat: locationFromApp.latitude, 
-          lng: locationFromApp.longitude 
-        };
-        
-        console.log('🎯 지도 이동할 위치:', position);
-        
-        if (map) {
-          // 지도 중심 이동
-          map.setCenter(position);
-          map.setZoom(15);
-          
-          // 기존 마커 제거
-          if (currentLocationMarker) {
-            currentLocationMarker.setMap(null);
-          }
-          
-          // 현재 위치 마커 생성 및 표시
-          const marker = new window.google.maps.Marker({
-            position: position,
-            map: map,
-            title: '현재 위치',
-            icon: {
-              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" fill="#4285F4" stroke="#ffffff" stroke-width="2"/>
-                  <circle cx="12" cy="12" r="4" fill="#ffffff"/>
-                </svg>
-              `),
-              scaledSize: new window.google.maps.Size(24, 24),
-              anchor: new window.google.maps.Point(12, 12)
-            }
-          });
-          
-          setCurrentLocationMarker(marker);
-          console.log('🎯 현재 위치 마커 생성 완료');
-          
-          // 현재 위치의 주소 정보 가져오기
-          const geocoder = new window.google.maps.Geocoder();
-          console.log('🎯 주소 정보 가져오기 시작...');
-          
-          geocoder.geocode({ location: position }, (results: any, status: any) => {
-            console.log('🎯 Geocoder 응답:', { status, results });
-            
-            if (status === 'OK' && results && results[0]) {
-              const address = results[0].formatted_address;
-              console.log('📍 현재 위치 주소:', address);
-              
-              // 주소 정보를 부모 컴포넌트로 전달 (수동 선택한 것처럼)
-              const locationDetails = {
-                lat: position.lat,
-                lng: position.lng,
-                name: address,
-                address: address,
-                placeId: results[0].place_id
-              };
-              
-              console.log('🎯 부모 컴포넌트로 전달할 위치 정보:', locationDetails);
-              onLocationSelect(address, locationDetails);
-              
-              // 입력 필드에 주소 표시
-              if (locationInputRef.current) {
-                locationInputRef.current.value = address;
-                console.log('🎯 입력 필드에 주소 표시 완료:', address);
-              }
-            } else {
-              console.error('❌ 주소 정보 가져오기 실패:', status);
-              console.error('❌ 결과:', results);
-            }
-          });
-        } else {
-          console.error('❌ 지도가 초기화되지 않음');
-        }
-      } else {
-        console.log('🎯 앱 환경: 위치 정보가 없음, 앱에서 위치 정보 요청');
-        // 위치 정보가 없으면 앱에서 요청
-        requestLocationFromApp();
-      }
+      console.log('🎯 앱 환경: 앱에 위치 요청');
+      // 항상 앱에 위치 요청 (더 확실한 방법)
+      requestLocationFromApp();
     } else {
       console.log('🎯 웹 환경: 웹 Geolocation API 사용');
       // 웹 환경: 웹 Geolocation API 사용
