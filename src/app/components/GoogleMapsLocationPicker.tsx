@@ -276,7 +276,19 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         zoom: 15,
         mapTypeControl: false,
         streetViewControl: false,
-        fullscreenControl: false
+        fullscreenControl: false,
+        // 모바일 최적화 설정
+        gestureHandling: 'greedy', // 한 손으로 지도 조작 가능
+        zoomControl: true, // 줌 컨트롤 표시
+        scaleControl: false, // 스케일 컨트롤 숨김
+        clickableIcons: false, // POI 클릭 비활성화
+        // 터치 제스처 최적화
+        draggable: true,
+        scrollwheel: false, // 마우스 휠 비활성화 (모바일에서)
+        disableDoubleClickZoom: false, // 더블클릭 줌 활성화
+        // 모바일 터치 최적화
+        touchZoom: true,
+        panControl: false // 팬 컨트롤 숨김
       });
 
       // 지도 클릭 이벤트 리스너 추가
