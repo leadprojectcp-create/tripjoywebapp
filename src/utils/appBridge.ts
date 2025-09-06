@@ -15,7 +15,9 @@ export const detectAppEnvironment = (): AppEnvironment => {
   // 더 확실한 앱 환경 감지
   const urlParams = new URLSearchParams(window.location.search);
   const isAppFromUrl = urlParams.get('app') === 'true';
+  const platformFromUrl = urlParams.get('platform') as 'ios' | 'android' | null;
   console.log('🔍 URL 파라미터 app:', urlParams.get('app'));
+  console.log('🔍 URL 파라미터 platform:', platformFromUrl);
   
   const isApp = typeof window !== 'undefined' && 
                 (isAppFromUrl ||
@@ -27,13 +29,19 @@ export const detectAppEnvironment = (): AppEnvironment => {
   let platform: 'ios' | 'android' | 'web' = 'web';
   
   if (isApp) {
-    const userAgent = navigator.userAgent.toLowerCase();
-    console.log('🔍 userAgent (소문자):', userAgent);
-    
-    if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
-      platform = 'ios';
+    // URL 파라미터에서 플랫폼 정보를 우선 사용
+    if (platformFromUrl && (platformFromUrl === 'ios' || platformFromUrl === 'android')) {
+      platform = platformFromUrl;
     } else {
-      platform = 'android';
+      // URL 파라미터가 없으면 userAgent로 감지
+      const userAgent = navigator.userAgent.toLowerCase();
+      console.log('🔍 userAgent (소문자):', userAgent);
+      
+      if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+        platform = 'ios';
+      } else {
+        platform = 'android';
+      }
     }
   }
 

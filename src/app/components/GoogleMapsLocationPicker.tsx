@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import styles from './GoogleMapsLocationPicker.module.css';
@@ -14,6 +14,7 @@ import {
 } from '../utils/locationUtils';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { useAppBridge } from '../../hooks/useAppBridge';
+import { LocationData } from '../../types/appBridge';
 
 export interface LocationDetails {
   placeId: string;
@@ -54,6 +55,14 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     isAppEnvironment 
   } = useGeolocation();
   
+  // States
+  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+  const [isMapVisible, setIsMapVisible] = useState(isPostUploadPage); // post-upload 페이지에서는 지도 표시
+  const [autocomplete, setAutocomplete] = useState<any>(null);
+  const [map, setMap] = useState<any>(null);
+  const [marker, setMarker] = useState<any>(null);
+  const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
+
   // 지도 업데이트 함수
   const updateMapWithLocation = useCallback((location: LocationData) => {
     if (!map) return;
@@ -124,14 +133,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     locationFromApp, 
     requestLocation: requestLocationFromApp 
   } = useAppBridge(updateMapWithLocation);
-  
-  // States
-  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const [isMapVisible, setIsMapVisible] = useState(isPostUploadPage); // post-upload 페이지에서는 지도 표시
-  const [autocomplete, setAutocomplete] = useState<any>(null);
-  const [map, setMap] = useState<any>(null);
-  const [marker, setMarker] = useState<any>(null);
-  const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
   
   // Refs
   const locationInputRef = useRef<HTMLInputElement>(null);
