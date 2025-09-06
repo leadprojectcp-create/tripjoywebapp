@@ -547,14 +547,10 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
               type="button"
               className={styles['current-location-btn']}
               onClick={handleCurrentLocationClick}
-              disabled={locationLoading || appLocationLoading}
+              disabled={false}
               title="현재 위치로 이동"
             >
-              {(locationLoading || appLocationLoading) ? (
-                <div className={styles['loading-spinner']}></div>
-              ) : (
-                '📍'
-              )}
+              📍
             </button>
           )}
           
