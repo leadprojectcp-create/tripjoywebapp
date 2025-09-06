@@ -11,8 +11,11 @@ export const detectAppEnvironment = (): AppEnvironment => {
   console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   console.log('🔍 navigator.userAgent:', navigator.userAgent);
   
+  // 더 간단한 앱 환경 감지
   const isApp = typeof window !== 'undefined' && 
-                (window as any).ReactNativeWebView !== undefined;
+                ((window as any).ReactNativeWebView !== undefined || 
+                 navigator.userAgent.includes('wv') ||
+                 navigator.userAgent.includes('WebView'));
   
   let platform: 'ios' | 'android' | 'web' = 'web';
   
@@ -45,20 +48,36 @@ export const sendMessageToApp = (message: BridgeMessage): void => {
   console.log('🔄 window 객체 존재:', typeof window !== 'undefined');
   console.log('🔄 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   
-  if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+  // 여러 방법으로 메시지 전송 시도
+  if (typeof window !== 'undefined') {
     try {
       const messageString = JSON.stringify(message);
       console.log('📤 전송할 메시지 문자열:', messageString);
       
-      (window as any).ReactNativeWebView.postMessage(messageString);
-      console.log('✅ 앱으로 메시지 전송 성공:', message);
+      // 방법 1: ReactNativeWebView.postMessage
+      if ((window as any).ReactNativeWebView) {
+        (window as any).ReactNativeWebView.postMessage(messageString);
+        console.log('✅ ReactNativeWebView.postMessage로 전송 성공');
+      }
+      
+      // 방법 2: window.postMessage
+      if (window.postMessage) {
+        window.postMessage(messageString, '*');
+        console.log('✅ window.postMessage로 전송 성공');
+      }
+      
+      // 방법 3: 직접 호출
+      if ((window as any).sendMessageToApp) {
+        (window as any).sendMessageToApp(message);
+        console.log('✅ sendMessageToApp 함수로 전송 성공');
+      }
+      
+      console.log('✅ 앱으로 메시지 전송 완료:', message);
     } catch (error) {
       console.error('❌ 앱으로 메시지 전송 실패:', error);
     }
   } else {
-    console.warn('⚠️ WebView 환경이 아닙니다. 메시지 전송을 건너뜁니다.');
-    console.warn('⚠️ window:', typeof window);
-    console.warn('⚠️ ReactNativeWebView:', (window as any).ReactNativeWebView);
+    console.warn('⚠️ window 객체가 없습니다.');
   }
 };
 
