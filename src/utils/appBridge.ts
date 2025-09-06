@@ -93,34 +93,55 @@ export const setupMessageListener = (
 
   const handleMessage = (event: MessageEvent) => {
     try {
+      // 이벤트 데이터가 없으면 무시
+      if (!event || !event.data) {
+        console.log('📥 빈 메시지 이벤트 무시');
+        return;
+      }
+
       console.log('📥 웹앱에서 메시지 이벤트 수신:', event.data);
       console.log('📥 이벤트 데이터 타입:', typeof event.data);
-      console.log('📥 이벤트 데이터 내용:', event.data);
-      console.log('📥 이벤트 origin:', event.origin);
-      console.log('📥 이벤트 source:', event.source);
       
       // 데이터가 문자열인 경우 JSON 파싱 시도
       let message: BridgeMessage;
       if (typeof event.data === 'string') {
+        // 빈 문자열이면 무시
+        if (event.data.trim() === '') {
+          console.log('📥 빈 문자열 메시지 무시');
+          return;
+        }
+        
         // 유효한 JSON인지 확인
         if (event.data.startsWith('{') && event.data.endsWith('}')) {
-          message = JSON.parse(event.data);
+          try {
+            message = JSON.parse(event.data);
+          } catch (parseError) {
+            console.warn('⚠️ JSON 파싱 실패:', parseError);
+            console.warn('⚠️ 원본 데이터:', event.data);
+            return;
+          }
         } else {
           console.warn('⚠️ 유효하지 않은 JSON 형식:', event.data);
           return;
         }
-      } else if (typeof event.data === 'object') {
+      } else if (typeof event.data === 'object' && event.data !== null) {
         message = event.data;
       } else {
         console.warn('⚠️ 지원하지 않는 데이터 타입:', typeof event.data);
         return;
       }
       
+      // 메시지 유효성 검사
+      if (!message || typeof message !== 'object') {
+        console.warn('⚠️ 유효하지 않은 메시지 객체:', message);
+        return;
+      }
+      
       console.log('📥 앱에서 메시지 수신 성공:', message);
       callback(message);
     } catch (error) {
-      console.error('❌ 메시지 파싱 실패:', error);
-      console.error('❌ 원본 데이터:', event.data);
+      console.error('❌ 메시지 처리 실패:', error);
+      console.error('❌ 원본 데이터:', event?.data);
     }
   };
 
@@ -131,12 +152,42 @@ export const setupMessageListener = (
   if ((window as any).ReactNativeWebView) {
     console.log('📥 ReactNativeWebView 메시지 리스너 등록');
     (window as any).ReactNativeWebView.onMessage = (data: string) => {
-      console.log('📥 ReactNativeWebView.onMessage 수신:', data);
       try {
-        const message = JSON.parse(data);
+        // 데이터가 없으면 무시
+        if (!data || typeof data !== 'string') {
+          console.log('📥 ReactNativeWebView: 빈 데이터 무시');
+          return;
+        }
+
+        console.log('📥 ReactNativeWebView.onMessage 수신:', data);
+        
+        // 빈 문자열이면 무시
+        if (data.trim() === '') {
+          console.log('📥 ReactNativeWebView: 빈 문자열 무시');
+          return;
+        }
+
+        // JSON 파싱 시도
+        let message;
+        try {
+          message = JSON.parse(data);
+        } catch (parseError) {
+          console.warn('⚠️ ReactNativeWebView JSON 파싱 실패:', parseError);
+          console.warn('⚠️ 원본 데이터:', data);
+          return;
+        }
+
+        // 메시지 유효성 검사
+        if (!message || typeof message !== 'object') {
+          console.warn('⚠️ ReactNativeWebView: 유효하지 않은 메시지 객체:', message);
+          return;
+        }
+
+        console.log('📥 ReactNativeWebView 메시지 수신 성공:', message);
         callback(message);
       } catch (error) {
-        console.error('❌ ReactNativeWebView 메시지 파싱 실패:', error);
+        console.error('❌ ReactNativeWebView 메시지 처리 실패:', error);
+        console.error('❌ 원본 데이터:', data);
       }
     };
   }
