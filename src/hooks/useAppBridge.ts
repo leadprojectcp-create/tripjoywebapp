@@ -85,23 +85,22 @@ export const useAppBridge = (): UseAppBridgeReturn => {
     return cleanup;
   }, [appEnvironment.isApp]);
 
-  // 앱에 위치 정보 요청
+  // 앱에 위치 정보 요청 (로딩 UI 없이 백그라운드에서 처리)
   const requestLocation = useCallback(() => {
     if (!appEnvironment.isApp) {
       setError('앱 환경에서만 사용할 수 있습니다.');
       return;
     }
 
-    setLoading(true);
+    // 로딩 UI를 표시하지 않음 - 백그라운드에서 조용히 처리
     setError(null);
     
     try {
       requestLocationFromApp();
-      console.log('📤 앱에 위치 정보 요청');
+      console.log('📤 앱에 위치 정보 요청 (백그라운드)');
     } catch (error) {
       console.error('❌ 위치 정보 요청 실패:', error);
       setError('위치 정보 요청에 실패했습니다.');
-      setLoading(false);
     }
   }, [appEnvironment.isApp]);
 
