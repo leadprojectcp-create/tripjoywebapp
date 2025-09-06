@@ -21,7 +21,7 @@ interface UseAppBridgeReturn {
   clearLocation: () => void;
 }
 
-export const useAppBridge = (): UseAppBridgeReturn => {
+export const useAppBridge = (onLocationReceived?: (location: LocationData) => void): UseAppBridgeReturn => {
   const [appEnvironment, setAppEnvironment] = useState<AppEnvironment>({
     isApp: false,
     platform: 'web'
@@ -72,12 +72,18 @@ export const useAppBridge = (): UseAppBridgeReturn => {
             locationData = message.data as LocationData;
           }
           
-          setLocationFromApp(locationData);
-          setError(null);
-          console.log('📍 앱에서 위치 정보 수신:', locationData);
-          console.log('📍 locationData.latitude:', locationData.latitude);
-          console.log('📍 locationData.longitude:', locationData.longitude);
-          console.log('📍 locationData.accuracy:', locationData.accuracy);
+              setLocationFromApp(locationData);
+              setError(null);
+              console.log('📍 앱에서 위치 정보 수신:', locationData);
+              console.log('📍 locationData.latitude:', locationData.latitude);
+              console.log('📍 locationData.longitude:', locationData.longitude);
+              console.log('📍 locationData.accuracy:', locationData.accuracy);
+              
+              // 콜백 함수 호출 (지도 업데이트용)
+              if (onLocationReceived) {
+                console.log('📍 콜백 함수 호출하여 지도 업데이트');
+                onLocationReceived(locationData);
+              }
         }
 
       } catch (error) {
