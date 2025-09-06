@@ -65,16 +65,6 @@ export const useAppBridge = (): UseAppBridgeReturn => {
           console.log('📍 앱에서 위치 정보 수신:', locationData);
         }
 
-        // 다른 메시지 타입들도 여기서 처리 가능
-        // switch (message.type) {
-        //   case 'CAMERA_RESPONSE':
-        //     // 카메라 응답 처리
-        //     break;
-        //   case 'FILE_RESPONSE':
-        //     // 파일 응답 처리
-        //     break;
-        // }
-
       } catch (error) {
         console.error('❌ 메시지 처리 실패:', error);
         setError('메시지 처리 중 오류가 발생했습니다.');

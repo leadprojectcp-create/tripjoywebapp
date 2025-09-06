@@ -45,24 +45,22 @@ export const useGeolocation = (
     }
   }, []);
 
-  // 현재 위치 가져오기
+  // 현재 위치 가져오기 (로딩 UI 없이 백그라운드에서 처리)
   const getCurrentLocation = useCallback(async () => {
     if (loading) return;
 
-    setLoading(true);
+    // 로딩 UI를 표시하지 않음 - 백그라운드에서 조용히 처리
     setError(null);
 
     try {
       // 앱 환경에서는 앱에서 위치 정보를 받아오므로 웹 API 사용하지 않음
       if (isAppEnvironment) {
         console.log('📱 앱 환경: 앱에서 위치 정보를 받아옵니다.');
-        setLoading(false);
         return;
       }
 
       // 웹 환경에서는 현재 위치 기능을 사용하지 않음
       console.log('🌐 웹 환경: 현재 위치 기능을 사용하지 않습니다.');
-      setLoading(false);
       return;
     } catch (error) {
       const errorMessage = error instanceof Error 
@@ -72,8 +70,6 @@ export const useGeolocation = (
       setError(errorMessage);
       setPermissionGranted(false);
       console.error('❌ 현재 위치 가져오기 실패:', error);
-    } finally {
-      setLoading(false);
     }
   }, [loading, isAppEnvironment]);
 

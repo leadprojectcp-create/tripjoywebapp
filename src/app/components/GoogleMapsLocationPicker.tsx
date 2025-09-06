@@ -49,7 +49,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   // 현재 위치 관련 훅들
   const { 
     location: currentLocation, 
-    loading: locationLoading, 
     error: locationError,
     getCurrentLocation,
     isAppEnvironment 
@@ -58,7 +57,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const { 
     appEnvironment, 
     locationFromApp, 
-    loading: appLocationLoading,
     requestLocation: requestLocationFromApp 
   } = useAppBridge();
   
