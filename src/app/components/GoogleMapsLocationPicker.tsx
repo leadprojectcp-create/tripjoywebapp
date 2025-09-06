@@ -362,7 +362,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     };
   }, [isGoogleMapsLoaded, currentLanguage, isMapVisible, onLocationSelect]);
 
-  // 🎯 현재 위치 감지 및 지도 중심 이동 (앱 환경에서만)
+  // 🎯 현재 위치 감지 (앱 환경에서만) - 자동 지도 이동 제거
   useEffect(() => {
     if (!map || !isMapVisible) {
       return;
@@ -374,66 +374,10 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       return;
     }
 
-    // 앱에서 받은 위치 정보로 지도 중심 이동
+    // 앱에서 받은 위치 정보를 저장만 하고, 자동으로 지도를 이동시키지 않음
     if (appEnvironment.isApp && locationFromApp) {
-      console.log('📍 앱에서 받은 위치 정보:', locationFromApp);
-      const position = { 
-        lat: locationFromApp.latitude, 
-        lng: locationFromApp.longitude 
-      };
-      
-      console.log('📍 현재 위치로 지도 중심 이동:', position);
-      
-      // 지도 중심 이동
-      map.setCenter(position);
-      map.setZoom(15);
-      
-      // 현재 위치 마커 표시
-      if (currentLocationMarker) {
-        currentLocationMarker.setMap(null);
-      }
-      
-      const newCurrentLocationMarker = new window.google.maps.Marker({
-        position: position,
-        map: map,
-        title: '현재 위치',
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: '#4285F4',
-          fillOpacity: 1,
-          strokeColor: '#FFFFFF',
-          strokeWeight: 2
-        },
-        animation: window.google.maps.Animation.DROP
-      });
-      
-      setCurrentLocationMarker(newCurrentLocationMarker);
-      
-      // 현재 위치의 주소 정보 가져오기
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: position }, (results: any, status: any) => {
-        if (status === 'OK' && results && results[0]) {
-          const address = results[0].formatted_address;
-          console.log('📍 현재 위치 주소:', address);
-          
-          // 주소 정보를 부모 컴포넌트로 전달 (수동 선택한 것처럼)
-          onLocationSelect(address, {
-            lat: position.lat,
-            lng: position.lng,
-            name: address,
-            address: address,
-            placeId: results[0].place_id
-          });
-          
-          // 입력 필드에 주소 표시
-          if (locationInputRef.current) {
-            locationInputRef.current.value = address;
-          }
-        } else {
-          console.error('❌ 주소 정보 가져오기 실패:', status);
-        }
-      });
+      console.log('📍 앱에서 받은 위치 정보 저장됨:', locationFromApp);
+      // 위치 정보는 저장되어 있고, 버튼을 눌렀을 때만 지도를 이동시킴
     }
   }, [map, isMapVisible, appEnvironment.isApp, locationFromApp]);
 
@@ -531,15 +475,19 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           lng: locationFromApp.longitude 
         };
         
+        console.log('🎯 지도 이동할 위치:', position);
+        
         if (map) {
+          // 지도 중심 이동
           map.setCenter(position);
           map.setZoom(15);
           
-          // 현재 위치 마커 표시
+          // 기존 마커 제거
           if (currentLocationMarker) {
             currentLocationMarker.setMap(null);
           }
           
+          // 현재 위치 마커 생성 및 표시
           const marker = new window.google.maps.Marker({
             position: position,
             map: map,
@@ -557,31 +505,43 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           });
           
           setCurrentLocationMarker(marker);
+          console.log('🎯 현재 위치 마커 생성 완료');
           
           // 현재 위치의 주소 정보 가져오기
           const geocoder = new window.google.maps.Geocoder();
+          console.log('🎯 주소 정보 가져오기 시작...');
+          
           geocoder.geocode({ location: position }, (results: any, status: any) => {
+            console.log('🎯 Geocoder 응답:', { status, results });
+            
             if (status === 'OK' && results && results[0]) {
               const address = results[0].formatted_address;
               console.log('📍 현재 위치 주소:', address);
               
               // 주소 정보를 부모 컴포넌트로 전달 (수동 선택한 것처럼)
-              onLocationSelect(address, {
+              const locationDetails = {
                 lat: position.lat,
                 lng: position.lng,
                 name: address,
                 address: address,
                 placeId: results[0].place_id
-              });
+              };
+              
+              console.log('🎯 부모 컴포넌트로 전달할 위치 정보:', locationDetails);
+              onLocationSelect(address, locationDetails);
               
               // 입력 필드에 주소 표시
               if (locationInputRef.current) {
                 locationInputRef.current.value = address;
+                console.log('🎯 입력 필드에 주소 표시 완료:', address);
               }
             } else {
               console.error('❌ 주소 정보 가져오기 실패:', status);
+              console.error('❌ 결과:', results);
             }
           });
+        } else {
+          console.error('❌ 지도가 초기화되지 않음');
         }
       } else {
         console.log('🎯 앱 환경: 위치 정보가 없음, 앱에서 위치 정보 요청');
@@ -629,7 +589,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
               type="button"
               className={styles['current-location-btn']}
               onClick={handleCurrentLocationClick}
-              disabled={false}
               title="현재 위치로 이동"
             >
               📍
