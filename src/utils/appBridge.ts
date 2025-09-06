@@ -11,7 +11,7 @@ export const detectAppEnvironment = (): AppEnvironment => {
   console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   console.log('🔍 navigator.userAgent:', navigator.userAgent);
   
-그  // 더 간단한 앱 환경 감지
+  // 더 간단한 앱 환경 감지
   const isApp = typeof window !== 'undefined' && 
                 ((window as any).ReactNativeWebView !== undefined || 
                  navigator.userAgent.includes('wv') ||
@@ -93,11 +93,32 @@ export const setupMessageListener = (
 
   const handleMessage = (event: MessageEvent) => {
     try {
-      const message: BridgeMessage = JSON.parse(event.data);
-      console.log('📥 앱에서 메시지 수신:', message);
+      console.log('📥 웹앱에서 메시지 이벤트 수신:', event.data);
+      console.log('📥 이벤트 데이터 타입:', typeof event.data);
+      console.log('📥 이벤트 데이터 내용:', event.data);
+      
+      // 데이터가 문자열인 경우 JSON 파싱 시도
+      let message: BridgeMessage;
+      if (typeof event.data === 'string') {
+        // 유효한 JSON인지 확인
+        if (event.data.startsWith('{') && event.data.endsWith('}')) {
+          message = JSON.parse(event.data);
+        } else {
+          console.warn('⚠️ 유효하지 않은 JSON 형식:', event.data);
+          return;
+        }
+      } else if (typeof event.data === 'object') {
+        message = event.data;
+      } else {
+        console.warn('⚠️ 지원하지 않는 데이터 타입:', typeof event.data);
+        return;
+      }
+      
+      console.log('📥 앱에서 메시지 수신 성공:', message);
       callback(message);
     } catch (error) {
       console.error('❌ 메시지 파싱 실패:', error);
+      console.error('❌ 원본 데이터:', event.data);
     }
   };
 
