@@ -410,7 +410,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       
       setCurrentLocationMarker(newCurrentLocationMarker);
     }
-  }, [map, isMapVisible, appEnvironment.isApp, locationFromApp, requestLocationFromApp, currentLocationMarker]);
+  }, [map, isMapVisible, appEnvironment.isApp, locationFromApp]);
 
   // 🛡️ 지도 위치 업데이트 (안정한 의존성 배열)
   useEffect(() => {
