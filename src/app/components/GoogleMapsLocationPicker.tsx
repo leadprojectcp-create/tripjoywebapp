@@ -368,13 +368,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       return;
     }
 
-    // 앱 환경에서만 현재 위치 기능 사용
-    if (appEnvironment.isApp && !locationFromApp) {
-      console.log('📱 앱 환경: 앱에서 위치 정보 요청');
-      requestLocationFromApp();
-      return;
-    }
-
     // 웹 환경에서는 현재 위치 기능을 사용하지 않음
     if (!appEnvironment.isApp) {
       console.log('🌐 웹 환경: 현재 위치 기능을 사용하지 않습니다.');
@@ -383,6 +376,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
 
     // 앱에서 받은 위치 정보로 지도 중심 이동
     if (appEnvironment.isApp && locationFromApp) {
+      console.log('📍 앱에서 받은 위치 정보:', locationFromApp);
       const position = { 
         lat: locationFromApp.latitude, 
         lng: locationFromApp.longitude 
@@ -501,11 +495,49 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     console.log('🎯 현재 위치 버튼 클릭됨');
     console.log('🎯 appEnvironment:', appEnvironment);
     console.log('🎯 appEnvironment.isApp:', appEnvironment.isApp);
+    console.log('🎯 locationFromApp:', locationFromApp);
     
     if (appEnvironment.isApp) {
-      console.log('🎯 앱 환경: 앱에서 위치 정보 요청 시작');
-      // 앱 환경: 앱에서 위치 정보 요청
-      requestLocationFromApp();
+      if (locationFromApp) {
+        console.log('🎯 앱 환경: 이미 받은 위치 정보로 지도 이동');
+        // 이미 받은 위치 정보로 지도 이동
+        const position = { 
+          lat: locationFromApp.latitude, 
+          lng: locationFromApp.longitude 
+        };
+        
+        if (map) {
+          map.setCenter(position);
+          map.setZoom(15);
+          
+          // 현재 위치 마커 표시
+          if (currentLocationMarker) {
+            currentLocationMarker.setMap(null);
+          }
+          
+          const marker = new window.google.maps.Marker({
+            position: position,
+            map: map,
+            title: '현재 위치',
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#4285F4" stroke="#ffffff" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="4" fill="#ffffff"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(24, 24),
+              anchor: new window.google.maps.Point(12, 12)
+            }
+          });
+          
+          setCurrentLocationMarker(marker);
+        }
+      } else {
+        console.log('🎯 앱 환경: 위치 정보가 없음, 앱에서 위치 정보 요청');
+        // 위치 정보가 없으면 앱에서 요청
+        requestLocationFromApp();
+      }
     } else {
       console.log('🎯 웹 환경: 웹 Geolocation API 사용');
       // 웹 환경: 웹 Geolocation API 사용

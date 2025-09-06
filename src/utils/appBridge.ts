@@ -11,7 +11,7 @@ export const detectAppEnvironment = (): AppEnvironment => {
   console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   console.log('🔍 navigator.userAgent:', navigator.userAgent);
   
-  // 더 간단한 앱 환경 감지
+그  // 더 간단한 앱 환경 감지
   const isApp = typeof window !== 'undefined' && 
                 ((window as any).ReactNativeWebView !== undefined || 
                  navigator.userAgent.includes('wv') ||
