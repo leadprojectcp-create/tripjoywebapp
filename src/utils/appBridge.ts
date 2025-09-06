@@ -10,12 +10,19 @@ export const detectAppEnvironment = (): AppEnvironment => {
   console.log('🔍 window 객체 존재:', typeof window !== 'undefined');
   console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
   console.log('🔍 navigator.userAgent:', navigator.userAgent);
+  console.log('🔍 window.location.href:', window.location.href);
   
-  // 더 간단한 앱 환경 감지
+  // 더 확실한 앱 환경 감지
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAppFromUrl = urlParams.get('app') === 'true';
+  console.log('🔍 URL 파라미터 app:', urlParams.get('app'));
+  
   const isApp = typeof window !== 'undefined' && 
-                ((window as any).ReactNativeWebView !== undefined || 
+                (isAppFromUrl ||
+                 (window as any).ReactNativeWebView !== undefined || 
                  navigator.userAgent.includes('wv') ||
-                 navigator.userAgent.includes('WebView'));
+                 navigator.userAgent.includes('WebView') ||
+                 navigator.userAgent.includes('TripJoy'));
   
   let platform: 'ios' | 'android' | 'web' = 'web';
   
