@@ -420,13 +420,14 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           console.log('📍 현재 위치 주소:', address);
           
           // 주소 정보를 부모 컴포넌트로 전달
-          onLocationSelect({
+          const locationDetails = {
             lat: position.lat,
             lng: position.lng,
             address: address,
             placeId: results[0].place_id,
             name: '현재 위치'
-          });
+          };
+          onLocationSelect(address, locationDetails);
         }
       });
     }
