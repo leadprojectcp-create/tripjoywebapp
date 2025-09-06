@@ -12,6 +12,8 @@ import {
   getCurrentRegionCode,
   getLocationHintByLanguage
 } from '../utils/locationUtils';
+import { useGeolocation } from '../../hooks/useGeolocation';
+import { useAppBridge } from '../../hooks/useAppBridge';
 
 export interface LocationDetails {
   placeId: string;
@@ -44,12 +46,29 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   // 게시물 업로드 페이지인지 확인
   const isPostUploadPage = pathname?.includes('/post-upload');
   
+  // 현재 위치 관련 훅들
+  const { 
+    location: currentLocation, 
+    loading: locationLoading, 
+    error: locationError,
+    getCurrentLocation,
+    isAppEnvironment 
+  } = useGeolocation();
+  
+  const { 
+    appEnvironment, 
+    locationFromApp, 
+    loading: appLocationLoading,
+    requestLocation: requestLocationFromApp 
+  } = useAppBridge();
+  
   // States
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(isPostUploadPage); // post-upload 페이지에서는 지도 표시
   const [autocomplete, setAutocomplete] = useState<any>(null);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
+  const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
   
   // Refs
   const locationInputRef = useRef<HTMLInputElement>(null);
@@ -254,10 +273,75 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       
       const mapInstance = new window.google.maps.Map(mapRef.current, {
         center: center,
-        zoom: 10,
+        zoom: 15,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false
+      });
+
+      // 지도 클릭 이벤트 리스너 추가
+      const clickListener = mapInstance.addListener('click', async (event: any) => {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        
+        console.log('📍 지도 클릭:', { lat, lng });
+        
+        try {
+          // Geocoding API를 사용하여 주소 정보 가져오기
+          const geocoder = new window.google.maps.Geocoder();
+          const result = await new Promise<any>((resolve, reject) => {
+            geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+              if (status === 'OK' && results && results.length > 0) {
+                resolve(results[0]);
+              } else {
+                reject(new Error('주소를 찾을 수 없습니다.'));
+              }
+            });
+          });
+
+          const place = result;
+          const address = place.formatted_address || '알 수 없는 위치';
+          
+          // 주소 구성 요소에서 정보 추출
+          let basicInfo: any = {};
+          if (place.address_components) {
+            place.address_components.forEach((component: any) => {
+              const types = component.types || [];
+              if (types.includes('locality')) {
+                basicInfo.cityName = component.long_name;
+              }
+              if (types.includes('country')) {
+                basicInfo.countryName = component.long_name;
+                basicInfo.nationality = component.short_name || '';
+              }
+            });
+          }
+
+          const locationDetails: LocationDetails = {
+            placeId: place.place_id || `click_${Date.now()}`,
+            name: place.name || address,
+            address: address,
+            lat: lat,
+            lng: lng,
+            city: undefined,
+            nationality: basicInfo.nationality || undefined,
+            cityName: basicInfo.cityName || undefined,
+            countryName: basicInfo.countryName || undefined
+          };
+
+          // 부모 컴포넌트에 위치 정보 전달
+          onLocationSelect(address, locationDetails);
+
+          // input 값 동기화
+          if (locationInputRef.current) {
+            locationInputRef.current.value = address;
+          }
+
+          console.log('✅ 클릭한 위치 정보:', locationDetails);
+        } catch (error) {
+          console.error('❌ 주소 정보 가져오기 실패:', error);
+          alert('선택한 위치의 주소 정보를 가져올 수 없습니다.');
+        }
       });
 
       console.log('✅ 지도 생성 완료');
@@ -276,7 +360,63 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
         }
       }
     };
-  }, [isGoogleMapsLoaded, currentLanguage, isMapVisible]);
+  }, [isGoogleMapsLoaded, currentLanguage, isMapVisible, onLocationSelect]);
+
+  // 🎯 현재 위치 감지 및 지도 중심 이동 (앱 환경에서만)
+  useEffect(() => {
+    if (!map || !isMapVisible) {
+      return;
+    }
+
+    // 앱 환경에서만 현재 위치 기능 사용
+    if (appEnvironment.isApp && !locationFromApp) {
+      console.log('📱 앱 환경: 앱에서 위치 정보 요청');
+      requestLocationFromApp();
+      return;
+    }
+
+    // 웹 환경에서는 현재 위치 기능을 사용하지 않음
+    if (!appEnvironment.isApp) {
+      console.log('🌐 웹 환경: 현재 위치 기능을 사용하지 않습니다.');
+      return;
+    }
+
+    // 앱에서 받은 위치 정보로 지도 중심 이동
+    if (appEnvironment.isApp && locationFromApp) {
+      const position = { 
+        lat: locationFromApp.latitude, 
+        lng: locationFromApp.longitude 
+      };
+      
+      console.log('📍 현재 위치로 지도 중심 이동:', position);
+      
+      // 지도 중심 이동
+      map.setCenter(position);
+      map.setZoom(15);
+      
+      // 현재 위치 마커 표시
+      if (currentLocationMarker) {
+        currentLocationMarker.setMap(null);
+      }
+      
+      const newCurrentLocationMarker = new window.google.maps.Marker({
+        position: position,
+        map: map,
+        title: '현재 위치',
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#4285F4',
+          fillOpacity: 1,
+          strokeColor: '#FFFFFF',
+          strokeWeight: 2
+        },
+        animation: window.google.maps.Animation.DROP
+      });
+      
+      setCurrentLocationMarker(newCurrentLocationMarker);
+    }
+  }, [map, isMapVisible, appEnvironment.isApp, locationFromApp, requestLocationFromApp, currentLocationMarker]);
 
   // 🛡️ 지도 위치 업데이트 (안정한 의존성 배열)
   useEffect(() => {
@@ -356,6 +496,17 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     }
   };
 
+  // 현재 위치 버튼 클릭 핸들러
+  const handleCurrentLocationClick = () => {
+    if (appEnvironment.isApp) {
+      // 앱 환경: 앱에서 위치 정보 요청
+      requestLocationFromApp();
+    } else {
+      // 웹 환경: 웹 Geolocation API 사용
+      getCurrentLocation();
+    }
+  };
+
   // 디버깅을 위한 로그
   console.log('🗺️ GoogleMapsLocationPicker 렌더링:', {
     isGoogleMapsLoaded,
@@ -381,6 +532,23 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
               onClick={toggleMapVisibility}
             >
               {isMapVisible ? '지도 숨기기' : '지도 보기'}
+            </button>
+          )}
+          
+          {/* 현재 위치 버튼 (앱 환경에서만 표시) */}
+          {appEnvironment.isApp && (
+            <button
+              type="button"
+              className={styles['current-location-btn']}
+              onClick={handleCurrentLocationClick}
+              disabled={locationLoading || appLocationLoading}
+              title="현재 위치로 이동"
+            >
+              {(locationLoading || appLocationLoading) ? (
+                <div className={styles['loading-spinner']}></div>
+              ) : (
+                '📍'
+              )}
             </button>
           )}
           
