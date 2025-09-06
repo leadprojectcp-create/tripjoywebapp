@@ -15,7 +15,6 @@ interface UseAppBridgeReturn {
   appEnvironment: AppEnvironment;
   isWebViewAvailable: boolean;
   locationFromApp: LocationData | null;
-  loading: boolean;
   error: string | null;
   requestLocation: () => void;
   sendMessage: (message: BridgeMessage) => void;
@@ -28,7 +27,6 @@ export const useAppBridge = (): UseAppBridgeReturn => {
     platform: 'web'
   });
   const [locationFromApp, setLocationFromApp] = useState<LocationData | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isWebViewAvailable, setIsWebViewAvailable] = useState(false);
 
@@ -60,7 +58,6 @@ export const useAppBridge = (): UseAppBridgeReturn => {
         if (isLocationUpdateMessage(message)) {
           const locationData = message.data as LocationData;
           setLocationFromApp(locationData);
-          setLoading(false);
           setError(null);
           console.log('📍 앱에서 위치 정보 수신:', locationData);
         }
@@ -68,7 +65,6 @@ export const useAppBridge = (): UseAppBridgeReturn => {
       } catch (error) {
         console.error('❌ 메시지 처리 실패:', error);
         setError('메시지 처리 중 오류가 발생했습니다.');
-        setLoading(false);
       }
     });
 
@@ -120,7 +116,6 @@ export const useAppBridge = (): UseAppBridgeReturn => {
     appEnvironment,
     isWebViewAvailable,
     locationFromApp,
-    loading,
     error,
     requestLocation,
     sendMessage,
