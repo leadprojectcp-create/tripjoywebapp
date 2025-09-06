@@ -498,10 +498,16 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
 
   // 현재 위치 버튼 클릭 핸들러
   const handleCurrentLocationClick = () => {
+    console.log('🎯 현재 위치 버튼 클릭됨');
+    console.log('🎯 appEnvironment:', appEnvironment);
+    console.log('🎯 appEnvironment.isApp:', appEnvironment.isApp);
+    
     if (appEnvironment.isApp) {
+      console.log('🎯 앱 환경: 앱에서 위치 정보 요청 시작');
       // 앱 환경: 앱에서 위치 정보 요청
       requestLocationFromApp();
     } else {
+      console.log('🎯 웹 환경: 웹 Geolocation API 사용');
       // 웹 환경: 웹 Geolocation API 사용
       getCurrentLocation();
     }

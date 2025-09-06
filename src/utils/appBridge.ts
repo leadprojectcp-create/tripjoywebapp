@@ -6,6 +6,11 @@ import { BridgeMessage, LocationData, AppEnvironment, MessageType } from '../typ
  * 앱 환경 감지
  */
 export const detectAppEnvironment = (): AppEnvironment => {
+  console.log('🔍 앱 환경 감지 시작');
+  console.log('🔍 window 객체 존재:', typeof window !== 'undefined');
+  console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
+  console.log('🔍 navigator.userAgent:', navigator.userAgent);
+  
   const isApp = typeof window !== 'undefined' && 
                 (window as any).ReactNativeWebView !== undefined;
   
@@ -13,6 +18,8 @@ export const detectAppEnvironment = (): AppEnvironment => {
   
   if (isApp) {
     const userAgent = navigator.userAgent.toLowerCase();
+    console.log('🔍 userAgent (소문자):', userAgent);
+    
     if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
       platform = 'ios';
     } else {
@@ -20,25 +27,38 @@ export const detectAppEnvironment = (): AppEnvironment => {
     }
   }
 
-  return {
+  const result = {
     isApp,
-    platform
+    platform,
+    userAgent: navigator.userAgent
   };
+  
+  console.log('🔍 앱 환경 감지 결과:', result);
+  return result;
 };
 
 /**
  * WebView로 메시지 전송
  */
 export const sendMessageToApp = (message: BridgeMessage): void => {
+  console.log('🔄 앱으로 메시지 전송 시도:', message);
+  console.log('🔄 window 객체 존재:', typeof window !== 'undefined');
+  console.log('🔄 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
+  
   if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
     try {
-      (window as any).ReactNativeWebView.postMessage(JSON.stringify(message));
-      console.log('📤 앱으로 메시지 전송:', message);
+      const messageString = JSON.stringify(message);
+      console.log('📤 전송할 메시지 문자열:', messageString);
+      
+      (window as any).ReactNativeWebView.postMessage(messageString);
+      console.log('✅ 앱으로 메시지 전송 성공:', message);
     } catch (error) {
       console.error('❌ 앱으로 메시지 전송 실패:', error);
     }
   } else {
     console.warn('⚠️ WebView 환경이 아닙니다. 메시지 전송을 건너뜁니다.');
+    console.warn('⚠️ window:', typeof window);
+    console.warn('⚠️ ReactNativeWebView:', (window as any).ReactNativeWebView);
   }
 };
 
