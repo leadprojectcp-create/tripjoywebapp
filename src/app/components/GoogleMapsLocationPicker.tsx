@@ -412,7 +412,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       
       // 현재 위치의 주소 정보 가져오기
       const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: position }, (results, status) => {
+      geocoder.geocode({ location: position }, (results: any, status: any) => {
         if (status === 'OK' && results && results[0]) {
           const address = results[0].formatted_address;
           console.log('📍 현재 위치 주소:', address);
@@ -422,6 +422,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
             lat: position.lat,
             lng: position.lng,
             name: address,
+            address: address,
             placeId: results[0].place_id
           });
           
@@ -559,7 +560,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           
           // 현재 위치의 주소 정보 가져오기
           const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: position }, (results, status) => {
+          geocoder.geocode({ location: position }, (results: any, status: any) => {
             if (status === 'OK' && results && results[0]) {
               const address = results[0].formatted_address;
               console.log('📍 현재 위치 주소:', address);
@@ -569,6 +570,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
                 lat: position.lat,
                 lng: position.lng,
                 name: address,
+                address: address,
                 placeId: results[0].place_id
               });
               
