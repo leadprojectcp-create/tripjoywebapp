@@ -409,6 +409,30 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       });
       
       setCurrentLocationMarker(newCurrentLocationMarker);
+      
+      // 현재 위치의 주소 정보 가져오기
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ location: position }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          const address = results[0].formatted_address;
+          console.log('📍 현재 위치 주소:', address);
+          
+          // 주소 정보를 부모 컴포넌트로 전달 (수동 선택한 것처럼)
+          onLocationSelect(address, {
+            lat: position.lat,
+            lng: position.lng,
+            name: address,
+            placeId: results[0].place_id
+          });
+          
+          // 입력 필드에 주소 표시
+          if (locationInputRef.current) {
+            locationInputRef.current.value = address;
+          }
+        } else {
+          console.error('❌ 주소 정보 가져오기 실패:', status);
+        }
+      });
     }
   }, [map, isMapVisible, appEnvironment.isApp, locationFromApp]);
 
@@ -532,6 +556,30 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           });
           
           setCurrentLocationMarker(marker);
+          
+          // 현재 위치의 주소 정보 가져오기
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: position }, (results, status) => {
+            if (status === 'OK' && results && results[0]) {
+              const address = results[0].formatted_address;
+              console.log('📍 현재 위치 주소:', address);
+              
+              // 주소 정보를 부모 컴포넌트로 전달 (수동 선택한 것처럼)
+              onLocationSelect(address, {
+                lat: position.lat,
+                lng: position.lng,
+                name: address,
+                placeId: results[0].place_id
+              });
+              
+              // 입력 필드에 주소 표시
+              if (locationInputRef.current) {
+                locationInputRef.current.value = address;
+              }
+            } else {
+              console.error('❌ 주소 정보 가져오기 실패:', status);
+            }
+          });
         }
       } else {
         console.log('🎯 앱 환경: 위치 정보가 없음, 앱에서 위치 정보 요청');
