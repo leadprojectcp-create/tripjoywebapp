@@ -175,11 +175,13 @@ export default function LoginPage(): React.JSX.Element {
       if (user.isNewUser) {
         // 첫 로그인 (회원가입) - 약관 동의 + 추가 정보 입력
         console.log('🆕 신규 사용자 - 회원가입 플로우');
-        router.push('/auth/signup');
+        console.log('🔄 window.location.href = /auth/signup 실행');
+        window.location.href = '/auth/signup';
       } else {
         // 기존 사용자 - 바로 홈으로
         console.log('👤 기존 사용자 - 홈으로 이동');
-        router.push('/');
+        console.log('🔄 window.location.href = / 실행');
+        window.location.href = '/';
       }
     };
 
