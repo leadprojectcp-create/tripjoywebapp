@@ -32,6 +32,13 @@ export default function LoginPage(): React.JSX.Element {
         console.log('🌐 현재 URL:', window.location.href);
         console.log('🔍 URL 파라미터:', window.location.search);
         
+        // 네이티브 앱에서 로그인한 경우에는 리다이렉트 결과를 확인하지 않음
+        if (window.location.search.includes('app=true') || 
+            window.navigator.userAgent.includes('ReactNativeWebView')) {
+          console.log('📱 네이티브 앱 환경 - 리다이렉트 결과 확인 건너뜀');
+          setIsLoading(false);
+          return;
+        }
 
         setIsLoading(true); // 리다이렉트 결과 처리 중 로딩 표시
         const result = await getRedirectResult(auth);
