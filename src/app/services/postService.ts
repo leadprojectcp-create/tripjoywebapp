@@ -42,7 +42,6 @@ export interface PostData {
     countryName?: string; // 전체 국가명 (예: "Vietnam", "South Korea")
   };
   hashtags: string[];
-  companionAvailable: boolean; // 동행 가능 여부
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
@@ -71,7 +70,6 @@ export const createPost = async (
   locationDetails: LocationDetails | null,
   locationDescription: string,
   hashtags: string,
-  companionAvailable: boolean,
   countryCityInfo?: CountryCityInfo,
   onProgress?: (progress: number) => void
 ): Promise<string> => {
@@ -85,15 +83,22 @@ export const createPost = async (
     onProgress?.(0);
 
     // 3. 이미지 업로드 (ImageKit)
-    console.log(`📸 ${imageFiles.length}개 이미지 업로드 중...`);
-    const uploadedImages = await uploadMultipleImages(
-      imageFiles, 
-      tempPostId,
-      (imageProgress) => {
-        // 이미지 업로드는 전체의 80%를 차지
-        onProgress?.(imageProgress * 0.8);
-      }
-    );
+    let uploadedImages: UploadedImage[] = [];
+    
+    if (imageFiles.length > 0) {
+      console.log(`📸 ${imageFiles.length}개 이미지 업로드 중...`);
+      uploadedImages = await uploadMultipleImages(
+        imageFiles, 
+        tempPostId,
+        (imageProgress) => {
+          // 이미지 업로드는 전체의 80%를 차지
+          onProgress?.(imageProgress * 0.8);
+        }
+      );
+    }
+
+    // 4. 이미지 업로드 완료 후 진행률 업데이트
+    onProgress?.(80);
 
     // 4. 해시태그 파싱
     const parsedHashtags = hashtags
@@ -110,7 +115,7 @@ export const createPost = async (
         lng: locationDetails.lng,
       },
       placeId: locationDetails.placeId,
-      description: locationDescription.trim() || undefined,
+      description: locationDescription.trim() || '',
       // 🆕 드롭다운에서 선택한 지역 정보 저장 (코드만)
       city: countryCityInfo?.cityCode || locationDetails.city,
       nationality: countryCityInfo?.countryCode || locationDetails.nationality,
@@ -123,25 +128,34 @@ export const createPost = async (
       address: '',
       coordinates: { lat: 0, lng: 0 },
       placeId: '',
-      description: locationDescription.trim() || undefined,
+      description: locationDescription.trim() || '',
       city: countryCityInfo.cityCode,
       nationality: countryCityInfo.countryCode,
       // cityName과 countryName 필드는 아예 추가하지 않음 (Firebase undefined 에러 방지)
-    } : undefined;
+    } : {
+      // 위치 정보가 없는 경우 기본값
+      name: '',
+      address: '',
+      coordinates: { lat: 0, lng: 0 },
+      placeId: '',
+      description: '',
+      city: '',
+      nationality: '',
+    };
 
-    // 6. Firestore에 게시물 데이터 저장 (imageUrls 중복 제거)
+    // 6. Firestore에 게시물 데이터 저장 (이미지 포함)
     console.log('💾 Firestore에 게시물 저장 중...');
     onProgress?.(85);
 
-    const postData: Omit<PostData, 'id'> = {
+    // Firestore에 저장할 데이터 (기존 구조와 호환)
+    const postData: any = {
       userId,
       content: content.trim(),
-      images: uploadedImages, // 🎯 images만 저장 (중복 제거)
+      images: uploadedImages, // 🎯 이미지 저장
       location: locationData,
       hashtags: parsedHashtags,
-      companionAvailable, // 동행 가능 여부
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       likeCount: 0, // 좋아요 카운트
       bookmarkCount: 0, // 새로운 북마크 카운트
       likedBy: {}, // 좋아요한 사용자들 맵 초기화
@@ -150,7 +164,37 @@ export const createPost = async (
       isVisible: true,
     };
 
-    const docRef = await addDoc(collection(db, 'posts'), postData);
+    // undefined 값 완전 제거 (재귀적으로 처리)
+    const removeUndefined = (obj: any): any => {
+      if (obj === null || obj === undefined) {
+        return null;
+      }
+      if (Array.isArray(obj)) {
+        return obj.map(removeUndefined).filter(item => item !== undefined);
+      }
+      if (typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (value !== undefined) {
+            const cleanedValue = removeUndefined(value);
+            if (cleanedValue !== undefined) {
+              cleaned[key] = cleanedValue;
+            }
+          }
+        }
+        return cleaned;
+      }
+      return obj;
+    };
+
+    const cleanPostData = removeUndefined(postData);
+
+    // 디버깅: undefined 값 확인
+    console.log('🔍 postData 디버깅:');
+    console.log('원본 postData:', postData);
+    console.log('정리된 cleanPostData:', cleanPostData);
+
+    const docRef = await addDoc(collection(db, 'posts'), cleanPostData);
     const finalPostId = docRef.id;
 
     // 7. 완료
@@ -492,9 +536,8 @@ export const updatePost = async (
   countryCode: string,
   cityCode: string,
   hashtags: string[],
-  companionAvailable: boolean,
   newImages?: File[],
-  remainingExistingImages?: UploadedImage[] // 남은 기존 이미지들
+  remainingExistingImages?: UploadedImage[], // 남은 기존 이미지들
 ): Promise<boolean> => {
   try {
     console.log('📝 게시물 업데이트 시작:', postId);
@@ -532,6 +575,7 @@ export const updatePost = async (
     
     console.log('🎯 최종 이미지 목록:', finalImages.length, '개');
 
+
     // 3. 게시물 업데이트
     const updatedPost: any = {
       content,
@@ -540,7 +584,6 @@ export const updatePost = async (
       countryCode,
       cityCode,
       hashtags,
-      companionAvailable,
       images: finalImages,
       updatedAt: new Date()
     };

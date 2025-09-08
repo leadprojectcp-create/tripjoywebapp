@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
-import { RightSidebar } from "../components/RightSidebar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
@@ -427,12 +426,6 @@ function ProfileContent() {
     }
   };
 
-  const handleCompanionRequest = () => {
-    if (profileUserId) {
-      // 동행신청 페이지로 이동
-      router.push(`/companion-request?userId=${profileUserId}`);
-    }
-  };
 
 
 
@@ -477,7 +470,6 @@ function ProfileContent() {
                 <div className={styles.profileLoadingSpinner}>로딩 중...</div>
               </div>
             </div>
-            <RightSidebar />
           </div>
         </div>
         <BottomNavigator />
@@ -633,9 +625,6 @@ function ProfileContent() {
                         <button className={`${styles.actionBtn} ${styles.primary}`} onClick={handleChat}>
                           {t('chat')}
                         </button>
-                        <button className={`${styles.actionBtn} ${styles.secondary}`} onClick={handleCompanionRequest}>
-                          {t('companionRequest')}
-                        </button>
                       </>
                     )}
                   </div>
@@ -686,7 +675,6 @@ function ProfileContent() {
             </div>
 
               {/* Right Sidebar */}
-              <RightSidebar />
             </div>
           </div>
           

@@ -87,7 +87,7 @@ export const useTranslation = () => {
     const loadTranslations = async () => {
       try {
         // 여러 번역 파일 로드
-        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, receivedCompanionsResponse, requestedCompanionsResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse, postcardResponse] = await Promise.all([
+        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, curatorsResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse, postcardResponse] = await Promise.all([
           fetch('/translations/sidebar.json'),
           fetch('/translations/auth.json'),
           fetch('/translations/signup.json'),
@@ -98,8 +98,6 @@ export const useTranslation = () => {
           fetch('/translations/post-upload.json'),
           fetch('/translations/dashboard.json'),
           fetch('/translations/curators.json'),
-          fetch('/translations/received-companions.json'),
-          fetch('/translations/requested-companions.json'),
           fetch('/translations/my-activity.json'),
           fetch('/translations/alert.json'),
           fetch('/translations/notice.json'),
@@ -118,8 +116,6 @@ export const useTranslation = () => {
         const postUploadData = await postUploadResponse.json();
         const dashboardData = await dashboardResponse.json();
         const curatorsData = await curatorsResponse.json();
-        const receivedCompanionsData = await receivedCompanionsResponse.json();
-        const requestedCompanionsData = await requestedCompanionsResponse.json();
         const myActivityData = await myActivityResponse.json();
         const alertData = await alertResponse.json();
         const noticeData = await noticeResponse.json();
@@ -140,8 +136,6 @@ export const useTranslation = () => {
           ...postUploadData,
           ...dashboardData,
           ...curatorsData,
-          ...receivedCompanionsData,
-          ...requestedCompanionsData,
           ...myActivityData,
           ...alertData,
           ...noticeData,

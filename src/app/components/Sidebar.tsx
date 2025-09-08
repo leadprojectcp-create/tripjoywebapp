@@ -326,14 +326,7 @@ export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Ele
           </div>
           <span>{t('home')}</span>
         </Link>
-        
-        <Link href="/curators" className={`nav-item ${isActive('/curators') ? 'active' : ''}`}>
-          <div className="nav-icon">
-            <CuratorIcon isActive={isActive('/curators')} />
-          </div>
-          <span>{t('curator')}</span>
-        </Link>
-        
+                
         <div className={`nav-item ${isActive('/post-upload') ? 'active' : ''}`} onClick={handlePostUpload} style={{ cursor: 'pointer' }}>
           <div className="nav-icon">
             <PostIcon isActive={isActive('/post-upload')} />
@@ -372,19 +365,6 @@ export const Sidebar = ({ unreadMessageCount = 0 }: SidebarProps): React.JSX.Ele
           <span>{t('chat')}</span>
         </Link>
         
-        <Link href="/received-companions" className={`nav-item ${isActive('/received-companions') ? 'active' : ''}`}>
-          <div className="nav-icon">
-            <ReceiveIcon isActive={isActive('/received-companions')} />
-          </div>
-          <span>{t('receivedCompanions')}</span>
-        </Link>
-        
-        <Link href="/requested-companions" className={`nav-item ${isActive('/requested-companions') ? 'active' : ''}`}>
-          <div className="nav-icon">
-            <SendIcon isActive={isActive('/requested-companions')} />
-          </div>
-          <span>{t('requestedCompanions')}</span>
-        </Link>
         
         <div 
           className={`nav-item ${isSettingsModalOpen ? 'active' : ''}`}

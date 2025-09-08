@@ -6,6 +6,16 @@ import { BridgeMessage, LocationData, AppEnvironment, MessageType } from '../typ
  * 앱 환경 감지
  */
 export const detectAppEnvironment = (): AppEnvironment => {
+  // 서버 사이드 렌더링에서는 기본값 반환
+  if (typeof window === 'undefined') {
+    console.log('🔍 서버 사이드 렌더링 - 기본값 반환');
+    return {
+      isApp: false,
+      platform: 'web' as const,
+      userAgent: ''
+    };
+  }
+
   console.log('🔍 앱 환경 감지 시작');
   console.log('🔍 window 객체 존재:', typeof window !== 'undefined');
   console.log('🔍 ReactNativeWebView 존재:', !!(window as any).ReactNativeWebView);
@@ -19,12 +29,11 @@ export const detectAppEnvironment = (): AppEnvironment => {
   console.log('🔍 URL 파라미터 app:', urlParams.get('app'));
   console.log('🔍 URL 파라미터 platform:', platformFromUrl);
   
-  const isApp = typeof window !== 'undefined' && 
-                (isAppFromUrl ||
-                 (window as any).ReactNativeWebView !== undefined || 
-                 navigator.userAgent.includes('wv') ||
-                 navigator.userAgent.includes('WebView') ||
-                 navigator.userAgent.includes('TripJoy'));
+  const isApp = isAppFromUrl ||
+                (window as any).ReactNativeWebView !== undefined || 
+                navigator.userAgent.includes('wv') ||
+                navigator.userAgent.includes('WebView') ||
+                navigator.userAgent.includes('TripJoy');
   
   let platform: 'ios' | 'android' | 'web' = 'web';
   

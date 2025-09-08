@@ -40,15 +40,6 @@ export const PostCard: React.FC<PostCardProps> = ({
   const { user } = useAuthContext();
   const router = useRouter();
 
-  // 디버깅 로그 - companionAvailable 필드 확인
-  console.log('PostCard Debug:', {
-    postId: post.id,
-    companionAvailable: post.companionAvailable,
-    userId: post.userId,
-    currentUser: user?.uid,
-    isOwnPost: user?.uid === post.userId,
-    shouldShowButton: post.companionAvailable && user?.uid && post.userId !== user.uid
-  });
   const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -581,14 +572,6 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
             <div className={styles.userDetails}>
               <div className={styles.userName}>{userInfo.name}</div>
-              <div className={styles.userLocation}>
-                {post.location ? (
-                  <>
-                    <img src="/assets/location.svg" alt="위치" className={styles.locationIcon} />
-                    {post.location.name}
-                  </>
-                ) : '위치 정보 없음'}
-              </div>
             </div>
             
           </div>
@@ -602,38 +585,15 @@ export const PostCard: React.FC<PostCardProps> = ({
           </div>
         )}
 
-        {/* 동생 신청 버튼 (companionAvailable이 true이고 본인 게시물이 아닌 경우) */}
-        {post.companionAvailable && user?.uid && post.userId !== user.uid && (
-          <button 
-            className={styles.companionRequestBtn}
-            onClick={() => {
-              // 동생 신청 페이지로 이동 (location 정보 포함)
-              if (!post.id) return; // post.id가 없으면 리턴
-              
-              const params = new URLSearchParams({
-                postId: post.id,
-                userId: post.userId
-              });
-              
-              // post의 location 정보가 있으면 URL 파라미터로 전달
-              if (post.location) {
-                params.append('locationName', post.location.name || '');
-                params.append('locationAddress', post.location.address || '');
-                params.append('locationLat', post.location.coordinates.lat.toString());
-                params.append('locationLng', post.location.coordinates.lng.toString());
-                params.append('locationPlaceId', post.location.placeId || '');
-                if (post.location.description) {
-                  params.append('locationDescription', post.location.description);
-                }
-              }
-              
-              router.push(`/companion-request?${params.toString()}`);
-            }}
-            title={t('companionRequestTooltip') || '동생 신청'}
-          >
-            {t('companionRequest') || '동생 신청'}
-          </button>
-        )}
+
+        {/* 상세보기 버튼 */}
+        <button 
+          className={styles.detailBtn}
+          onClick={() => router.push(`/post/${post.id}`)}
+          title={t('viewDetail') || '상세보기'}
+        >
+          {t('viewDetail') || '상세보기'}
+        </button>
 
         {/* 설정 메뉴 (본인 게시물인 경우에만 표시) */}
         {showSettings && (

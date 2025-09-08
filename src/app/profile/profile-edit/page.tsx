@@ -8,7 +8,6 @@ import { getUserData, updateUserProfile } from '../../auth/services/authService'
 import { uploadImage } from '../../services/imageKitService';
 import { Sidebar } from '../../components/Sidebar';
 import { AppBar } from '../../components/AppBar';
-import { RightSidebar } from '../../components/RightSidebar';
 import { BottomNavigator } from '../../components/BottomNavigator';
 import { AuthGuard } from '../../components/AuthGuard';
 import ClientStyleProvider from '../../components/ClientStyleProvider';
@@ -21,7 +20,6 @@ interface ProfileEditData {
   gender: 'male' | 'female' | '';
   bio: string;
   image: string;
-  companionRequestEnabled: boolean;
 }
 
 function ProfileEditContent() {
@@ -37,7 +35,6 @@ function ProfileEditContent() {
     gender: '',
     bio: '',
     image: '',
-    companionRequestEnabled: true
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +78,6 @@ function ProfileEditContent() {
             gender: convertedGender,
             bio: userData.bio || '',
             image: userData.photoUrl || userData.image || '', // photoUrl 우선, 없으면 image 필드
-            companionRequestEnabled: userData.companionRequestEnabled ?? true
           });
         }
       } catch (error) {
@@ -186,7 +182,6 @@ function ProfileEditContent() {
         gender: koreanGender, // 한국어로 변환해서 저장
         bio: profileData.bio,
         photoUrl: profileData.image, // photoUrl 필드에 이미지 경로 저장
-        companionRequestEnabled: profileData.companionRequestEnabled
       });
 
       alert(t('updateSuccess'));
@@ -350,30 +345,6 @@ function ProfileEditContent() {
           </div>
         </div>
 
-        {/* 동행신청 활성화 */}
-        <div className="form-group">
-          <div className="notification-section">
-            <h3>{t('notificationSettings')}</h3>
-            <div className="notification-item">
-              <div className="notification-info">
-                <div className="notification-title">
-                  {t('notificationSettings')}
-                </div>
-                <div className="notification-description">
-                  {t('notificationDescription')}
-                </div>
-              </div>
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={profileData.companionRequestEnabled}
-                  onChange={(e) => handleInputChange('companionRequestEnabled', e.target.checked)}
-                />
-                <span className="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
 
                 {/* 저장 버튼 */}
                 <div className="form-actions">
@@ -389,7 +360,6 @@ function ProfileEditContent() {
               </div>
               
               {/* Right Sidebar */}
-              <RightSidebar />
             </div>
           </div>
           <BottomNavigator />

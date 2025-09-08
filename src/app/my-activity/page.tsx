@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
-import { RightSidebar } from "../components/RightSidebar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
@@ -293,7 +292,6 @@ export default function MyActivity() {
             </div>
 
             {/* Right Sidebar */}
-            <RightSidebar />
           </div>
         </div>
         

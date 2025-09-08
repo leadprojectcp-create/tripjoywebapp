@@ -24,7 +24,6 @@ interface PostData {
   cityCode: string;
   images: File[];
   hashtags: string;
-  companionAvailable: boolean; // 동행 가능 여부
 }
 
 interface PreviewImage {
@@ -33,6 +32,7 @@ interface PreviewImage {
   isExisting?: boolean; // 기존 이미지인지 새 이미지인지 구분
   originalUrl?: string; // 기존 이미지의 원본 URL (ImageKit 삭제용)
 }
+
 
 const PostUploadContent: React.FC = () => {
   const router = useRouter();
@@ -54,7 +54,6 @@ const PostUploadContent: React.FC = () => {
     cityCode: '',
     images: [],
     hashtags: '',
-    companionAvailable: false // 동행 가능 여부 기본값
   });
 
   const [previewImages, setPreviewImages] = useState<PreviewImage[]>([]);
@@ -103,7 +102,6 @@ const PostUploadContent: React.FC = () => {
           cityCode: '',
           images: [], // 기존 이미지는 File 객체가 아니므로 빈 배열
           hashtags: existingPost.hashtags?.join(' ') || '',
-          companionAvailable: existingPost.companionAvailable || false
         });
 
         // 기존 이미지들을 미리보기로 표시 (URL만)
@@ -116,6 +114,7 @@ const PostUploadContent: React.FC = () => {
           }));
           setPreviewImages(existingPreviews);
         }
+
 
       } catch (error) {
         console.error('❌ 게시물 데이터 로드 실패:', error);
@@ -135,59 +134,6 @@ const PostUploadContent: React.FC = () => {
     }));
   };
 
-  // 다중 이미지 업로드 핸들러
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    
-    if (files.length === 0) return;
-
-    // 기존 이미지와 합쳐서 최대 10장 제한
-    if (postData.images.length + files.length > 10) {
-      alert('최대 10장의 사진까지 업로드할 수 있습니다.');
-      return;
-    }
-
-    const validFiles: File[] = [];
-    const newPreviews: PreviewImage[] = [];
-
-    files.forEach(file => {
-      // 이미지 파일 검증
-      if (!file.type.startsWith('image/')) {
-        alert(`${file.name}은(는) 이미지 파일이 아닙니다.`);
-        return;
-      }
-
-      // 파일 크기 제한 (10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`${file.name}의 파일 크기는 10MB 이하여야 합니다.`);
-        return;
-      }
-
-      validFiles.push(file);
-
-      // 미리보기 URL 생성
-      const url = URL.createObjectURL(file);
-      newPreviews.push({ 
-        file, 
-        url,
-        isExisting: false // 새 이미지 표시
-      });
-    });
-
-    if (validFiles.length > 0) {
-      setPostData(prev => ({
-        ...prev,
-        images: [...prev.images, ...validFiles]
-      }));
-
-      setPreviewImages(prev => [...prev, ...newPreviews]);
-    }
-
-    // input 초기화
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
 
   // 이미지 제거 핸들러
   const handleImageRemove = async (index: number) => {
@@ -220,6 +166,40 @@ const PostUploadContent: React.FC = () => {
 
     setPreviewImages(prev => prev.filter((_, i) => i !== index));
   };
+
+  // 이미지 업로드 핸들러
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    
+    if (files.length === 0) return;
+
+    // 기존 이미지와 합쳐서 최대 10장 제한
+    if (previewImages.length + files.length > 10) {
+      alert('최대 10장의 사진만 업로드할 수 있습니다.');
+      return;
+    }
+
+    files.forEach(file => {
+      // 이미지 파일 검증
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+        return;
+      }
+
+      // 파일 크기 제한 (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name}의 파일 크기는 10MB 이하여야 합니다.`);
+        return;
+      }
+      
+      const url = URL.createObjectURL(file);
+      setPreviewImages(prev => [...prev, { url, file, isExisting: false }]);
+    });
+    
+    event.target.value = '';
+  };
+
+
 
   // 위치 선택 핸들러
   const handleLocationSelect = (location: string, locationDetails: LocationDetails | null) => {
@@ -257,7 +237,7 @@ const PostUploadContent: React.FC = () => {
     }
 
     if (postData.images.length === 0 && previewImages.length === 0) {
-      alert(t('imageRequired'));
+      alert(t('mediaRequired'));
       return;
     }
 
@@ -287,9 +267,14 @@ const PostUploadContent: React.FC = () => {
               medium: img.originalUrl!
             }
           }));
+
         
-        // 새로 추가된 이미지들만 추출
-        const newImages = postData.images.length > 0 ? postData.images : undefined;
+        // 새로 추가된 파일들만 추출
+        const newImageFiles = previewImages
+          .filter(img => !img.isExisting && img.file)
+          .map(img => img.file!);
+        
+        const newImages = newImageFiles.length > 0 ? newImageFiles : undefined;
         
         console.log('📷 남은 기존 이미지:', remainingExistingImages.length, '개');
         console.log('🖼️ 새 이미지:', newImages?.length || 0, '개');
@@ -303,7 +288,6 @@ const PostUploadContent: React.FC = () => {
           postData.countryCode,
           postData.cityCode,
           hashtags,
-          postData.companionAvailable,
           newImages,
           remainingExistingImages
         );
@@ -329,14 +313,19 @@ const PostUploadContent: React.FC = () => {
           user: user.uid
         });
 
+        // 새로 업로드할 파일들 추출
+        const newImageFiles = previewImages
+          .filter(img => !img.isExisting && img.file)
+          .map(img => img.file!);
+        
+
         const postId = await createPost(
           user.uid,
           postData.content,
-          postData.images,
+          newImageFiles,
           postData.locationDetails,
           postData.locationDescription,
           postData.hashtags,
-          postData.companionAvailable,
           {
             countryCode: postData.countryCode,
             cityCode: postData.cityCode
@@ -400,20 +389,23 @@ const PostUploadContent: React.FC = () => {
             {/* 이미지 업로드 */}
             <div className={styles['form-group']}>
               <label className={styles['form-label']}>{t('uploadImages')}</label>
+              
+              {/* 숨겨진 파일 입력들 */}
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 multiple
                 onChange={handleImageUpload}
                 className={styles['file-input']}
                 style={{ display: 'none' }}
               />
               
-              {/* 이미지 미리보기 */}
-              <div className={styles['image-upload-container']}>
+              {/* 미디어 미리보기 컨테이너 */}
+              <div className={styles['media-upload-container']}>
+                {/* 이미지 미리보기 */}
                 {previewImages.map((preview, index) => (
-                  <div key={index} className={styles['image-preview-wrapper']}>
+                  <div key={`img-${index}`} className={styles['image-preview-wrapper']}>
                     <img
                       src={preview.url}
                       alt={`미리보기 ${index + 1}`}
@@ -429,24 +421,27 @@ const PostUploadContent: React.FC = () => {
                   </div>
                 ))}
                 
+                
                 {/* 이미지 추가 버튼 */}
-                {postData.images.length < 10 && (
+                {previewImages.length < 10 && (
                   <button
                     type="button"
-                    className={styles['add-image-btn']}
                     onClick={() => fileInputRef.current?.click()}
+                    className={styles['add-media-btn']}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
                       <circle cx="9" cy="9" r="2" stroke="currentColor" strokeWidth="2"/>
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" stroke="currentColor" strokeWidth="2"/>
                     </svg>
-                    {t('addImage')}
+                    {t('addImages')}
                   </button>
                 )}
               </div>
-              <div className={styles['image-count-info']}>
-                {postData.images.length}/10 {t('uploadImages')}
+              
+              {/* 이미지 카운트 정보 */}
+              <div className={styles['media-count-info']}>
+                사진 {postData.images.length + previewImages.filter(img => img.isExisting).length}/10
               </div>
             </div>
 
@@ -514,32 +509,6 @@ const PostUploadContent: React.FC = () => {
               </div>
             </div>
 
-            {/* 동행 가능 여부 */}
-            <div className={styles['form-group']}>
-              <div className={styles['notification-section']}>
-                <h3>🤝 동행 가능 여부</h3>
-                <div className={styles['notification-item']}>
-                  <div className={styles['notification-info']}>
-                    <div className={styles['notification-title']}>
-                      동행 가능 여부
-                    </div>
-                    <div className={styles['notification-description']}>
-                      {postData.companionAvailable 
-                        ? '다른 여행자들과 함께 여행할 수 있습니다.' 
-                        : '혼자 여행하거나 동행을 원하지 않습니다.'}
-                    </div>
-                  </div>
-                  <label className={styles['toggle-switch']}>
-                    <input
-                      type="checkbox"
-                      checked={postData.companionAvailable}
-                      onChange={(e) => setPostData(prev => ({ ...prev, companionAvailable: e.target.checked }))}
-                    />
-                    <span className={styles['toggle-slider']}></span>
-                  </label>
-                </div>
-              </div>
-            </div>
 
             {/* 제출 버튼 */}
             <div className={styles['submit-section']}>

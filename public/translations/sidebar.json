@@ -71,24 +71,6 @@
     "th": "อัปโหลดโพสต์",
     "fil": "Mag-upload ng Post"
   },
-  "receivedCompanions": {
-    "ko": "받은 동행",
-    "en": "Received Companions", 
-    "vi": "Lời mời đã nhận",
-    "zh": "收到的邀请",
-    "ja": "受信した同行",
-    "th": "คำเชิญที่ได้รับ",
-    "fil": "Natanggap na Kasama"
-  },
-  "requestedCompanions": {
-    "ko": "신청한 동행",
-    "en": "Requested Companions",
-    "vi": "Lời mời đã gửi", 
-    "zh": "发送的邀请",
-    "ja": "申請した同行",
-    "th": "คำเชิญที่ส่ง",
-    "fil": "Hiniling na Kasama"
-  },
   "settings": {
     "ko": "설정",
     "en": "Settings",

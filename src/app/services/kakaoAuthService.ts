@@ -7,6 +7,7 @@ import {
   User 
 } from 'firebase/auth';
 import { auth } from './firebase';
+import { isReactNativeApp } from '../utils/webviewDetector';
 
 // 카카오 SDK 타입 정의
 declare global {
@@ -55,9 +56,29 @@ const initializeKakaoSDK = () => {
  */
 export const signInWithKakao = async (): Promise<KakaoAuthResult> => {
   try {
-    console.log('🔄 카카오 로그인 시작 (JavaScript SDK)');
+    console.log('🔄 카카오 로그인 시작');
     console.log('🌐 현재 환경:', typeof window !== 'undefined' ? '웹' : '서버');
+    console.log('📱 React Native 앱 환경:', isReactNativeApp() ? '예' : '아니오');
     console.log('📱 웹뷰 환경:', typeof window !== 'undefined' && (window as any).ReactNativeWebView ? '예' : '아니오');
+    
+    // React Native 앱 환경에서는 네이티브 SDK 사용
+    if (isReactNativeApp()) {
+      console.log('📱 React Native 앱에서 네이티브 카카오 로그인 호출');
+      
+      if (typeof window !== 'undefined' && (window as any).ReactNativeWebView) {
+        (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'KAKAO_LOGIN'
+        }));
+        return {
+          success: true,
+          isNewUser: false
+        };
+      } else {
+        throw new Error('React Native WebView를 찾을 수 없습니다.');
+      }
+    }
+    
+    console.log('🖥️ 웹 환경에서 JavaScript SDK 사용');
     console.log('📱 Kakao SDK 로드 상태:', typeof window !== 'undefined' ? (window.Kakao ? '로드됨' : '로드 안됨') : '서버');
     
     // 카카오 SDK가 로드될 때까지 대기

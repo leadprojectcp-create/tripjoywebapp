@@ -639,3 +639,141 @@ input:checked + .toggle-slider:before {
     height: 100px;
   }
 }
+
+/* 미디어 업로드 관련 스타일 */
+.media-upload-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+/* 영상 업로드 관련 스타일 */
+.video-upload-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.video-preview-wrapper {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e1e8ed;
+  background: #f8f9fa;
+}
+
+.video-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.remove-video-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.remove-video-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.add-video-btn {
+  width: 200px;
+  height: 150px;
+  border: 2px dashed #1da1f2;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #1da1f2;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.add-video-btn:hover {
+  background: #e3f2fd;
+  border-color: #1991db;
+  color: #1991db;
+}
+
+.video-count-info {
+  font-size: 12px;
+  color: #657786;
+  margin-top: 5px;
+}
+
+.add-media-btn {
+  width: 200px;
+  height: 150px;
+  border: 2px dashed #1da1f2;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #1da1f2;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.add-media-btn:hover {
+  background: #e3f2fd;
+  border-color: #1991db;
+  color: #1991db;
+}
+
+.media-count-info {
+  font-size: 12px;
+  color: #657786;
+  margin-top: 5px;
+}
+
+/* 모바일 반응형 - 미디어 업로드 */
+@media (max-width: 768px) {
+  .media-upload-container,
+  .video-upload-container {
+    gap: 10px;
+  }
+
+  .video-preview-wrapper,
+  .add-video-btn,
+  .add-media-btn {
+    width: 150px;
+    height: 112px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-preview-wrapper,
+  .add-video-btn,
+  .add-media-btn {
+    width: 120px;
+    height: 90px;
+  }
+}

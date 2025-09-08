@@ -175,8 +175,6 @@ export const AppBar = ({
             <div className="mobile-menu-items">
               <button onClick={() => handleMenuItemClick('/trip-tour')}>트립투어</button>
               <button onClick={() => handleMenuItemClick('/my-activity')}>내활동</button>
-              <button onClick={() => handleMenuItemClick('/received-companions')}>받은 동행</button>
-              <button onClick={() => handleMenuItemClick('/requested-companions')}>보낸 동행</button>
               
               {/* 설정 항목들 */}
               <div className="mobile-settings-section">

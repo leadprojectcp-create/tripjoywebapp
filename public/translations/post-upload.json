@@ -9,13 +9,40 @@
     "fil": "Mag-upload ng Post"
   },
   "uploadImages": {
-    "ko": "사진 업로드",
+    "ko": "이미지 업로드",
     "en": "Upload Images",
     "vi": "Tải lên hình ảnh",
     "zh": "上传图片",
     "ja": "画像アップロード",
     "th": "อัปโหลดรูปภาพ",
     "fil": "Mag-upload ng Larawan"
+  },
+  "addImages": {
+    "ko": "사진 추가",
+    "en": "Add Photos",
+    "vi": "Thêm ảnh",
+    "zh": "添加照片",
+    "ja": "写真を追加",
+    "th": "เพิ่มรูปภาพ",
+    "fil": "Magdagdag ng Larawan"
+  },
+  "imageCountInfo": {
+    "ko": "사진 {imageCount}/10",
+    "en": "Photos {imageCount}/10",
+    "vi": "Ảnh {imageCount}/10",
+    "zh": "照片 {imageCount}/10",
+    "ja": "写真 {imageCount}/10",
+    "th": "รูปภาพ {imageCount}/10",
+    "fil": "Mga Larawan {imageCount}/10"
+  },
+  "imageRequired": {
+    "ko": "최소 1장의 사진을 업로드해주세요",
+    "en": "Please upload at least 1 photo",
+    "vi": "Vui lòng tải lên ít nhất 1 ảnh",
+    "zh": "请至少上传1张照片",
+    "ja": "最低1枚の写真をアップロードしてください",
+    "th": "กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป",
+    "fil": "Mangyaring mag-upload ng hindi bababa sa 1 larawan"
   },
   "addImage": {
     "ko": "사진 추가",
@@ -206,15 +233,6 @@
     "ja": "内容を入力してください",
     "th": "กรุณากรอกเนื้อหา",
     "fil": "Mangyaring maglagay ng nilalaman"
-  },
-  "imageRequired": {
-    "ko": "최소 1장의 사진을 업로드해주세요",
-    "en": "Please upload at least 1 image",
-    "vi": "Vui lòng tải lên ít nhất 1 hình ảnh",
-    "zh": "请至少上传1张图片",
-    "ja": "最低1枚の画像をアップロードしてください",
-    "th": "กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป",
-    "fil": "Mangyaring mag-upload ng hindi bababa sa 1 larawan"
   },
   "uploadSuccess": {
     "ko": "게시물이 성공적으로 업로드되었습니다!",

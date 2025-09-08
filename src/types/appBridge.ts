@@ -24,6 +24,7 @@ export interface AppEnvironment {
   isApp: boolean;
   platform: 'ios' | 'android' | 'web';
   version?: string;
+  userAgent?: string;
 }
 
 export interface GeolocationOptions {

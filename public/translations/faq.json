@@ -98,15 +98,6 @@
     "th": "การท่องเที่ยว",
     "fil": "Paglalakbay"
   },
-  "filterCompanion": {
-    "ko": "동행",
-    "en": "Companion",
-    "vi": "Đồng hành",
-    "zh": "同行",
-    "ja": "同行",
-    "th": "เพื่อนร่วมทาง",
-    "fil": "Kasama"
-  },
   "filterTechnical": {
     "ko": "기술지원",
     "en": "Technical",
@@ -151,15 +142,6 @@
     "ja": "旅行",
     "th": "การท่องเที่ยว",
     "fil": "Paglalakbay"
-  },
-  "categoryCompanion": {
-    "ko": "동행",
-    "en": "Companion",
-    "vi": "Đồng hành",
-    "zh": "同行",
-    "ja": "同行",
-    "th": "เพื่อนร่วมทาง",
-    "fil": "Kasama"
   },
   "categoryTechnical": {
     "ko": "기술지원",

@@ -28,6 +28,7 @@ export interface UploadedImage {
   };
 }
 
+
 const IMAGEKIT_ENDPOINT = process.env.NEXT_PUBLIC_IMAGEKIT_ENDPOINT;
 const IMAGEKIT_PUBLIC_KEY = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY;
 
@@ -403,6 +404,12 @@ export const getOptimizedImageUrl = (
   const paramString = params.toString();
   return paramString ? `${originalUrl}?${paramString}` : originalUrl;
 };
+
+
+
+
+
+
 
 // ImageKit에서 폴더 전체 삭제
 export const deleteFolderFromImageKit = async (folderPath: string): Promise<boolean> => {

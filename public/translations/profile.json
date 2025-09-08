@@ -260,15 +260,6 @@
     "th": "แชท",
     "fil": "Chat"
   },
-  "companionRequest": {
-    "ko": "동행신청",
-    "en": "Companion Request",
-    "vi": "Yêu cầu đồng hành",
-    "zh": "同行申请",
-    "ja": "同行申請",
-    "th": "ขอเป็นเพื่อนเดินทาง",
-    "fil": "Kahilingang Kasama"
-  },
   "uploadPost": {
     "ko": "게시물 업로드",
     "en": "Upload Post",

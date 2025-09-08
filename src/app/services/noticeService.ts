@@ -42,7 +42,6 @@ export const getNotices = async (limit: number = 20): Promise<NoticeItem[]> => {
 
 주요 새 기능:
 • 실시간 채팅 기능
-• 동행 요청 시스템
 • 큐레이터 팔로우 기능
 • 다국어 지원 (7개 언어)
 
@@ -97,7 +96,7 @@ export const getNotices = async (limit: number = 20): Promise<NoticeItem[]> => {
 참여 방법: 
 1. 첫 게시물 작성하기
 2. 큐레이터 3명 이상 팔로우하기  
-3. 동행 요청 1회 이상 보내기
+3. 게시물 1개 이상 작성하기
 
 달성하신 분들께는 특별 배지를 드립니다!`,
         category: 'event',

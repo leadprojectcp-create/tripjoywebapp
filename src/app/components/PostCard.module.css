@@ -10,6 +10,19 @@
   flex-shrink: 0; /* 크기 고정 */
 }
 
+/* 상세 페이지용 카드 */
+.detailCard {
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
 /* 카드 헤더 */
 .cardHeader {
   display: flex;
@@ -96,7 +109,6 @@
   font-size: 14px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 2px;
 }
 
 /* 카드 이미지 - 기본 스타일 */
@@ -567,14 +579,6 @@
   font-weight: 600;
 }
 
-/* 사용자 위치 정보 */
-.userLocation {
-  font-size: 12px;
-  color: #666;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 
 /* 위치 아이콘 */
 .locationIcon {
@@ -1084,46 +1088,19 @@
   }
 }
 
-/* 동생 신청 버튼 스타일 */
-.companionRequestBtn {
-  border-radius: 5px;
-  border: 1px solid #237AF2;
-  color: #237AF2;
-  font-size: 14px;
-  font-weight: 600;
-  background: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  margin-left: auto;
-  transition: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  text-decoration: none;
-  box-shadow: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-}
 
-.companionRequestBtn:active,
-.companionRequestBtn:focus,
-.companionRequestBtn:hover,
-.companionRequestBtn:visited {
-  background: none !important;
-  border: 1px solid #237AF2 !important;
-  color: #237AF2 !important;
-  box-shadow: none !important;
-  transform: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-  outline: none !important;
-  text-decoration: none !important;
+/* 상세보기 버튼 스타일 */
+.detailBtn {
+  background: transparent;
+  border: 1px solid #1da1f2;
+  color: #1da1f2;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 /* 설정 메뉴 스타일 */

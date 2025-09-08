@@ -16,7 +16,7 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  category: 'general' | 'account' | 'travel' | 'companion' | 'technical' | 'safety';
+  category: 'general' | 'account' | 'travel' | 'technical' | 'safety';
   priority: number; // 높을수록 위에 표시
   createdAt: any;
   updatedAt: any;
@@ -37,11 +37,10 @@ export const getFAQs = async (limit: number = 50): Promise<FAQItem[]> => {
       {
         id: '1',
         question: 'TRIPJOY는 어떤 서비스인가요?',
-        answer: `TRIPJOY는 여행자들이 서로 연결되어 정보를 공유하고 동행을 찾을 수 있는 여행 커뮤니티 플랫폼입니다.
+        answer: `TRIPJOY는 여행자들이 서로 연결되어 정보를 공유할 수 있는 여행 커뮤니티 플랫폼입니다.
 
 주요 기능:
 • 여행 경험과 팁 공유
-• 동행자 찾기 및 요청
 • 큐레이터 팔로우 시스템
 • 실시간 채팅
 • 7개국 언어 지원
@@ -73,30 +72,6 @@ export const getFAQs = async (limit: number = 50): Promise<FAQItem[]> => {
         updatedAt: new Date('2024-01-02'),
         isVisible: true,
         tags: ['회원가입', '계정', '프로필']
-      },
-      {
-        id: '3',
-        question: '동행 요청은 어떻게 보내나요?',
-        answer: `동행 요청을 보내는 방법:
-
-1. 프로필 페이지에서 원하는 사용자를 찾기
-2. "동행 요청" 버튼 클릭
-3. 여행 정보 입력:
-   - 목적지
-   - 여행 날짜
-   - 시간
-   - 호텔명 (선택사항)
-   - 요청 메시지
-4. "요청 보내기" 클릭
-
-상대방이 승인하면 채팅으로 자세한 계획을 세울 수 있습니다.
-신청한 동행은 "신청한 동행" 메뉴에서 확인 가능해요!`,
-        category: 'companion',
-        priority: 85,
-        createdAt: new Date('2024-01-03'),
-        updatedAt: new Date('2024-01-03'),
-        isVisible: true,
-        tags: ['동행', '요청', '여행']
       },
       {
         id: '4',
@@ -207,7 +182,7 @@ export const getFAQs = async (limit: number = 50): Promise<FAQItem[]> => {
         answer: `TRIPJOY 채팅 기능 사용법:
 
 채팅 시작하기:
-• 동행 요청이 승인된 후 자동으로 채팅방 생성
+• 다른 사용자와 직접 채팅방 생성
 • 메시지 메뉴에서 채팅 목록 확인
 
 채팅 기능:
@@ -239,7 +214,6 @@ export const getFAQs = async (limit: number = 50): Promise<FAQItem[]> => {
 • 모든 게시물과 사진
 • 채팅 기록
 • 팔로워/팔로잉 관계
-• 동행 요청 내역
 • 프로필 정보
 
 계정 삭제 방법:
@@ -389,7 +363,6 @@ export const getCategoryIcon = (category: FAQItem['category']): string => {
     general: '❓',
     account: '👤',
     travel: '✈️',
-    companion: '🤝',
     technical: '⚙️',
     safety: '🛡️'
   };
@@ -405,7 +378,6 @@ export const getCategoryKey = (category: FAQItem['category']): string => {
     general: 'categoryGeneral',
     account: 'categoryAccount', 
     travel: 'categoryTravel',
-    companion: 'categoryCompanion',
     technical: 'categoryTechnical',
     safety: 'categorySafety'
   };

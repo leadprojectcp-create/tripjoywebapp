@@ -3,7 +3,6 @@
 import React from 'react';
 import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
-import { RightSidebar } from "../components/RightSidebar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from '../contexts/TranslationContext';
@@ -55,7 +54,6 @@ export default function TripTourPage() {
             </div>
 
             {/* Right Sidebar */}
-            <RightSidebar />
           </div>
         </div>
         

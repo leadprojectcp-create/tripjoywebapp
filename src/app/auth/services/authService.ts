@@ -27,7 +27,6 @@ export interface UserData {
   // 프로필 편집 관련 필드
   bio?: string;
   image?: string;
-  companionRequestEnabled?: boolean;
   
   // 포인트 시스템
   points: number;
@@ -474,7 +473,6 @@ export const updateUserProfile = async (
     bio?: string;
     image?: string;
     photoUrl?: string;
-    companionRequestEnabled?: boolean;
   }
 ) => {
   try {
@@ -501,5 +499,25 @@ export const updateUserProfile = async (
   } catch (error) {
     logError(error, 'updateUserProfile');
     throw new Error(getErrorMessage(error));
+  }
+};
+
+// 사용자 ID로 사용자 정보 가져오기
+export const getUserById = async (userId: string): Promise<UserData | null> => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      const userData = userDoc.data() as UserData;
+      console.log('✅ 사용자 정보 조회 성공:', userId);
+      return userData;
+    } else {
+      console.log('⚠️ 사용자를 찾을 수 없음:', userId);
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ 사용자 정보 조회 실패:', error);
+    throw error;
   }
 };

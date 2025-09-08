@@ -143,12 +143,6 @@ export default function FAQPage() {
                   {t('filterTravel')}
                 </button>
                 <button 
-                  className={`filter-tab ${filter === 'companion' ? 'active' : ''}`}
-                  onClick={() => setFilter('companion')}
-                >
-                  {t('filterCompanion')}
-                </button>
-                <button 
                   className={`filter-tab ${filter === 'technical' ? 'active' : ''}`}
                   onClick={() => setFilter('technical')}
                 >

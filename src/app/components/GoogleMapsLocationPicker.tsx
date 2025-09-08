@@ -62,6 +62,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
   const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
+  const [isAppEnv, setIsAppEnv] = useState(false); // 앱 환경 상태
   
   // 현재 위치 관련 로컬 상태
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
@@ -172,6 +173,15 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     return () => {
       clearTimeout(timeout);
     };
+  }, []);
+
+  // 🔍 앱 환경 확인 (클라이언트 사이드에서만)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const environment = detectAppEnvironment();
+      setIsAppEnv(environment.isApp);
+      console.log('🔍 앱 환경 확인 완료:', environment);
+    }
   }, []);
 
   // 🚀 Autocomplete 초기화 (완전 새로 생성)
@@ -453,12 +463,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     }
   };
 
-  // 앱 환경인지 확인 (기존 함수 사용)
-  const isAppEnvironment = () => {
-    const environment = detectAppEnvironment();
-    console.log('🔍 환경 확인 (기존 함수 사용):', environment);
-    return environment.isApp;
-  };
 
   // 현재 위치 버튼 클릭 핸들러 (앱에서만 사용)
   const handleCurrentLocationClick = () => {
@@ -713,7 +717,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           )}
           
                   {/* 현재 위치 버튼 (앱에서만 표시) */}
-                  {isAppEnvironment() && (
+                  {isAppEnv && (
                     <button
                       type="button"
                       className={styles['current-location-btn']}
