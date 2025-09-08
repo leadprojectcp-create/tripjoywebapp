@@ -105,6 +105,8 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'GOOGLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 구글 로그인 성공:', data.user);
           setIsLoading(false);
+          // 로그인 성공 후 홈으로 이동
+          window.location.href = '/';
         } else if (data.type === 'GOOGLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 구글 로그인 실패:', data.error);
           setError('구글 로그인에 실패했습니다.');
@@ -112,6 +114,8 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'APPLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 애플 로그인 성공:', data.user);
           setIsLoading(false);
+          // 로그인 성공 후 홈으로 이동
+          window.location.href = '/';
         } else if (data.type === 'APPLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 애플 로그인 실패:', data.error);
           setError('애플 로그인에 실패했습니다.');
