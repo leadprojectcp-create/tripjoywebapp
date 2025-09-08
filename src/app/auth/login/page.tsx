@@ -82,16 +82,21 @@ export default function LoginPage(): React.JSX.Element {
     };
 
     // 웹뷰 메시지 처리
-    const handleWebViewMessage = (event: MessageEvent) => {
+    const handleWebViewMessage = (event: any) => {
       try {
-        // JSON이 아닌 메시지는 무시
-        if (typeof event.data !== 'string' || !event.data.startsWith('{')) {
-          console.log('📱 웹뷰 메시지 (JSON 아님):', event.data);
+        console.log('📱 웹뷰 메시지 수신 (원본):', event);
+        
+        let data;
+        if (typeof event.data === 'string') {
+          data = JSON.parse(event.data);
+        } else if (typeof event.data === 'object') {
+          data = event.data;
+        } else {
+          console.log('📱 웹뷰 메시지 (처리 불가):', event.data);
           return;
         }
         
-        const data = JSON.parse(event.data);
-        console.log('📱 웹뷰 메시지 수신:', data);
+        console.log('📱 웹뷰 메시지 수신 (파싱됨):', data);
         
         if (data.type === 'KAKAO_LOGIN_REDIRECT') {
           console.log('🔄 카카오 로그인 리다이렉트:', data.url);
@@ -136,24 +141,30 @@ export default function LoginPage(): React.JSX.Element {
 
     handleRedirectResult();
 
-    // 웹뷰 메시지 리스너 등록
+    // 웹뷰 메시지 리스너 등록 (간단하게)
     if (typeof window !== 'undefined') {
-      // React Native WebView에서 postMessage를 받는 방법
+      // 모든 가능한 방법으로 메시지 수신
       window.addEventListener('message', handleWebViewMessage);
+      document.addEventListener('message', handleWebViewMessage as EventListener);
       
-      // React Native WebView 전용 이벤트 (postMessage 대신 사용)
+      // React Native WebView 전용
       if ((window as any).ReactNativeWebView) {
         (window as any).ReactNativeWebView.onMessage = handleWebViewMessage;
       }
+      
+      // 전역 함수로도 등록
+      (window as any).handleWebViewMessage = handleWebViewMessage;
     }
 
     // 클린업
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleWebViewMessage);
+        document.removeEventListener('message', handleWebViewMessage as EventListener);
         if ((window as any).ReactNativeWebView) {
           (window as any).ReactNativeWebView.onMessage = null;
         }
+        delete (window as any).handleWebViewMessage;
       }
     };
   }, []);
