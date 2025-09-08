@@ -136,17 +136,14 @@ export default function LoginPage(): React.JSX.Element {
 
     handleRedirectResult();
 
-    // 웹뷰 메시지 리스너 등록 (여러 방법 시도)
+    // 웹뷰 메시지 리스너 등록
     if (typeof window !== 'undefined') {
-      // 방법 1: window.addEventListener
+      // React Native WebView에서 postMessage를 받는 방법
       window.addEventListener('message', handleWebViewMessage);
       
-      // 방법 2: document.addEventListener (WebView에서 더 잘 작동할 수 있음)
-      document.addEventListener('message', handleWebViewMessage as EventListener);
-      
-      // 방법 3: React Native WebView 전용 이벤트
+      // React Native WebView 전용 이벤트 (postMessage 대신 사용)
       if ((window as any).ReactNativeWebView) {
-        window.addEventListener('ReactNativeWebViewMessage', handleWebViewMessage as EventListener);
+        (window as any).ReactNativeWebView.onMessage = handleWebViewMessage;
       }
     }
 
@@ -154,9 +151,8 @@ export default function LoginPage(): React.JSX.Element {
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleWebViewMessage);
-        document.removeEventListener('message', handleWebViewMessage as EventListener);
         if ((window as any).ReactNativeWebView) {
-          window.removeEventListener('ReactNativeWebViewMessage', handleWebViewMessage as EventListener);
+          (window as any).ReactNativeWebView.onMessage = null;
         }
       }
     };
