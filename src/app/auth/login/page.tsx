@@ -136,15 +136,28 @@ export default function LoginPage(): React.JSX.Element {
 
     handleRedirectResult();
 
-    // 웹뷰 메시지 리스너 등록
+    // 웹뷰 메시지 리스너 등록 (여러 방법 시도)
     if (typeof window !== 'undefined') {
+      // 방법 1: window.addEventListener
       window.addEventListener('message', handleWebViewMessage);
+      
+      // 방법 2: document.addEventListener (WebView에서 더 잘 작동할 수 있음)
+      document.addEventListener('message', handleWebViewMessage as EventListener);
+      
+      // 방법 3: React Native WebView 전용 이벤트
+      if ((window as any).ReactNativeWebView) {
+        window.addEventListener('ReactNativeWebViewMessage', handleWebViewMessage as EventListener);
+      }
     }
 
     // 클린업
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('message', handleWebViewMessage);
+        document.removeEventListener('message', handleWebViewMessage as EventListener);
+        if ((window as any).ReactNativeWebView) {
+          window.removeEventListener('ReactNativeWebViewMessage', handleWebViewMessage as EventListener);
+        }
       }
     };
   }, []);
