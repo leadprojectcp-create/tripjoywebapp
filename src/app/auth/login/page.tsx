@@ -85,11 +85,18 @@ export default function LoginPage(): React.JSX.Element {
     const handleWebViewMessage = (event: any) => {
       try {
         console.log('📱 웹뷰 메시지 수신 (원본):', event);
+        console.log('📱 웹뷰 메시지 수신 (event.data):', event.data);
+        console.log('📱 웹뷰 메시지 수신 (event.data 타입):', typeof event.data);
         
         let data;
         if (typeof event.data === 'string') {
-          data = JSON.parse(event.data);
-        } else if (typeof event.data === 'object') {
+          try {
+            data = JSON.parse(event.data);
+          } catch (e) {
+            console.log('📱 JSON 파싱 실패:', e);
+            return;
+          }
+        } else if (typeof event.data === 'object' && event.data !== null) {
           data = event.data;
         } else {
           console.log('📱 웹뷰 메시지 (처리 불가):', event.data);
@@ -97,6 +104,7 @@ export default function LoginPage(): React.JSX.Element {
         }
         
         console.log('📱 웹뷰 메시지 수신 (파싱됨):', data);
+        console.log('📱 웹뷰 메시지 수신 (data.type):', data.type);
         
         if (data.type === 'KAKAO_LOGIN_REDIRECT') {
           console.log('🔄 카카오 로그인 리다이렉트:', data.url);
