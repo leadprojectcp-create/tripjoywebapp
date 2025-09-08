@@ -60,13 +60,19 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
     
     try {
       console.log('📝 새 사용자 생성 시도...');
-      firebaseUser = await auth.createUser({
+      const userData: any = {
         uid: kakaoUid, // 카카오 UID 그대로 사용 (4425085307)
         email: email,
         emailVerified: true,
         displayName: profileNickname,
-        photoURL: profileImage || '',
-      });
+      };
+
+      // photoURL이 유효한 경우에만 추가
+      if (profileImage && profileImage.trim() !== '') {
+        userData.photoURL = profileImage;
+      }
+
+      firebaseUser = await auth.createUser(userData);
       
       console.log('✅ 새 사용자 생성됨:', firebaseUser.uid);
       isNewUser = true;
@@ -75,12 +81,18 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
       // 사용자가 이미 존재하면 업데이트 (Python except 로직과 동일)
       try {
         console.log('📝 기존 사용자 업데이트 시도...');
-        firebaseUser = await auth.updateUser(kakaoUid, {
+        const updateData: any = {
           email: email,
           emailVerified: true,
           displayName: profileNickname,
-          photoURL: profileImage || '',
-        });
+        };
+
+        // photoURL이 유효한 경우에만 추가
+        if (profileImage && profileImage.trim() !== '') {
+          updateData.photoURL = profileImage;
+        }
+
+        firebaseUser = await auth.updateUser(kakaoUid, updateData);
         
         console.log('✅ 기존 사용자 업데이트됨:', firebaseUser.uid);
         
@@ -105,7 +117,7 @@ async function createFirebaseCustomToken(kakaoUid: string, email: string, profil
       provider: 'kakao',
       email: email,
       displayName: profileNickname,
-      ...(profileImage && { photoURL: profileImage })
+      ...(profileImage && profileImage.trim() !== '' && { photoURL: profileImage })
     };
     
     console.log('✅ 생성된 claims:', claims);
