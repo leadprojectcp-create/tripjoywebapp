@@ -65,6 +65,13 @@ export const useAuth = () => {
           
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
+            // 네이티브 앱 환경에서는 자동 리다이렉트 하지 않음
+            if (window.location.search.includes('app=true') || 
+                window.navigator.userAgent.includes('ReactNativeWebView')) {
+              console.log('📱 네이티브 앱 환경 - 자동 리다이렉트 건너뜀');
+              return;
+            }
+            
             // 실제 Firestore userData만 체크 (defaultUserData는 제외)
             const realUserData = await getUserData(firebaseUser.uid);
             
