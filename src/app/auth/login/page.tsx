@@ -113,8 +113,7 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'KAKAO_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 카카오 로그인 성공:', data.user);
           setIsLoading(false);
-          // 로그인 성공 후 홈으로 이동
-          window.location.href = '/';
+          handleNativeLoginSuccess(data.user);
         } else if (data.type === 'KAKAO_LOGIN_FAILED') {
           console.error('❌ 네이티브 카카오 로그인 실패:', data.error);
           setError('카카오 로그인에 실패했습니다.');
@@ -125,8 +124,7 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'GOOGLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 구글 로그인 성공:', data.user);
           setIsLoading(false);
-          // 로그인 성공 후 홈으로 이동
-          window.location.href = '/';
+          handleNativeLoginSuccess(data.user);
         } else if (data.type === 'GOOGLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 구글 로그인 실패:', data.error);
           setError('구글 로그인에 실패했습니다.');
@@ -134,8 +132,7 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'APPLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 애플 로그인 성공:', data.user);
           setIsLoading(false);
-          // 로그인 성공 후 홈으로 이동
-          window.location.href = '/';
+          handleNativeLoginSuccess(data.user);
         } else if (data.type === 'APPLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 애플 로그인 실패:', data.error);
           setError('애플 로그인에 실패했습니다.');
@@ -147,7 +144,42 @@ export default function LoginPage(): React.JSX.Element {
       }
     };
 
+    // URL 스킴 처리 함수
+    const handleUrlScheme = () => {
+      if (window.location.href.startsWith('tripjoy://login-success')) {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const data = JSON.parse(decodeURIComponent(urlParams.get('data') || '{}'));
+          
+          console.log('🔗 URL 스킴으로 로그인 성공 수신:', data);
+          
+          if (data.type && data.type.includes('_LOGIN_SUCCESS')) {
+            setIsLoading(false);
+            handleNativeLoginSuccess(data.user);
+          }
+        } catch (error) {
+          console.error('❌ URL 스킴 처리 실패:', error);
+        }
+      }
+    };
+
+    // 네이티브 로그인 성공 처리
+    const handleNativeLoginSuccess = (user: any) => {
+      console.log('🎉 네이티브 로그인 성공 처리:', user);
+      
+      if (user.isNewUser) {
+        // 첫 로그인 (회원가입) - 약관 동의 + 추가 정보 입력
+        console.log('🆕 신규 사용자 - 회원가입 플로우');
+        window.location.href = '/auth/signup';
+      } else {
+        // 기존 사용자 - 바로 홈으로
+        console.log('👤 기존 사용자 - 홈으로 이동');
+        window.location.href = '/';
+      }
+    };
+
     handleRedirectResult();
+    handleUrlScheme(); // URL 스킴 체크
 
     // 웹뷰 메시지 리스너 등록 (간단하게)
     if (typeof window !== 'undefined') {
