@@ -144,23 +144,28 @@ export default function LoginPage(): React.JSX.Element {
       }
     };
 
-    // URL 스킴 처리 함수
-    const handleUrlScheme = () => {
-      if (window.location.href.startsWith('tripjoy://login-success')) {
+    // Deep Link 처리 함수
+    const handleDeepLink = () => {
+      const currentUrl = window.location.href;
+      console.log('🔍 현재 URL 체크:', currentUrl);
+      
+      if (currentUrl.includes('tripjoy://login-success')) {
         try {
-          const urlParams = new URLSearchParams(window.location.search);
-          const data = JSON.parse(decodeURIComponent(urlParams.get('data') || '{}'));
+          const url = new URL(currentUrl);
+          const data = JSON.parse(decodeURIComponent(url.searchParams.get('data') || '{}'));
           
-          console.log('🔗 URL 스킴으로 로그인 성공 수신:', data);
+          console.log('🔗 Deep Link로 로그인 성공 수신:', data);
           
           if (data.type && data.type.includes('_LOGIN_SUCCESS')) {
             setIsLoading(false);
             handleNativeLoginSuccess(data.user);
+            return true;
           }
         } catch (error) {
-          console.error('❌ URL 스킴 처리 실패:', error);
+          console.error('❌ Deep Link 처리 실패:', error);
         }
       }
+      return false;
     };
 
     // 네이티브 로그인 성공 처리
@@ -179,20 +184,19 @@ export default function LoginPage(): React.JSX.Element {
     };
 
     handleRedirectResult();
-    handleUrlScheme(); // URL 스킴 체크
+    handleDeepLink(); // Deep Link 체크
 
-    // 웹뷰 메시지 리스너 등록 (간단하게)
+    // 웹뷰 메시지 리스너 등록
     if (typeof window !== 'undefined') {
-      // 모든 가능한 방법으로 메시지 수신
-      window.addEventListener('message', handleWebViewMessage);
-      document.addEventListener('message', handleWebViewMessage as EventListener);
-      
-      // React Native WebView 전용
+      // React Native WebView 전용 메시지 수신
       if ((window as any).ReactNativeWebView) {
         (window as any).ReactNativeWebView.onMessage = handleWebViewMessage;
       }
       
-      // 전역 함수로도 등록
+      // 일반 웹뷰 메시지 수신
+      window.addEventListener('message', handleWebViewMessage);
+      
+      // 전역 함수로 등록 (네이티브에서 직접 호출용)
       (window as any).handleWebViewMessage = handleWebViewMessage;
     }
 
