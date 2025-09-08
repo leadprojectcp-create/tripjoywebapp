@@ -86,7 +86,7 @@ export const useAuth = () => {
                 return;
               }
               
-              router.push('/');
+              window.location.href = '/';
             } else {
               
               // 새 사용자 플래그 확인해서 로그인 방법 판단
@@ -136,7 +136,7 @@ export const useAuth = () => {
                   console.log('📝 에러 케이스 앱 알림 실패 (웹 브라우저일 수 있음)');
                 }
                 
-                router.push('/');
+                window.location.href = '/';
               } else {
                 console.log('🔄 에러 후 재확인: Firestore에 사용자 데이터 없음 - 회원가입 플로우');
                 
@@ -207,7 +207,7 @@ export const useAuth = () => {
         // 웹뷰 환경 감지
         if (isWebView()) {
           // 웹뷰에서는 메인 페이지로 리다이렉트
-          router.push('/');
+          window.location.href = '/';
         } else {
           router.push('/auth/login');
         }
@@ -219,7 +219,7 @@ export const useAuth = () => {
       // 웹뷰 환경 감지
       if (isWebView()) {
         // 웹뷰에서는 메인 페이지로 리다이렉트 (로그인 상태가 해제된 상태)
-        router.push('/');
+        window.location.href = '/';
       } else {
         router.push('/auth/login');
       }
@@ -227,7 +227,7 @@ export const useAuth = () => {
       console.error('로그아웃 실패:', error);
       // 에러 발생 시에도 웹뷰 환경에 따라 리다이렉트
       if (isWebView()) {
-        router.push('/');
+        window.location.href = '/';
       } else {
         router.push('/auth/login');
       }
