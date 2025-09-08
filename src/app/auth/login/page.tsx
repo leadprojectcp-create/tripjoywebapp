@@ -93,8 +93,8 @@ export default function LoginPage(): React.JSX.Element {
         } else if (data.type === 'KAKAO_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 카카오 로그인 성공:', data.user);
           setIsLoading(false);
-          // 네이티브에서 받은 사용자 정보로 Firebase 로그인 처리
-          // 이 부분은 네이티브 앱에서 Firebase Auth로 처리됨
+          // 로그인 성공 후 홈으로 이동
+          window.location.href = '/';
         } else if (data.type === 'KAKAO_LOGIN_FAILED') {
           console.error('❌ 네이티브 카카오 로그인 실패:', data.error);
           setError('카카오 로그인에 실패했습니다.');
