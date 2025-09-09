@@ -16,7 +16,45 @@ interface UserData {
   gender?: string;
   location?: string;
   signupMethod?: 'email' | 'kakao' | 'google' | 'apple';
+  isTemporary?: boolean; // 임시 사용자 플래그 (약관 동의 + 추가 정보 미완료)
+  consents?: {
+    termsOfService?: boolean;
+    personalInfo?: boolean;
+    locationInfo?: boolean;
+    marketing?: boolean;
+    thirdParty?: boolean;
+  };
 }
+
+// API로 사용자 데이터 가져오기
+const getUserDataViaAPI = async (uid: string): Promise<UserData | null> => {
+  try {
+    console.log('🔍 API로 사용자 데이터 확인:', uid);
+    
+    const response = await fetch('/api/auth/user-management', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'check-user', uid })
+    });
+    
+    if (!response.ok) {
+      console.error('❌ 사용자 확인 API 실패:', response.status);
+      return null;
+    }
+    
+    const result = await response.json();
+    console.log('✅ 사용자 확인 API 결과:', result);
+    
+    if (result.exists && result.data) {
+      return result.data as UserData;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('❌ 사용자 확인 오류:', error);
+    return null;
+  }
+};
 
 export const useAuth = () => {
   const [user, setUser] = useState<UserData | null>(null);
@@ -43,35 +81,47 @@ export const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Firestore에서 사용자 정보 가져오기
-          const userData = await getUserData(firebaseUser.uid);
+          // API로 사용자 정보 가져오기
+          const userData = await getUserDataViaAPI(firebaseUser.uid);
           
-          if (userData) {
-            // uid 필드 추가
+          // 사용자 데이터 완성도 검사
+          const isCompleteUser = userData && 
+            !userData.isTemporary && 
+            userData.name && 
+            userData.phoneNumber && 
+            userData.birthDate &&
+            userData.consents?.termsOfService;
+            
+          console.log('🔍 사용자 완성도 검사:', {
+            hasUserData: !!userData,
+            isTemporary: userData?.isTemporary,
+            hasName: !!userData?.name,
+            hasPhone: !!userData?.phoneNumber,
+            hasBirth: !!userData?.birthDate,
+            hasConsents: !!userData?.consents?.termsOfService,
+            isCompleteUser
+          });
+
+          if (isCompleteUser) {
+            // 완전한 사용자 데이터 (약관 동의 + 추가 정보 완료)
             const userWithUid = { ...userData, uid: firebaseUser.uid };
             setUser(userWithUid);
             localStorage.setItem('tripjoy_user', JSON.stringify(userWithUid));
           } else {
-            // Firestore에 사용자 정보가 없는 경우 기본 정보 사용
-            const defaultUserData: UserData = {
-              id: firebaseUser.uid,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
-            };
-            setUser(defaultUserData);
-            localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
+            // 불완전한 사용자 - 회원가입 플로우 필요
+            console.log('⚠️ 불완전한 사용자 - 회원가입 플로우 필요');
+            setUser(null); // 로그인 상태로 처리하지 않음
           }
           
           // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 실제 Firestore userData만 체크 (defaultUserData는 제외)
-            const realUserData = await getUserData(firebaseUser.uid);
+            // 이미 위에서 가져온 userData 사용 (중복 API 호출 방지)
             
-            if (realUserData) {
+            if (isCompleteUser) {
+              // 완전한 사용자 - 홈으로 이동
+              console.log('✅ 완전한 사용자 - 홈으로 이동');
               
               // 앱에 로그인 알림 (앱에서 FCM 토큰 처리)
-              console.log('🚀 로그인 성공 - 앱에 사용자 정보 전달');
               try {
                 const { notifyAppUserLogin } = await import('../services/fcmService');
                 notifyAppUserLogin(firebaseUser.uid);
@@ -88,6 +138,8 @@ export const useAuth = () => {
               
               window.location.href = '/';
             } else {
+              // Firestore에 데이터가 없는 신규 사용자 - 회원가입 플로우 필요
+              console.log('🆕 신규 사용자 - 회원가입 플로우로 이동');
               
               // 새 사용자 플래그 확인해서 로그인 방법 판단
               const kakaoNewUser = localStorage.getItem('kakao_new_user');
@@ -101,10 +153,20 @@ export const useAuth = () => {
               else if (appleNewUser) method = 'apple';
               else if (emailNewUser) method = 'email';
               
-              console.log('🔍 회원가입 플로우 진입:', { method, uid: firebaseUser.uid });
+              console.log('🔍 회원가입 플로우 진입:', { 
+                method, 
+                uid: firebaseUser.uid,
+                flags: { kakaoNewUser, googleNewUser, appleNewUser, emailNewUser }
+              });
               
-              // 새 사용자는 회원가입 플로우로 이동
-              router.push(`/auth/signup?method=${method}&uid=${firebaseUser.uid}`);
+              // 소셜과 이메일을 완전히 분리
+              if (method === 'email') {
+                // 이메일 가입 플로우 (이메일 입력부터)
+                router.push('/auth/email');
+              } else {
+                // 소셜 가입 플로우 (약관 동의부터)
+                router.push(`/auth/terms?method=${method}&uid=${firebaseUser.uid}`);
+              }
             }
           }
         } catch (error) {
@@ -123,7 +185,7 @@ export const useAuth = () => {
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
             // 에러 케이스도 실제 Firestore 데이터 다시 확인
             try {
-              const realUserData = await getUserData(firebaseUser.uid);
+              const realUserData = await getUserDataViaAPI(firebaseUser.uid);
               
               if (realUserData) {
                 
@@ -209,27 +271,27 @@ export const useAuth = () => {
           // 웹뷰에서는 메인 페이지로 리다이렉트
           window.location.href = '/';
         } else {
-          router.push('/auth/login');
+          router.push('/'); // 로그인 페이지가 아닌 홈으로 이동
         }
         return;
       }
       
       await signOut();
       
-      // 웹뷰 환경 감지
+      // 로그아웃 후 홈으로 이동 (로그인 페이지가 아닌)
       if (isWebView()) {
-        // 웹뷰에서는 메인 페이지로 리다이렉트 (로그인 상태가 해제된 상태)
+        // 웹뷰에서는 메인 페이지로 리다이렉트
         window.location.href = '/';
       } else {
-        router.push('/auth/login');
+        router.push('/'); // 로그인 페이지가 아닌 홈으로 이동
       }
     } catch (error) {
       console.error('로그아웃 실패:', error);
-      // 에러 발생 시에도 웹뷰 환경에 따라 리다이렉트
+      // 에러 발생 시에도 홈으로 리다이렉트
       if (isWebView()) {
         window.location.href = '/';
       } else {
-        router.push('/auth/login');
+        router.push('/'); // 로그인 페이지가 아닌 홈으로 이동
       }
     }
   };
@@ -261,6 +323,7 @@ export const useAuth = () => {
   };
 
   const openLoginPage = () => {
+    // AuthGuard에서만 호출되는 함수 - 로그인이 필수인 페이지에서만 리다이렉트
     router.push('/auth/login');
   };
 

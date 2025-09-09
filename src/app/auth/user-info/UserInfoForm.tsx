@@ -1,24 +1,30 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AppBar } from '../../components/AppBar';
-import { UserInfo } from '../signup/types';
+import { UserInfo } from '../email/types';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import './UserInfoForm.css';
 
 interface UserInfoFormProps {
-  onSubmit: (userInfo: UserInfo) => void;
-  onBack: () => void;
-  method: string;
+  onSubmit?: (userInfo: UserInfo) => void;
+  onBack?: () => void;
+  method?: string;
   uid?: string;
 }
 
 export const UserInfoForm: React.FC<UserInfoFormProps> = ({
   onSubmit,
   onBack,
-  method,
-  uid
+  method: propMethod,
+  uid: propUid
 }) => {
+  const searchParams = useSearchParams();
+  
+  // URL 파라미터에서 method와 uid 가져오기 (props보다 우선)
+  const method = searchParams.get('method') || propMethod || 'email';
+  const uid = searchParams.get('uid') || propUid;
   const { t } = useTranslationContext();
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
@@ -71,9 +77,41 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(userInfo);
+    
+    if (onSubmit) {
+      // props로 onSubmit이 전달된 경우
+      onSubmit(userInfo);
+    } else {
+      // 독립적으로 작동하는 경우 - API 호출 후 홈으로 이동
+      try {
+        console.log('📝 사용자 정보 업데이트 시작:', userInfo);
+        
+        const response = await fetch('/api/auth/user-management', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'update-user-info',
+            uid: uid,
+            method: method,
+            userInfo: userInfo
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('사용자 정보 업데이트 실패');
+        }
+
+        console.log('✅ 사용자 정보 업데이트 완료');
+        
+        // 홈으로 이동
+        window.location.href = '/';
+      } catch (error) {
+        console.error('❌ 사용자 정보 업데이트 오류:', error);
+        alert('사용자 정보 저장에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
   const getMethodText = () => {

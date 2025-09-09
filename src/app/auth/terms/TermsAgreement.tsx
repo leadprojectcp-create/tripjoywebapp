@@ -1,20 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "./TermsAgreement.css";
 import { AppBar } from "../../components/AppBar";
+import { SignupMethod } from "../email/types";
 
 interface TermsAgreementProps {
-  onAgree: () => void;
-  onBack: () => void;
-  method: 'email' | 'kakao' | 'google' | 'apple';
+  onAgree?: () => void;
+  onBack?: () => void;
+  method?: SignupMethod;
 }
 
 export const TermsAgreement: React.FC<TermsAgreementProps> = ({ 
   onAgree, 
   onBack, 
-  method 
+  method: propMethod 
 }) => {
+  const [method, setMethod] = useState<SignupMethod>(propMethod || 'email');
+  const [uid, setUid] = useState<string>('');
+  const router = useRouter();
+
+  // URL 파라미터에서 method와 uid 확인
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const methodParam = urlParams.get('method') as SignupMethod;
+      const uidParam = urlParams.get('uid');
+      
+      if (methodParam) setMethod(methodParam);
+      if (uidParam) setUid(uidParam);
+    }
+  }, []);
+
   const [consents, setConsents] = useState({
     termsOfService: false,
     personalInfo: false,
@@ -49,7 +67,20 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
       alert('필수 약관에 동의해야 합니다.');
       return;
     }
-    onAgree();
+    
+    if (onAgree) {
+      // 외부에서 onAgree가 전달된 경우
+      onAgree();
+    } else {
+      // 독립적으로 사용되는 경우 내부 로직 처리
+      localStorage.setItem('user_consents', JSON.stringify(consents));
+      
+      if (method === 'email') {
+        router.push('/auth/user-info?method=email');
+      } else {
+        router.push(`/auth/user-info?method=${method}&uid=${uid}`);
+      }
+    }
   };
 
   const getMethodText = () => {

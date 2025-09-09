@@ -30,27 +30,6 @@ const HomeIcon = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
-const CuratorIcon = ({ isActive }: { isActive: boolean }) => {
-  if (isActive) {
-    return (
-      <Image 
-        src="/icons/curator_active.svg" 
-        alt="Curator Active" 
-        width={28} 
-        height={28}
-      />
-    );
-  }
-  
-  return (
-    <Image 
-      src="/icons/curator.svg" 
-      alt="Curator" 
-      width={28} 
-      height={28}
-    />
-  );
-};
 
 const PostIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
@@ -155,12 +134,6 @@ export const BottomNavigator = (): React.JSX.Element => {
         <span>{t('home')}</span>
       </Link>
       
-      <Link href="/curators" className={`nav-item ${isActive('/curators') ? 'active' : ''}`}>
-        <div className="nav-icon">
-          <CuratorIcon isActive={isActive('/curators')} />
-        </div>
-        <span>{t('curator')}</span>
-      </Link>
       
       <Link href="/post-upload" className={`nav-item ${isActive('/post-upload') ? 'active' : ''}`}>
         <div className="nav-icon">

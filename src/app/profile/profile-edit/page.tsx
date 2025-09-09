@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { getUserData, updateUserProfile } from '../../auth/services/authService';
 import { uploadImage } from '../../services/imageKitService';
-import { Sidebar } from '../../components/Sidebar';
+
 import { AppBar } from '../../components/AppBar';
 import { BottomNavigator } from '../../components/BottomNavigator';
 import { AuthGuard } from '../../components/AuthGuard';
@@ -211,7 +211,7 @@ function ProfileEditContent() {
             {/* Body Content */}
             <div className="body-content">
               {/* Left Sidebar */}
-              <Sidebar />
+              
 
               {/* Main Content */}
               <div className="profile-edit-main-content">

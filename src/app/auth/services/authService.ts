@@ -1,10 +1,9 @@
 import { 
-  createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
   UserCredential,
   User
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase';
 import { getErrorMessage, logError } from '../../utils/errorHandler';
 
@@ -62,7 +61,7 @@ export interface UserData {
 
 
 
-// 이메일 회원가입
+// 이메일 회원가입 (API 사용)
 export const signUpWithEmail = async (email: string, password: string, userInfo: any): Promise<UserData> => {
   try {
     // 입력 데이터 검증
@@ -74,118 +73,31 @@ export const signUpWithEmail = async (email: string, password: string, userInfo:
       throw new Error('비밀번호는 6자 이상이어야 합니다.');
     }
 
-    // Firebase가 초기화되지 않은 경우 에러
-    console.log('🔍 Firebase auth 상태:', !!auth);
-    console.log('🔍 Firebase db 상태:', !!db);
-    if (!auth || !db) {
-      console.error('❌ Firebase가 초기화되지 않았습니다.');
-      console.error('auth:', auth);
-      console.error('db:', db);
-      throw new Error('Firebase가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    console.log('📤 이메일 회원가입 API 호출:', { email, userInfo });
+
+    // 통합 API를 통해 사용자 생성
+    const response = await fetch('/api/auth/user-management', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create-email-user', email, password, userInfo })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '회원가입에 실패했습니다.');
     }
 
-    // 실제 Firebase Auth로 사용자 계정 생성
-    const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    const result = await response.json();
+    console.log('✅ 이메일 회원가입 API 성공:', result);
 
-    // 한국 시간대 기준 타임스탬프 포맷팅 함수
-    const formatKoreanTimestamp = (date: Date): string => {
-      const koreaTime = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
-      
-      const year = koreaTime.getFullYear();
-      const month = koreaTime.getMonth() + 1;
-      const day = koreaTime.getDate();
-      const hours = koreaTime.getHours();
-      const minutes = koreaTime.getMinutes();
-      const seconds = koreaTime.getSeconds();
-      
-      const period = hours < 12 ? '오전' : '오후';
-      const displayHours = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
-      
-      return `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분 ${seconds}초 UTC+9`;
-    };
+    // 클라이언트에서 Firebase Auth 로그인
+    if (!auth) {
+      throw new Error('Firebase가 설정되지 않았습니다.');
+    }
 
-    // 생년월일을 타임스탬프로 변환
-    const birthDate = new Date(
-      parseInt(userInfo.birthYear), 
-      parseInt(userInfo.birthMonth) - 1, 
-      parseInt(userInfo.birthDay)
-    );
-    
-    const currentTime = new Date();
-    
-    // 국가코드에 따른 언어 설정 (지원하는 7개 언어만)
-    const getLanguageByCountryCode = (countryCode: string): string => {
-      switch (countryCode) {
-        case '+82': return 'ko';  // 한국
-        case '+1': return 'en';   // 미국
-        case '+84': return 'vi';  // 베트남
-        case '+86': return 'zh';  // 중국
-        case '+81': return 'ja';  // 일본
-        case '+66': return 'th';  // 태국
-        case '+63': return 'fil'; // 필리핀
-        default: return 'en';     // 기본값: 영어
-      }
-    };
-
-    // 전화번호 국가코드를 ISO 국가코드로 변환 (지원하는 7개 언어만)
-    const getISOCountryCode = (countryCode: string): string => {
-      switch (countryCode) {
-        case '+82': return 'ko';  // 한국
-        case '+1': return 'en';   // 미국
-        case '+84': return 'vi';  // 베트남
-        case '+86': return 'zh';  // 중국
-        case '+81': return 'ja';  // 일본
-        case '+66': return 'th';  // 태국
-        case '+63': return 'fil'; // 필리핀
-        default: return 'en';     // 기본값: 영어
-      }
-    };
-
-
-
-    // Firestore에 사용자 정보 저장
-    const userData: UserData = {
-      id: user.uid,
-      name: userInfo.name,
-      email: user.email!,
-      phoneNumber: userInfo.countryCode + userInfo.phoneNumber, // 국가코드 + 전화번호
-      birthDate: formatKoreanTimestamp(birthDate),
-      gender: userInfo.gender === 'male' ? '남성' : '여성',
-      location: getISOCountryCode(userInfo.countryCode), // ISO 국가코드로 저장
-
-      referralCode: userInfo.referralCode || '',
-      referredBy: null,
-      signupMethod: 'email',
-      loginType: 'email',
-      photoUrl: '',
-      
-      // 포인트 시스템 기본값
-      points: 3000, // 가입 시 기본 포인트
-      usage_count: 0,
-      
-      // 언어 및 토큰 (선택한 국가에 따라 언어 설정)
-      language: getLanguageByCountryCode(userInfo.countryCode),
-      fcmToken: '',
-      
-      // 동의 관련 (맵 형태로 저장)
-      consents: {
-        termsOfService: userInfo.consents.termsOfService,
-        personalInfo: userInfo.consents.personalInfo,
-        locationInfo: userInfo.consents.locationInfo,
-        marketing: userInfo.consents.marketing,
-        thirdParty: userInfo.consents.thirdParty
-      },
-      
-      // 타임스탬프들
-      createdAt: formatKoreanTimestamp(currentTime),
-      updatedAt: formatKoreanTimestamp(currentTime),
-      lastUpdated: formatKoreanTimestamp(currentTime),
-      lastLoginAt: formatKoreanTimestamp(currentTime),
-      tokenUpdatedAt: formatKoreanTimestamp(currentTime)
-    };
-
-    await setDoc(doc(db, 'users', user.uid), userData);
+    const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+    // API에서 반환된 사용자 데이터 사용
+    const userData = result.userData;
     
     // Firebase 회원가입 완료 후 localStorage 업데이트
     if (typeof window !== 'undefined') {
@@ -333,133 +245,6 @@ export const signOut = async (): Promise<void> => {
   }
 };
 
-// 소셜 로그인 사용자 회원가입 (정보 완성)
-export const createSocialUser = async (
-  userId: string,
-  email: string,
-  signupMethod: 'kakao' | 'google' | 'apple',
-  userInfo: {
-    name: string;
-    phoneNumber: string;
-    countryCode: string;
-    birthYear: string;
-    birthMonth: string;
-    birthDay: string;
-    gender: string;
-    referralCode?: string;
-    consents?: {
-      termsOfService: boolean;
-      personalInfo: boolean;
-      locationInfo: boolean;
-      marketing: boolean;
-      thirdParty: boolean;
-    };
-  }
-): Promise<UserData> => {
-  try {
-    console.log('🚀 createSocialUser 함수 시작:', { userId, email, signupMethod, userInfo });
-    
-    // 한국 시간대 기준 타임스탬프 포맷팅 함수
-    const formatKoreanTimestamp = (date: Date): string => {
-      const koreaTime = new Date(date.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
-      
-      const year = koreaTime.getFullYear();
-      const month = koreaTime.getMonth() + 1;
-      const day = koreaTime.getDate();
-      const hours = koreaTime.getHours();
-      const minutes = koreaTime.getMinutes();
-      const seconds = koreaTime.getSeconds();
-      
-      const period = hours < 12 ? '오전' : '오후';
-      const displayHours = hours === 0 ? 12 : (hours > 12 ? hours - 12 : hours);
-      
-      return `${year}년 ${month}월 ${day}일 ${period} ${displayHours}시 ${minutes}분 ${seconds}초 UTC+9`;
-    };
-
-    // 생년월일을 타임스탬프로 변환
-    const birthDate = new Date(
-      parseInt(userInfo.birthYear), 
-      parseInt(userInfo.birthMonth) - 1, 
-      parseInt(userInfo.birthDay)
-    );
-    
-    const currentTime = new Date();
-    
-    // 국가코드에 따른 언어 및 위치 설정
-    const getLanguageAndLocationByCountryCode = (countryCode: string): { language: string, location: string } => {
-      switch (countryCode) {
-        case '+82': return { language: 'ko', location: 'ko' };  // 한국
-        case '+1': return { language: 'en', location: 'en' };   // 미국
-        case '+84': return { language: 'vi', location: 'vi' };  // 베트남
-        case '+86': return { language: 'zh', location: 'zh' };  // 중국
-        case '+81': return { language: 'ja', location: 'ja' };  // 일본
-        case '+66': return { language: 'th', location: 'th' };  // 태국
-        case '+63': return { language: 'fil', location: 'fil' }; // 필리핀
-        default: return { language: 'en', location: 'en' };     // 기본값
-      }
-    };
-
-    const { language, location } = getLanguageAndLocationByCountryCode(userInfo.countryCode);
-
-    // Firestore에 사용자 정보 저장
-    const userData: UserData = {
-      id: userId,
-      name: userInfo.name,
-      email: email,
-      phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
-      birthDate: formatKoreanTimestamp(birthDate),
-      gender: userInfo.gender === 'male' ? '남성' : '여성',
-      location: location,
-
-      referralCode: userInfo.referralCode || '',
-      referredBy: null,
-      signupMethod: signupMethod,
-      loginType: signupMethod,
-      photoUrl: '',
-      
-      // 포인트 시스템 기본값
-      points: 3000, // 가입 시 기본 포인트
-      usage_count: 0,
-      
-      // 언어 및 토큰
-      language: language,
-      fcmToken: '',
-      
-      // 동의 관련 (실제 사용자 동의 정보 사용 - 이메일 회원가입과 동일)
-      consents: userInfo.consents || {
-        termsOfService: true,
-        personalInfo: true,
-        locationInfo: false,
-        marketing: false,
-        thirdParty: false
-      },
-      
-      // 타임스탬프들
-      createdAt: formatKoreanTimestamp(currentTime),
-      updatedAt: formatKoreanTimestamp(currentTime),
-      lastUpdated: formatKoreanTimestamp(currentTime),
-      lastLoginAt: formatKoreanTimestamp(currentTime),
-      tokenUpdatedAt: formatKoreanTimestamp(currentTime)
-    };
-
-    console.log('💾 Firestore 저장 시작 - users 컬렉션:', { userId, userData });
-    
-    await setDoc(doc(db, 'users', userId), userData);
-    
-    console.log('✅ 소셜 사용자 Firestore 저장 성공!');
-    console.log('📊 저장된 데이터:', userData);
-    return userData;
-  } catch (error: any) {
-    console.error('❌ createSocialUser 에러 발생:', error);
-    console.error('❌ 에러 세부사항:', {
-      message: error?.message || 'Unknown error',
-      code: error?.code || 'NO_CODE',
-      stack: error?.stack || 'No stack trace'
-    });
-    logError(error, 'createSocialUser');
-    throw new Error(`소셜 사용자 저장 실패: ${getErrorMessage(error)}`);
-  }
-};
 
 // 사용자 프로필 업데이트
 export const updateUserProfile = async (

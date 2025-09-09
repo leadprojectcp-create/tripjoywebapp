@@ -1,96 +1,6 @@
 {
-  "customerCenter": {
-    "ko": "고객센터",
-    "en": "Customer Center",
-    "vi": "Trung tâm khách hàng",
-    "zh": "客服中心",
-    "ja": "カスタマーセンター",
-    "th": "ศูนย์ลูกค้า",
-    "fil": "Customer Center"
-  },
-  "operatingHours": {
-    "ko": "고객센터 : 오전 9시 - 새벽 2시 운영",
-    "en": "Customer Center : 9 AM - 2 AM Operation",
-    "vi": "Trung tâm khách hàng : Hoạt động 9h - 2h sáng",
-    "zh": "客服中心 : 上午9点 - 凌晨2点运营",
-    "ja": "カスタマーセンター : 午前9時 - 午前2時運営",
-    "th": "ศูนย์ลูกค้า : เปิดบริการ 9.00 - 02.00 น.",
-    "fil": "Customer Center : 9 AM - 2 AM na operasyon"
-  },
-  "chatSupport": {
-    "ko": "채팅상담",
-    "en": "Chat Support",
-    "vi": "Hỗ trợ chat",
-    "zh": "在线客服",
-    "ja": "チャット相談",
-    "th": "สนทนาออนไลน์",
-    "fil": "Chat Support"
-  },
-  "service": {
-    "ko": "서비스",
-    "en": "Service",
-    "vi": "Dịch vụ",
-    "zh": "服务",
-    "ja": "サービス",
-    "th": "บริการ",
-    "fil": "Serbisyo"
-  },
-  "userGuide": {
-    "ko": "이용가이드",
-    "en": "User Guide",
-    "vi": "Hướng dẫn sử dụng",
-    "zh": "使用指南",
-    "ja": "利用ガイド",
-    "th": "คู่มือการใช้งาน",
-    "fil": "Gabay sa Paggamit"
-  },
-  "legal": {
-    "ko": "법적고지",
-    "en": "Legal Notice",
-    "vi": "Thông báo pháp lý",
-    "zh": "法律声明",
-    "ja": "法的告知",
-    "th": "ประกาศทางกฎหมาย",
-    "fil": "Legal na Pabatid"
-  },
-  "termsOfService": {
-    "ko": "이용약관",
-    "en": "Terms of Service",
-    "vi": "Điều khoản dịch vụ",
-    "zh": "服务条款",
-    "ja": "利用規約",
-    "th": "ข้อกำหนดการใช้งาน",
-    "fil": "Mga Tuntunin ng Serbisyo"
-  },
-  "privacyPolicy": {
-    "ko": "개인정보보호방침",
-    "en": "Privacy Policy",
-    "vi": "Chính sách bảo mật",
-    "zh": "隐私政策",
-    "ja": "プライバシーポリシー",
-    "th": "นโยบายความเป็นส่วนตัว",
-    "fil": "Patakaran sa Privacy"
-  },
-  "cookiePolicy": {
-    "ko": "쿠키정책",
-    "en": "Cookie Policy",
-    "vi": "Chính sách cookie",
-    "zh": "Cookie政策",
-    "ja": "Cookieポリシー",
-    "th": "นโยบายคุกกี้",
-    "fil": "Patakaran sa Cookie"
-  },
-  "disclaimer": {
-    "ko": "면책조항",
-    "en": "Disclaimer",
-    "vi": "Tuyên bố miễn trách",
-    "zh": "免责声明",
-    "ja": "免責事項",
-    "th": "ข้อจำกัดความรับผิดชอบ",
-    "fil": "Disclaimer"
-  },
   "downloadApp": {
-    "ko": "앱 다운로드",
+    "ko": "앱다운로드 바로가기",
     "en": "Download App",
     "vi": "Tải ứng dụng",
     "zh": "下载应用",
@@ -98,31 +8,76 @@
     "th": "ดาวน์โหลดแอป",
     "fil": "I-download ang App"
   },
-  "companyInfo": {
-    "ko": "(주)리드프로젝트 | CEO 박상준, CTO 백경훈, CDD 임정윤 | 서울시 동작구로 413-67-02826 | 통신판매업 신고번호 1234-서울용동-5678",
-    "en": "Lead Project Co., Ltd. | CEO Park Sangjun, CTO Baek Kyunghoon, CDD Lim Jungyoon | Seoul Dongjak-gu 413-67-02826 | Telecom Sales Business Report No. 1234-Seoul-5678",
-    "vi": "Công ty TNHH Lead Project | CEO Park Sangjun, CTO Baek Kyunghoon, CDD Lim Jungyoon | Seoul Dongjak-gu 413-67-02826 | Số báo cáo kinh doanh bán hàng viễn thông 1234-Seoul-5678",
-    "zh": "Lead Project有限公司 | CEO 朴相俊, CTO 白京勋, CDD 林正允 | 首尔东作区413-67-02826 | 通信销售业申报号1234-首尔-5678",
-    "ja": "株式会社リードプロジェクト | CEO パク・サンジュン, CTO ペク・キョンフン, CDD イム・ジョンユン | ソウル市銅雀区413-67-02826 | 通信販売業申告番号1234-ソウル-5678",
-    "th": "บริษัท Lead Project จำกัด | CEO Park Sangjun, CTO Baek Kyunghoon, CDD Lim Jungyoon | Seoul Dongjak-gu 413-67-02826 | หมายเลขรายงานธุรกิจขายโทรคมนาคม 1234-Seoul-5678",
-    "fil": "Lead Project Co., Ltd. | CEO Park Sangjun, CTO Baek Kyunghoon, CDD Lim Jungyoon | Seoul Dongjak-gu 413-67-02826 | Telecom Sales Business Report No. 1234-Seoul-5678"
+  "companyName": {
+    "ko": "(주)리프컴퍼니",
+    "en": "Leap Company Ltd.",
+    "vi": "Leap Company Ltd.",
+    "zh": "Leap Company Ltd.",
+    "ja": "Leap Company Ltd.",
+    "th": "Leap Company Ltd.",
+    "fil": "Leap Company Ltd."
   },
-  "businessInfo": {
-    "ko": "팩스번호정보 브랜드문의 제+2024-0000225(통합브랜드) | 서울특별시 광진구 어이놈로길 14-12[구리동, 대한컨버전룸]",
-    "en": "Brand Inquiry +2024-0000225 | 14-12 Guri-dong, Seoul Gwangjin-gu [Guri-dong, Daehan Convention Room]",
-    "vi": "Liên hệ thương hiệu +2024-0000225 | 14-12 Guri-dong, Seoul Gwangjin-gu [Guri-dong, Daehan Convention Room]",
-    "zh": "品牌咨询 +2024-0000225 | 首尔广津区九里洞14-12[九里洞，大韩会议室]",
-    "ja": "ブランドお問い合わせ +2024-0000225 | ソウル广津区九里洞14-12[九里洞、大韩コンベンションルーム]",
-    "th": "สอบถามแบรนด์ +2024-0000225 | 14-12 Guri-dong, Seoul Gwangjin-gu [Guri-dong, Daehan Convention Room]",
-    "fil": "Brand Inquiry +2024-0000225 | 14-12 Guri-dong, Seoul Gwangjin-gu [Guri-dong, Daehan Convention Room]"
+  "companyExecutives": {
+    "ko": "CEO 박상호, CTO 배철응, CDO 정윤우",
+    "en": "CEO Park Sangho, CTO Bae Cheoleung, CDO Jung Yunwoo",
+    "vi": "CEO Park Sangho, CTO Bae Cheoleung, CDO Jung Yunwoo",
+    "zh": "CEO 朴相浩, CTO 裴哲应, CDO 郑允宇",
+    "ja": "CEO パク・サンホ, CTO ペ・チョルウン, CDO チョン・ユンウ",
+    "th": "CEO Park Sangho, CTO Bae Cheoleung, CDO Jung Yunwoo",
+    "fil": "CEO Park Sangho, CTO Bae Cheoleung, CDO Jung Yunwoo"
   },
-  "representativeInfo": {
-    "ko": "(주)리드프로젝트는 통신판매중개자이며 통신판매의 당사자가 아니며 상품 거래정보 및 거래 등에 대해 책임을 지지 않습니다.",
-    "en": "Lead Project Co., Ltd. is a telecommunications sales intermediary and is not a party to telecommunications sales and is not responsible for product transaction information and transactions.",
-    "vi": "Lead Project Co., Ltd. là trung gian bán hàng viễn thông và không phải là bên tham gia bán hàng viễn thông và không chịu trách nhiệm về thông tin giao dịch sản phẩm và giao dịch.",
-    "zh": "Lead Project有限公司是通信销售中介，不是通信销售的当事方，对产品交易信息和交易等不承担责任。",
-    "ja": "株式会社リードプロジェクトは通信販売仲介業者であり、通信販売の当事者ではなく、商品取引情報及び取引等について責任を負いません。",
-    "th": "Lead Project Co., Ltd. เป็นตัวกลางในการขายโทรคมนาคมและไม่ใช่ผู้เกี่ยวข้องในการขายโทรคมนาคมและไม่รับผิดชอบต่อข้อมูลการทำธุรกรรมสินค้าและการทำธุรกรรม",
-    "fil": "Ang Lead Project Co., Ltd. ay isang telecommunications sales intermediary at hindi partido sa telecommunications sales at hindi responsable sa product transaction information at mga transaksyon."
+  "businessRegistrationNumber": {
+    "ko": "사업자 등록번호 413-87-02826",
+    "en": "Business Registration No. 413-87-02826",
+    "vi": "Số đăng ký kinh doanh 413-87-02826",
+    "zh": "营业执照号 413-87-02826",
+    "ja": "事業者登録番号 413-87-02826",
+    "th": "เลขทะเบียนธุรกิจ 413-87-02826",
+    "fil": "Business Registration No. 413-87-02826"
+  },
+  "telecommunicationsSalesNumber": {
+    "ko": "통신판매업 신고번호 2024-서울광진-1870",
+    "en": "Telecommunications Sales Report No. 2024-Seoul Gwangjin-1870",
+    "vi": "Số báo cáo bán hàng viễn thông 2024-Seoul Gwangjin-1870",
+    "zh": "通信销售业申报号 2024-首尔广津-1870",
+    "ja": "通信販売業申告番号 2024-ソウル広津-1870",
+    "th": "หมายเลขรายงานการขายโทรคมนาคม 2024-Seoul Gwangjin-1870",
+    "fil": "Telecommunications Sales Report No. 2024-Seoul Gwangjin-1870"
+  },
+  "tourismBusinessRegistration": {
+    "ko": "관광사업등록증 제 2024-000022호",
+    "en": "Tourism Business Registration No. 2024-000022",
+    "vi": "Giấy đăng ký kinh doanh du lịch số 2024-000022",
+    "zh": "旅游业务注册证第2024-000022号",
+    "ja": "観光事業登録証第2024-000022号",
+    "th": "ใบทะเบียนธุรกิจท่องเที่ยว เลขที่ 2024-000022",
+    "fil": "Tourism Business Registration No. 2024-000022"
+  },
+  "companyAddress": {
+    "ko": "서울특별시 광진구 아차산로62길 14-12(구의동, 대영트윈,투)",
+    "en": "14-12 Achasan-ro 62-gil, Gwangjin-gu, Seoul (Guui-dong, Daeyoung Twin Two)",
+    "vi": "14-12 Achasan-ro 62-gil, Gwangjin-gu, Seoul (Guui-dong, Daeyoung Twin Two)",
+    "zh": "首尔特别市广津区峨嵯山路62街14-12(九宜洞，大英双子二)",
+    "ja": "ソウル特別市広津区峨嵯山路62ギル14-12(九宜洞、大英ツイン2)",
+    "th": "14-12 Achasan-ro 62-gil, Gwangjin-gu, Seoul (Guui-dong, Daeyoung Twin Two)",
+    "fil": "14-12 Achasan-ro 62-gil, Gwangjin-gu, Seoul (Guui-dong, Daeyoung Twin Two)"
+  },
+  "companyDisclaimer": {
+    "ko": "(주)리프컴퍼니는 통신판매중개자로서 통신판매의 당사자가 아니며 상품 거래정보 및 거래 등에 대해 책임을 지지 않습니다.",
+    "en": "Leaf Company Ltd. is a telecommunications sales intermediary and is not a party to telecommunications sales and is not responsible for product transaction information and transactions.",
+    "vi": "Leaf Company Ltd. là trung gian bán hàng viễn thông và không phải là bên tham gia bán hàng viễn thông và không chịu trách nhiệm về thông tin giao dịch sản phẩm và giao dịch.",
+    "zh": "Leaf公司是通信销售中介，不是通信销售的当事方，对产品交易信息和交易等不承担责任。",
+    "ja": "株式会社リーフカンパニーは通信販売仲介業者であり、通信販売の当事者ではなく、商品取引情報及び取引等について責任を負いません。",
+    "th": "Leaf Company Ltd. เป็นตัวกลางในการขายโทรคมนาคมและไม่ใช่ผู้เกี่ยวข้องในการขายโทรคมนาคมและไม่รับผิดชอบต่อข้อมูลการทำธุรกรรมสินค้าและการทำธุรกรรม",
+    "fil": "Ang Leaf Company Ltd. ay isang telecommunications sales intermediary at hindi partido sa telecommunications sales at hindi responsable sa product transaction information at mga transaksyon."
+  },
+  "copyright": {
+    "ko": "© 2024 Trip Joy. All rights reserved.",
+    "en": "© 2024 Trip Joy. All rights reserved.",
+    "vi": "© 2024 Trip Joy. Tất cả quyền được bảo lưu.",
+    "zh": "© 2024 Trip Joy. 版权所有。",
+    "ja": "© 2024 Trip Joy. All rights reserved.",
+    "th": "© 2024 Trip Joy. สงวนลิขสิทธิ์.",
+    "fil": "© 2024 Trip Joy. Lahat ng karapatan ay nakalaan."
   }
 }

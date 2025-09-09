@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Sidebar } from '../../components/Sidebar';
+
 import { AppBar } from '../../components/AppBar';
 import { BottomNavigator } from '../../components/BottomNavigator';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { useUnreadMessageCount } from '../../hooks/useUnreadMessageCount';
-import { AuthGuard } from '../../components/AuthGuard';
+
 import { PostCard } from '../../components/PostCard';
 import { getPostById, PostData } from '../../services/postService';
 import { getUserById } from '../../auth/services/authService';
@@ -396,7 +396,7 @@ export default function PostDetailPage() {
   };
 
   return (
-    <AuthGuard>
+    
       <ClientStyleProvider>
         <div className={styles.container}>
           {/* Top AppBar */}
@@ -409,7 +409,7 @@ export default function PostDetailPage() {
           {/* Body Content */}
           <div className="body-content">
             {/* Left Sidebar */}
-            <Sidebar unreadMessageCount={unreadMessageCount} />
+            
 
             {/* Main Content */}
             <div className={styles.mainContent}>
@@ -689,6 +689,6 @@ export default function PostDetailPage() {
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
       </ClientStyleProvider>
-    </AuthGuard>
+    
   );
 }

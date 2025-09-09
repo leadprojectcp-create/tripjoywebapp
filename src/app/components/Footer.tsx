@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import './Footer.css';
@@ -8,12 +8,15 @@ import './Footer.css';
 export const Footer: React.FC = () => {
   const { t } = useTranslationContext();
   const pathname = usePathname();
+  const [isApp, setIsApp] = useState(false);
   
   // 채팅 페이지에서는 footer 숨기기
   const isChatPage = pathname?.startsWith('/chat');
   
-  // 앱에서 접속한 경우 감지 (React Native WebView)
-  const isApp = typeof window !== 'undefined' && (window as any).ReactNativeWebView;
+  // 클라이언트에서만 앱 환경 감지
+  useEffect(() => {
+    setIsApp(typeof window !== 'undefined' && !!(window as any).ReactNativeWebView);
+  }, []);
   
   if (isChatPage) {
     return null;
@@ -24,21 +27,22 @@ export const Footer: React.FC = () => {
       <div className="footer-content">
         <div className="footer-bottom">
           <div className="company-info">
-            <p>(주)리프컴퍼니</p>
-            <p>CEO 박상호, CTO 배철응, CDD 정윤우</p>
-            <p>사업자 등록번호 413-87-02826</p>
-            <p>통신판매업 신고번호 1234-서울강동-5678</p>
-            <p>서울특별시 광진구 아차산로62길 14-12(구의동, 대영트윈,투)</p>
-            <p>(주)리프컴퍼니는 통신판매중개자로서 통신판매의 당사자가 아니며 상품 거래정보 및 거래 등에 대해 책임을 지지 않습니다.</p>
+            <p>{t('companyName')}</p>
+            <p>{t('companyExecutives')}</p>
+            <p>{t('businessRegistrationNumber')}</p>
+            <p>{t('telecommunicationsSalesNumber')}</p>
+            <p>{t('tourismBusinessRegistration')}</p>
+            <p>{t('companyAddress')}</p>
+            <p>{t('companyDisclaimer')}</p>
             <div className="copyright">
-              <p>© 2024 Trip Joy. All rights reserved.</p>
+              <p>{t('copyright')}</p>
             </div>
           </div>
           
           {/* 앱에서 접속한 경우 앱다운로드 섹션 숨기기 */}
           {!isApp && (
             <div className="footer-column">
-              <h3 className="footer-title">앱다운로드 바로가기</h3>
+              <h3 className="footer-title">{t('downloadApp')}</h3>
               <div className="app-download-links">
                 <a href="#" className="app-link google-play" onClick={(e) => e.preventDefault()}>
                   <img src="/assets/store/google_btn.png" alt="Google Play" />

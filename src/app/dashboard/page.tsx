@@ -2,14 +2,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { PostCard } from "../components/PostCard";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
-import { AuthGuard } from "../components/AuthGuard";
 import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../services/firebase";
@@ -55,28 +53,8 @@ export default function Dashboard() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // 웹뷰 환경에서 로그인 상태 확인
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      // 웹뷰 환경 감지
-      const userAgent = window.navigator.userAgent;
-      const isWebView = /wv|WebView/i.test(userAgent) || (window as any).ReactNativeWebView;
-      
-      if (isWebView) {
-        // 네이티브 앱에 로그인 필요 메시지 전송
-        if ((window as any).ReactNativeWebView) {
-          (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'NEED_LOGIN'
-          }));
-        }
-        console.log('🔄 웹뷰 환경: 로그인 필요');
-      } else {
-        // 일반 브라우저 환경에서는 로그인 페이지로 리다이렉트
-        console.log('🔄 브라우저 환경: 로그인 페이지로 이동');
-        router.push('/auth/login');
-      }
-    }
-  }, [authLoading, isAuthenticated]);
+  // 로그인 상태와 관계없이 Dashboard는 접근 가능
+  // (게시물 읽기는 로그인 불필요)
 
   // 게시물 데이터 로드
   useEffect(() => {
@@ -170,22 +148,18 @@ export default function Dashboard() {
 
   return (
     <>
-      <AuthGuard>
-        <div className={styles['dashboard-container']}>
-          {/* Top AppBar */}
-          <AppBar 
-            showBackButton={false}
-            showLogo={true}
-            showLanguageSelector={true}
-          />
-          
-          {/* Body Content */}
-          <div className={styles['body-content']}>
-            {/* Left Sidebar */}
-            <Sidebar unreadMessageCount={unreadMessageCount} />
-
-            {/* Main Content */}
-            <div className={styles['main-content']}>
+      <div className={styles['dashboard-container']}>
+        {/* Top AppBar */}
+        <AppBar 
+          showBackButton={false}
+          showLogo={true}
+          showLanguageSelector={true}
+        />
+        
+        {/* Body Content */}
+        <div className={styles['body-content']}>
+          {/* Main Content */}
+          <div className={styles['main-content']}>
               {/* Top Section */}
               <div className={styles['top-section']}>
                 {/* 어디로 떠나세요? 텍스트 */}
@@ -290,8 +264,7 @@ export default function Dashboard() {
         
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
-        </div>
-      </AuthGuard>
+      </div>
     </>
   );
 }

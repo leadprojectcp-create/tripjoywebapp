@@ -9,7 +9,7 @@ import { AppBar } from "../../components/AppBar";
 import { signInWithKakao } from "../../services/kakaoAuthService";
 import { signInWithGoogle } from "../../services/googleAuthService";
 import { signInWithApple } from "../../services/appleAuthService";
-import { getRedirectResult } from "firebase/auth";
+import { getRedirectResult, signInWithCustomToken } from "firebase/auth";
 import { auth } from "../../services/firebase";
 
 export default function LoginPage(): React.JSX.Element {
@@ -82,7 +82,7 @@ export default function LoginPage(): React.JSX.Element {
     };
 
     // 웹뷰 메시지 처리
-    const handleWebViewMessage = (event: any) => {
+    const handleWebViewMessage = async (event: any) => {
       try {
         console.log('📱 웹뷰 메시지 수신 (원본):', event);
         console.log('📱 웹뷰 메시지 수신 (event.data):', event.data);
@@ -112,8 +112,26 @@ export default function LoginPage(): React.JSX.Element {
           window.location.href = data.url;
         } else if (data.type === 'KAKAO_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 카카오 로그인 성공:', data.user);
+          console.log('🔑 Custom Token:', data.customToken);
+          
+          // 웹앱의 Firebase Auth에도 Custom Token으로 로그인
+          if (data.customToken) {
+            try {
+              await signInWithCustomToken(auth, data.customToken);
+              console.log('✅ 웹앱 Firebase 로그인 완료');
+              
+              // 신규 사용자면 localStorage에 플래그 설정 (웹앱 플로우와 동일)
+              if (data.user.isNewUser) {
+                localStorage.setItem('kakao_new_user', 'true');
+                console.log('🆕 신규 사용자 플래그 설정 - useAuth에서 회원가입 플로우로 이동');
+              }
+            } catch (error) {
+              console.error('❌ 웹앱 Firebase 로그인 실패:', error);
+            }
+          }
+          
           setIsLoading(false);
-          handleNativeLoginSuccess(data.user);
+          handleNativeLoginSuccess(data.user, 'kakao');
         } else if (data.type === 'KAKAO_LOGIN_FAILED') {
           console.error('❌ 네이티브 카카오 로그인 실패:', data.error);
           setError('카카오 로그인에 실패했습니다.');
@@ -123,16 +141,34 @@ export default function LoginPage(): React.JSX.Element {
           handleSocialLogin('kakao');
         } else if (data.type === 'GOOGLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 구글 로그인 성공:', data.user);
+          
+          // 신규 사용자면 localStorage에 플래그 설정
+          if (data.user.isNewUser) {
+            localStorage.setItem('google_new_user', 'true');
+            console.log('🆕 구글 신규 사용자 플래그 설정');
+          }
+          
+          // Firebase Auth 상태 동기화를 위해 임시 로그인 처리는 건너뜀
+          // useAuth에서 Firebase Auth 상태 변경을 감지하여 처리
           setIsLoading(false);
-          handleNativeLoginSuccess(data.user);
+          handleNativeLoginSuccess(data.user, 'google');
         } else if (data.type === 'GOOGLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 구글 로그인 실패:', data.error);
           setError('구글 로그인에 실패했습니다.');
           setIsLoading(false);
         } else if (data.type === 'APPLE_LOGIN_SUCCESS') {
           console.log('✅ 네이티브 애플 로그인 성공:', data.user);
+          
+          // 신규 사용자면 localStorage에 플래그 설정
+          if (data.user.isNewUser) {
+            localStorage.setItem('apple_new_user', 'true');
+            console.log('🆕 애플 신규 사용자 플래그 설정');
+          }
+          
+          // Firebase Auth 상태 동기화를 위해 임시 로그인 처리는 건너뜀
+          // useAuth에서 Firebase Auth 상태 변경을 감지하여 처리
           setIsLoading(false);
-          handleNativeLoginSuccess(data.user);
+          handleNativeLoginSuccess(data.user, 'apple');
         } else if (data.type === 'APPLE_LOGIN_FAILED') {
           console.error('❌ 네이티브 애플 로그인 실패:', data.error);
           setError('애플 로그인에 실패했습니다.');
@@ -144,39 +180,32 @@ export default function LoginPage(): React.JSX.Element {
       }
     };
 
-    // Deep Link 처리 함수
+    // Deep Link 처리 함수 (제거됨 - postMessage 방식 사용)
     const handleDeepLink = () => {
-      const currentUrl = window.location.href;
-      console.log('🔍 현재 URL 체크:', currentUrl);
-      
-      if (currentUrl.includes('tripjoy://login-success')) {
-        try {
-          const url = new URL(currentUrl);
-          const data = JSON.parse(decodeURIComponent(url.searchParams.get('data') || '{}'));
-          
-          console.log('🔗 Deep Link로 로그인 성공 수신:', data);
-          
-          if (data.type && data.type.includes('_LOGIN_SUCCESS')) {
-            setIsLoading(false);
-            handleNativeLoginSuccess(data.user);
-            return true;
-          }
-        } catch (error) {
-          console.error('❌ Deep Link 처리 실패:', error);
-        }
-      }
       return false;
     };
 
     // 네이티브 로그인 성공 처리
-    const handleNativeLoginSuccess = (user: any) => {
+    const handleNativeLoginSuccess = (user: any, provider?: string) => {
       console.log('🎉 네이티브 로그인 성공 처리:', user);
       
       if (user.isNewUser) {
         // 첫 로그인 (회원가입) - 약관 동의 + 추가 정보 입력
         console.log('🆕 신규 사용자 - 회원가입 플로우');
-        console.log('🔄 window.location.href = /auth/signup 실행');
-        window.location.href = '/auth/signup';
+        
+        // provider가 있으면 소셜 로그인, 없으면 이메일
+        const method = provider || 'email';
+        
+        if (method === 'email') {
+          // 이메일은 이메일 입력 페이지로
+          console.log('🔄 이메일 입력 페이지로 이동');
+          window.location.href = '/auth/email';
+        } else {
+          // 소셜은 바로 약관 동의 페이지로
+          const termsUrl = `/auth/terms?method=${method}&uid=${user.uid}`;
+          console.log('🔄 약관 동의 페이지로 이동:', termsUrl);
+          window.location.href = termsUrl;
+        }
       } else {
         // 기존 사용자 - 바로 홈으로
         console.log('👤 기존 사용자 - 홈으로 이동');
@@ -230,7 +259,7 @@ export default function LoginPage(): React.JSX.Element {
   };
 
   const handleSignupClick = () => {
-    router.push("/auth/signup");
+    router.push("/auth/email");
   };
 
   const handleSocialLogin = async (method: 'kakao' | 'google' | 'apple') => {

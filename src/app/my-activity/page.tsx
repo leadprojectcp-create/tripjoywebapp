@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sidebar } from "../components/Sidebar";
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
@@ -221,7 +220,6 @@ export default function MyActivity() {
           {/* Body Content */}
           <div className="body-content">
             {/* Left Sidebar */}
-            <Sidebar />
 
             {/* Main Content */}
             <div className="my-activity-main-content">

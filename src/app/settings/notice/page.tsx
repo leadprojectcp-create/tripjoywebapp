@@ -11,8 +11,8 @@ import {
   getImportanceIcon
 } from '../../services/noticeService';
 import { AppBar } from '../../components/AppBar';
-import { Sidebar } from '../../components/Sidebar';
-import { AuthGuard } from '../../components/AuthGuard';
+
+
 import './style.css';
 
 export default function NoticePage() {
@@ -60,11 +60,11 @@ export default function NoticePage() {
   };
 
   return (
-    <AuthGuard>
+    
       <div className="notice-page">
         <AppBar />
         <div className="body-content">
-          <Sidebar />
+          
           <div className="notice-main-content">
             <div className="notice-content">
               <div className="notice-header">
@@ -170,6 +170,6 @@ export default function NoticePage() {
           </div>
         </div>
       </div>
-    </AuthGuard>
+    
   );
 }

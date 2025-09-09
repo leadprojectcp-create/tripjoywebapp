@@ -102,13 +102,13 @@
     "ko": "고객센터",
     "en": "Customer Service",
     "vi": "Dịch vụ khách hàng",
-    "zh": "客服中心",
+    "zh": "客服중심",
     "ja": "カスタマーサービス",
     "th": "บริการลูกค้า",
     "fil": "Serbisyo sa Customer"
   },
   "faq": {
-    "ko": "FAQ",
+    "ko": "자주 묻는 질문",
     "en": "FAQ",
     "vi": "Câu hỏi thường gặp",
     "zh": "常见问题",
@@ -126,7 +126,7 @@
     "fil": "Pabatid"
   },
   "version": {
-    "ko": "버전",
+    "ko": "버전 정보",
     "en": "Version",
     "vi": "Phiên bản",
     "zh": "版本",
@@ -135,12 +135,21 @@
     "fil": "Bersyon"
   },
   "deleteAccount": {
-    "ko": "회원탈퇴",
+    "ko": "계정 삭제",
     "en": "Delete Account",
     "vi": "Xóa tài khoản",
     "zh": "删除账户",
     "ja": "アカウント削除",
     "th": "ลบบัญชี",
     "fil": "Tanggalin ang Account"
+  },
+  "menu": {
+    "ko": "메뉴",
+    "en": "Menu",
+    "vi": "Menu",
+    "zh": "菜单",
+    "ja": "メニュー",
+    "th": "เมนู",
+    "fil": "Menu"
   }
 }

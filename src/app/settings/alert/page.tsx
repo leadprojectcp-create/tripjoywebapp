@@ -5,8 +5,8 @@ import { useTranslationContext } from '../../contexts/TranslationContext';
 import { useAuth } from '../../hooks/useAuth';
 import { getMyPostAlerts, AlertItem, formatAlertTime } from '../../services/alertService';
 import { AppBar } from '../../components/AppBar';
-import { Sidebar } from '../../components/Sidebar';
-import { AuthGuard } from '../../components/AuthGuard';
+
+
 import './style.css';
 
 export default function AlertPage() {
@@ -44,11 +44,11 @@ export default function AlertPage() {
   };
 
   return (
-    <AuthGuard>
+    
       <div className="alert-page">
         <AppBar />
         <div className="body-content">
-          <Sidebar />
+          
           <div className="alert-main-content">
             <div className="alert-content">
               <div className="alert-header">
@@ -101,6 +101,6 @@ export default function AlertPage() {
           </div>
         </div>
       </div>
-    </AuthGuard>
+    
   );
 }

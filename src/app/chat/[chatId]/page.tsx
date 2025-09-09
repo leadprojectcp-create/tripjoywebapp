@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Sidebar } from '../../components/Sidebar';
+
 import { AppBar } from '../../components/AppBar';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
@@ -302,7 +302,7 @@ const ChatRoomPage: React.FC = () => {
         <div className="chat-room-page">
           <AppBar />
           <div className="chat-room-main-layout">
-            <Sidebar />
+            
             <div className="chat-room-main-content">
               <div className="chat-room-loading">
                 <div className="chat-loading-spinner">💬</div>
@@ -320,7 +320,7 @@ const ChatRoomPage: React.FC = () => {
       <div className="chat-room-page">
         <AppBar />
         <div className="chat-room-main-layout">
-          <Sidebar />
+          
           <div className="chat-room-main-content">
       {/* 채팅방 헤더 */}
       <div className="chat-room-header">

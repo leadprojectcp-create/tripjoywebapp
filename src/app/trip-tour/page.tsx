@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Sidebar } from "../components/Sidebar";
+
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
-import { AuthGuard } from "../components/AuthGuard";
 
 import './style.css';
 
@@ -23,8 +22,7 @@ export default function TripTourPage() {
 
   return (
     <>
-      <AuthGuard>
-        <div className="trip-tour-container">
+      <div className="trip-tour-container">
           {/* Top AppBar */}
           <AppBar 
             showBackButton={false}
@@ -35,7 +33,7 @@ export default function TripTourPage() {
           {/* Body Content */}
           <div className="body-content">
             {/* Left Sidebar */}
-            <Sidebar unreadMessageCount={unreadMessageCount} />
+            
 
             {/* Main Content */}
             <div className="main-content">
@@ -55,13 +53,10 @@ export default function TripTourPage() {
 
             {/* Right Sidebar */}
           </div>
-        </div>
         
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
-      </AuthGuard>
-      
-
+      </div>
     </>
   );
 }

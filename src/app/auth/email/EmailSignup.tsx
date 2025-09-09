@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import "./EmailSignup.css";
 import { AppBar } from "../../components/AppBar";
 import { useTranslationContext } from "../../contexts/TranslationContext";
 
 interface EmailSignupProps {
-  onNext: (email: string, password: string) => void;
-  onBack: () => void;
+  onNext?: (email: string, password: string) => void;
+  onBack?: () => void;
 }
 
 export const EmailSignup = ({ onNext, onBack }: EmailSignupProps): React.JSX.Element => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -52,7 +54,15 @@ export const EmailSignup = ({ onNext, onBack }: EmailSignupProps): React.JSX.Ele
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onNext(email, password);
+      if (onNext) {
+        // 외부에서 onNext가 전달된 경우
+        onNext(email, password);
+      } else {
+        // 독립적으로 사용되는 경우 내부 로직 처리
+        localStorage.setItem('email_signup_data', JSON.stringify({ email, password }));
+        localStorage.setItem('email_new_user', 'true');
+        router.push('/auth/terms?method=email');
+      }
     }
   };
 
@@ -86,6 +96,14 @@ export const EmailSignup = ({ onNext, onBack }: EmailSignupProps): React.JSX.Ele
         delete newErrors.confirmPassword;
         return newErrors;
       });
+    }
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      router.push('/auth/login');
     }
   };
 

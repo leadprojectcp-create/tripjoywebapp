@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Sidebar } from '../components/Sidebar';
+
 import { AppBar } from '../components/AppBar';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useTranslationContext } from '../contexts/TranslationContext';
@@ -851,7 +851,7 @@ const ChatPage: React.FC = () => {
       <div className="chat-page">
         <AppBar />
         <div className="chat-main-layout">
-          <Sidebar />
+          
           <div className="chat-main-content">
             <Suspense fallback={
               <div className="chat-loading">

@@ -10,7 +10,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { AuthGuard } from '../components/AuthGuard';
 import { AppBar } from '../components/AppBar';
-import { Sidebar } from '../components/Sidebar';
+
 import GoogleMapsLocationPicker, { LocationDetails } from '../components/GoogleMapsLocationPicker';
 import CountryAndCitySelector from '../components/CountryAndCitySelector';
 import styles from './page.module.css';
@@ -365,7 +365,7 @@ const PostUploadContent: React.FC = () => {
         <AppBar />
         
         <div className={styles['post-upload-body-content']}>
-          <Sidebar />
+          
           
           <div className={styles['post-upload-main-content']}>
             <form onSubmit={handleSubmit} className={styles['post-upload-form']}>

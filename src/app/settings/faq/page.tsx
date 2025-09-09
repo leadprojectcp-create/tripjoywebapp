@@ -11,8 +11,8 @@ import {
   getCategoryKey
 } from '../../services/faqService';
 import { AppBar } from '../../components/AppBar';
-import { Sidebar } from '../../components/Sidebar';
-import { AuthGuard } from '../../components/AuthGuard';
+
+
 import './style.css';
 
 export default function FAQPage() {
@@ -76,11 +76,11 @@ export default function FAQPage() {
   };
 
   return (
-    <AuthGuard>
+    
       <div className="faq-page">
         <AppBar />
         <div className="body-content">
-          <Sidebar />
+          
           <div className="faq-main-content">
             <div className="faq-content">
               <div className="faq-header">
@@ -227,6 +227,6 @@ export default function FAQPage() {
           </div>
         </div>
       </div>
-    </AuthGuard>
+    
   );
 }

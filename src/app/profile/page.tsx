@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import { Sidebar } from "../components/Sidebar";
+
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
@@ -464,7 +464,7 @@ function ProfileContent() {
             showLanguageSelector={true}
           />
           <div className="body-content">
-            <Sidebar unreadMessageCount={unreadMessageCount} />
+            
             <div className={styles.profileMainContent}>
               <div className={styles.profileLoading}>
                 <div className={styles.profileLoadingSpinner}>로딩 중...</div>
@@ -492,7 +492,7 @@ function ProfileContent() {
             {/* Body Content */}
             <div className="body-content">
               {/* Left Sidebar */}
-              <Sidebar unreadMessageCount={unreadMessageCount} />
+              
 
               {/* Main Content */}
               <div className={styles.profileMainContent}>

@@ -70,8 +70,8 @@ export const signInWithApple = async (): Promise<AppleAuthResult> => {
       
       console.log('✅ 애플 로그인 성공:', user);
       
-      // 사용자 정보를 Firestore에 저장/업데이트 및 새 사용자 확인
-      const isNewUser = await saveAppleUserToFirestore(user);
+      // API를 통해 사용자 정보를 Firestore에 저장/업데이트 및 새 사용자 확인
+      const isNewUser = await saveAppleUserViaAPI(user);
       
       console.log('✅ 애플 로그인 완료');
       return {
@@ -108,36 +108,57 @@ export const signInWithApple = async (): Promise<AppleAuthResult> => {
 };
 
 /**
- * 애플 사용자 정보를 Firestore에 저장 및 새 사용자 확인
+ * API를 통해 애플 사용자 정보를 Firestore에 저장 및 새 사용자 확인
  */
-export const saveAppleUserToFirestore = async (user: User): Promise<boolean> => {
+export const saveAppleUserViaAPI = async (user: User): Promise<boolean> => {
   try {
-    const userRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userRef);
+    console.log('📤 애플 사용자 API 저장 호출:', { uid: user.uid, email: user.email, displayName: user.displayName });
     
-    const isNewUser = !userDoc.exists();
+    // 먼저 사용자 존재 확인
+    const checkResponse = await fetch('/api/auth/user-management', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'check-user', uid: user.uid })
+    });
     
-    // Firebase에서 제공하는 사용자 정보 사용
-    const userData = {
-      uid: user.uid,
-      email: user.email,
-      name: user.displayName || '애플 사용자',
-      photoUrl: user.photoURL,
-      provider: 'apple',
-      providerId: user.providerId,
-      createdAt: userDoc.exists() ? userDoc.data().createdAt : serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      lastLoginAt: serverTimestamp(),
-      isActive: true
-    };
+    if (!checkResponse.ok) {
+      console.error('❌ 사용자 확인 API 실패:', checkResponse.status);
+      return true; // 에러 시 신규 사용자로 처리
+    }
     
-    await setDoc(userRef, userData, { merge: true });
-    console.log('✅ 애플 사용자 정보 Firestore 저장 완료');
+    const checkResult = await checkResponse.json();
+    const isNewUser = !checkResult.exists;
+    
+    // 신규 사용자인 경우에만 API로 생성
+    if (isNewUser) {
+      console.log('🆕 신규 애플 사용자 - API로 생성');
+      const createResponse = await fetch('/api/auth/user-management', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'create-social-user',
+          uid: user.uid, 
+          email: user.email, 
+          displayName: user.displayName, 
+          signupMethod: 'apple' 
+        })
+      });
+      
+      if (!createResponse.ok) {
+        console.error('❌ 애플 사용자 생성 API 실패:', createResponse.status);
+        return true; // 에러 시 신규 사용자로 처리
+      }
+      
+      const createResult = await createResponse.json();
+      console.log('✅ 애플 사용자 API 생성 성공:', createResult);
+    } else {
+      console.log('👤 기존 애플 사용자');
+    }
     
     return isNewUser;
     
   } catch (error) {
-    console.error('❌ 애플 사용자 정보 저장 실패:', error);
+    console.error('❌ 애플 사용자 API 저장 실패:', error);
     // 에러가 발생해도 로그인은 성공으로 처리하되, 새 사용자로 간주
     return true;
   }
