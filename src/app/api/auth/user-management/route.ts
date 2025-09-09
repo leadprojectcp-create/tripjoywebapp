@@ -3,31 +3,37 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// Firebase Admin SDK 초기화
-if (!getApps().length) {
-  try {
-    console.log('🔄 Firebase Admin SDK 초기화 시작...');
-    
-    // 환경 변수에서 서비스 계정 키 가져오기
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
-    
-    if (!serviceAccount.project_id) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY 환경 변수가 설정되지 않았습니다.');
-    }
-    
-    initializeApp({
-      credential: cert(serviceAccount),
-      projectId: serviceAccount.project_id,
-    });
-    
-    console.log('✅ Firebase Admin SDK 초기화 완료');
-  } catch (error) {
-    console.error('❌ Firebase Admin SDK 초기화 실패:', error);
-  }
-}
+// Firebase Admin SDK 초기화 (런타임에만)
+let adminAuth: any;
+let adminDb: any;
 
-const adminAuth = getAuth();
-const adminDb = getFirestore();
+const initializeFirebaseAdmin = () => {
+  if (!getApps().length) {
+    try {
+      console.log('🔄 Firebase Admin SDK 초기화 시작...');
+      
+      // 환경 변수에서 서비스 계정 키 가져오기
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
+      
+      if (!serviceAccount.project_id) {
+        throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY 환경 변수가 설정되지 않았습니다.');
+      }
+      
+      initializeApp({
+        credential: cert(serviceAccount),
+        projectId: serviceAccount.project_id,
+      });
+      
+      console.log('✅ Firebase Admin SDK 초기화 완료');
+    } catch (error) {
+      console.error('❌ Firebase Admin SDK 초기화 실패:', error);
+      throw error;
+    }
+  }
+  
+  adminAuth = getAuth();
+  adminDb = getFirestore();
+};
 
 /**
  * 통합 사용자 관리 API
@@ -40,6 +46,9 @@ const adminDb = getFirestore();
 
 export async function POST(request: NextRequest) {
   try {
+    // Firebase Admin SDK 초기화
+    initializeFirebaseAdmin();
+    
     const body = await request.json();
     const { action } = body;
     
