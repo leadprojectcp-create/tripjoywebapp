@@ -359,22 +359,52 @@ async function updateUserInfo(body: any) {
   try {
     console.log('🔄 사용자 정보 업데이트:', { uid, userInfo });
     
+    // 필수 필드 검증
+    if (!uid) {
+      throw new Error('UID가 필요합니다.');
+    }
+    
+    if (!userInfo) {
+      throw new Error('사용자 정보가 필요합니다.');
+    }
+    
+    // 생년월일 검증
+    if (!userInfo.birthYear || !userInfo.birthMonth || !userInfo.birthDay) {
+      throw new Error('생년월일이 필요합니다.');
+    }
+    
     const currentTime = new Date();
     
-    // 생년월일을 타임스탬프로 변환
-    const birthDate = new Date(
-      parseInt(userInfo.birthYear), 
-      parseInt(userInfo.birthMonth) - 1, 
-      parseInt(userInfo.birthDay)
-    );
+    // 생년월일을 타임스탬프로 변환 (유효성 검증 포함)
+    const birthYear = parseInt(userInfo.birthYear);
+    const birthMonth = parseInt(userInfo.birthMonth);
+    const birthDay = parseInt(userInfo.birthDay);
+    
+    if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) {
+      throw new Error('유효하지 않은 생년월일입니다.');
+    }
+    
+    if (birthYear < 1900 || birthYear > new Date().getFullYear()) {
+      throw new Error('유효하지 않은 출생년도입니다.');
+    }
+    
+    if (birthMonth < 1 || birthMonth > 12) {
+      throw new Error('유효하지 않은 출생월입니다.');
+    }
+    
+    if (birthDay < 1 || birthDay > 31) {
+      throw new Error('유효하지 않은 출생일입니다.');
+    }
+    
+    const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
     
     // 국가코드에 따른 언어 및 위치 설정 (기존 방식)
     const { language, location } = getLanguageAndLocationByCountryCode(userInfo.countryCode);
     
     // 업데이트할 데이터
     const updateData = {
-      name: userInfo.name,
-      phoneNumber: userInfo.countryCode + userInfo.phoneNumber,
+      name: userInfo.name || '',
+      phoneNumber: (userInfo.countryCode || '') + (userInfo.phoneNumber || ''),
       birthDate: formatKoreanTimestamp(birthDate),
       gender: userInfo.gender === 'male' ? '남성' : '여성',
       location: location, // 기존 방식 적용
@@ -382,11 +412,11 @@ async function updateUserInfo(body: any) {
       
       // 약관 동의 정보
       consents: {
-        termsOfService: userInfo.consents.termsOfService,
-        personalInfo: userInfo.consents.personalInfo,
-        locationInfo: userInfo.consents.locationInfo,
-        marketing: userInfo.consents.marketing,
-        thirdParty: userInfo.consents.thirdParty
+        termsOfService: userInfo.consents?.termsOfService || false,
+        personalInfo: userInfo.consents?.personalInfo || false,
+        locationInfo: userInfo.consents?.locationInfo || false,
+        marketing: userInfo.consents?.marketing || false,
+        thirdParty: userInfo.consents?.thirdParty || false
       },
       
       // 임시 사용자 플래그 제거
@@ -397,8 +427,20 @@ async function updateUserInfo(body: any) {
       lastUpdated: formatKoreanTimestamp(currentTime)
     };
     
-    // Firestore 업데이트
-    await adminDb.collection('users').doc(uid).update(updateData);
+    console.log('📝 업데이트할 데이터:', updateData);
+    
+    // 사용자 문서가 존재하는지 확인
+    const userDoc = await adminDb.collection('users').doc(uid).get();
+    
+    if (!userDoc.exists) {
+      console.log('⚠️ 사용자 문서가 존재하지 않습니다. 새로 생성합니다.');
+      // 문서가 없으면 새로 생성 (merge: true로 기존 데이터 보존)
+      await adminDb.collection('users').doc(uid).set(updateData, { merge: true });
+    } else {
+      console.log('✅ 사용자 문서가 존재합니다. 업데이트합니다.');
+      // 문서가 있으면 업데이트
+      await adminDb.collection('users').doc(uid).update(updateData);
+    }
     
     // 업데이트된 사용자 정보 가져오기
     const updatedUserDoc = await adminDb.collection('users').doc(uid).get();
@@ -411,10 +453,10 @@ async function updateUserInfo(body: any) {
       userData: updatedUserData
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ 사용자 정보 업데이트 실패:', error);
     return NextResponse.json(
-      { success: false, error: '사용자 정보 업데이트에 실패했습니다.' },
+      { success: false, error: error.message || '사용자 정보 업데이트에 실패했습니다.' },
       { status: 500 }
     );
   }

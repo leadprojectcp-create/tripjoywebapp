@@ -86,29 +86,82 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = ({
     } else {
       // 독립적으로 작동하는 경우 - API 호출 후 홈으로 이동
       try {
-        console.log('📝 사용자 정보 업데이트 시작:', userInfo);
+        console.log('📝 사용자 정보 업데이트 시작:', { method, uid, userInfo });
         
-        const response = await fetch('/api/auth/user-management', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'update-user-info',
-            uid: uid,
-            method: method,
-            userInfo: userInfo
-          })
-        });
+        if (method === 'email') {
+          // 이메일 회원가입의 경우 - 사용자 생성
+          const emailData = localStorage.getItem('email_signup_data');
+          if (!emailData) {
+            throw new Error('이메일 회원가입 데이터를 찾을 수 없습니다.');
+          }
+          
+          const { email, password } = JSON.parse(emailData);
+          const consents = JSON.parse(localStorage.getItem('user_consents') || '{}');
+          
+          const response = await fetch('/api/auth/user-management', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create-email-user',
+              email: email,
+              password: password,
+              userInfo: {
+                ...userInfo,
+                consents: consents
+              }
+            })
+          });
 
-        if (!response.ok) {
-          throw new Error('사용자 정보 업데이트 실패');
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || '회원가입에 실패했습니다.');
+          }
+
+          const result = await response.json();
+          console.log('✅ 이메일 회원가입 완료:', result);
+          
+          // localStorage 정리
+          localStorage.removeItem('email_signup_data');
+          localStorage.removeItem('user_consents');
+          localStorage.removeItem('email_new_user');
+          
+          // Firebase Auth 로그인
+          const { signInWithEmailAndPassword } = await import('firebase/auth');
+          const { auth } = await import('../../services/firebase');
+          
+          await signInWithEmailAndPassword(auth, email, password);
+          
+          // 사용자 데이터 저장
+          localStorage.setItem('tripjoy_user', JSON.stringify(result.userData));
+          
+        } else {
+          // 소셜 로그인의 경우 - 사용자 정보 업데이트
+          if (!uid) {
+            throw new Error('사용자 ID가 필요합니다.');
+          }
+          
+          const response = await fetch('/api/auth/user-management', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'update-user-info',
+              uid: uid,
+              method: method,
+              userInfo: userInfo
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('사용자 정보 업데이트 실패');
+          }
         }
 
-        console.log('✅ 사용자 정보 업데이트 완료');
+        console.log('✅ 사용자 정보 처리 완료');
         
         // 홈으로 이동
         window.location.href = '/';
       } catch (error) {
-        console.error('❌ 사용자 정보 업데이트 오류:', error);
+        console.error('❌ 사용자 정보 처리 오류:', error);
         alert('사용자 정보 저장에 실패했습니다. 다시 시도해주세요.');
       }
     }
