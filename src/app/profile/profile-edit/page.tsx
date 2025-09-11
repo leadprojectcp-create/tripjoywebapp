@@ -205,7 +205,7 @@ function ProfileEditContent() {
             <AppBar 
               showBackButton={false}
               showLogo={true}
-              showLanguageSelector={true}
+              
             />
             
             {/* Body Content */}

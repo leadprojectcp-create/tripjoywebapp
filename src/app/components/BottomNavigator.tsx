@@ -100,16 +100,44 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
 const TripTourIcon = ({ isActive }: { isActive: boolean }) => {
   if (isActive) {
     return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff6b35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
+      <Image 
+        src="/icons/triptour_active.svg" 
+        alt="Trip Tour Active" 
+        width={28} 
+        height={28}
+      />
     );
   }
   
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <Image 
+      src="/icons/triptour.svg" 
+      alt="Trip Tour" 
+      width={28} 
+      height={28}
+    />
+  );
+};
+
+const ChatIcon = ({ isActive }: { isActive: boolean }) => {
+  if (isActive) {
+    return (
+      <Image 
+        src="/icons/message_active.svg" 
+        alt="Chat Active" 
+        width={28} 
+        height={28}
+      />
+    );
+  }
+  
+  return (
+    <Image 
+      src="/icons/message.svg" 
+      alt="Chat" 
+      width={28} 
+      height={28}
+    />
   );
 };
 
@@ -147,6 +175,13 @@ export const BottomNavigator = (): React.JSX.Element => {
           <TripTourIcon isActive={isActive('/trip-tour')} />
         </div>
         <span>트립투어</span>
+      </Link>
+      
+      <Link href="/chat" className={`nav-item ${isActive('/chat') ? 'active' : ''}`}>
+        <div className="nav-icon">
+          <ChatIcon isActive={isActive('/chat')} />
+        </div>
+        <span>{t('chat')}</span>
       </Link>
       
       <Link href="/profile" className={`nav-item ${isActive('/profile') ? 'active' : ''}`}>

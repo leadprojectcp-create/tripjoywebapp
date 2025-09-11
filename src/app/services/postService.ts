@@ -17,7 +17,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { uploadMultipleImages, UploadedImage, deleteImageFromImageKit, deleteFolderFromImageKit } from './imageKitService';
+import { uploadMultipleImages, uploadVideoToImageKit, UploadedImage, deleteImageFromImageKit, deleteFolderFromImageKit } from './imageKitService';
 import { LocationDetails } from '../components/GoogleMapsLocationPicker';
 
 export interface PostData {
@@ -25,6 +25,7 @@ export interface PostData {
   userId: string;
   content: string;
   images: UploadedImage[];
+  video?: UploadedImage | null; // 동영상 파일 (ImageKit 업로드된 형태)
   // 🚀 imageUrls 제거 - images에서 동적으로 URL 추출
   location?: {
     name: string;
@@ -34,14 +35,12 @@ export interface PostData {
       lng: number;
     };
     placeId: string;
-    description?: string; // 사용자가 작성한 장소 설명
     // 🆕 API 기반 지역 정보 추가
     city?: string;        // 도시 코드 (예: "HAN", "SEL")
     nationality?: string; // 국가 코드 (예: "VN", "KR")
     cityName?: string;    // 전체 도시명 (예: "Hanoi", "Seoul")
     countryName?: string; // 전체 국가명 (예: "Vietnam", "South Korea")
   };
-  hashtags: string[];
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
@@ -68,9 +67,8 @@ export const createPost = async (
   content: string,
   imageFiles: File[],
   locationDetails: LocationDetails | null,
-  locationDescription: string,
-  hashtags: string,
   countryCityInfo?: CountryCityInfo,
+  videoFile?: File | null,
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   try {
@@ -91,20 +89,39 @@ export const createPost = async (
         imageFiles, 
         tempPostId,
         (imageProgress) => {
-          // 이미지 업로드는 전체의 80%를 차지
-          onProgress?.(imageProgress * 0.8);
+          // 이미지 업로드는 전체의 60%를 차지
+          onProgress?.(imageProgress * 0.6);
         }
       );
     }
 
-    // 4. 이미지 업로드 완료 후 진행률 업데이트
+    // 4. 동영상 업로드 (ImageKit)
+    let uploadedVideo: UploadedImage | null = null;
+    
+    if (videoFile) {
+      console.log('🎥 동영상 업로드 중...', {
+        fileName: videoFile.name,
+        fileSize: videoFile.size,
+        fileType: videoFile.type,
+        postId: tempPostId
+      });
+      onProgress?.(60);
+      uploadedVideo = await uploadVideoToImageKit(videoFile, tempPostId);
+      console.log('✅ 동영상 업로드 완료:', {
+        url: uploadedVideo.url,
+        id: uploadedVideo.id,
+        size: uploadedVideo.size,
+        width: uploadedVideo.width,
+        height: uploadedVideo.height
+      });
+    } else {
+      console.log('📹 동영상 파일이 없습니다.');
+    }
+
+    // 5. 업로드 완료 후 진행률 업데이트
     onProgress?.(80);
 
-    // 4. 해시태그 파싱
-    const parsedHashtags = hashtags
-      .split(' ')
-      .filter(tag => tag.trim().startsWith('#'))
-      .map(tag => tag.trim().toLowerCase());
+    // 해시태그 기능 제거됨
 
     // 5. 위치 데이터 변환 (드롭다운 선택 지역 정보 포함)
     const locationData = locationDetails ? {
@@ -115,7 +132,6 @@ export const createPost = async (
         lng: locationDetails.lng,
       },
       placeId: locationDetails.placeId,
-      description: locationDescription.trim() || '',
       // 🆕 드롭다운에서 선택한 지역 정보 저장 (코드만)
       city: countryCityInfo?.cityCode || locationDetails.city,
       nationality: countryCityInfo?.countryCode || locationDetails.nationality,
@@ -128,7 +144,6 @@ export const createPost = async (
       address: '',
       coordinates: { lat: 0, lng: 0 },
       placeId: '',
-      description: locationDescription.trim() || '',
       city: countryCityInfo.cityCode,
       nationality: countryCityInfo.countryCode,
       // cityName과 countryName 필드는 아예 추가하지 않음 (Firebase undefined 에러 방지)
@@ -138,7 +153,6 @@ export const createPost = async (
       address: '',
       coordinates: { lat: 0, lng: 0 },
       placeId: '',
-      description: '',
       city: '',
       nationality: '',
     };
@@ -152,10 +166,10 @@ export const createPost = async (
       userId,
       content: content.trim(),
       images: uploadedImages, // 🎯 이미지 저장
+      video: uploadedVideo, // 🎥 동영상 저장
       location: locationData,
-      hashtags: parsedHashtags,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
+      updatedAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       likeCount: 0, // 좋아요 카운트
       bookmarkCount: 0, // 새로운 북마크 카운트
       likedBy: {}, // 좋아요한 사용자들 맵 초기화
@@ -164,10 +178,21 @@ export const createPost = async (
       isVisible: true,
     };
 
+    console.log('💾 Firestore 저장 데이터:', {
+      hasVideo: !!uploadedVideo,
+      videoData: uploadedVideo,
+      imageCount: uploadedImages.length,
+      postId: tempPostId
+    });
+
     // undefined 값 완전 제거 (재귀적으로 처리)
     const removeUndefined = (obj: any): any => {
       if (obj === null || obj === undefined) {
         return null;
+      }
+      // serverTimestamp() 객체는 그대로 유지
+      if (obj && typeof obj === 'object' && obj._methodName === 'serverTimestamp') {
+        return obj;
       }
       if (Array.isArray(obj)) {
         return obj.map(removeUndefined).filter(item => item !== undefined);
@@ -245,15 +270,11 @@ export const getPosts = async (
   userId?: string
 ): Promise<PostData[]> => {
   try {
-    let q = query(
-      collection(db, 'posts'),
-      where('isVisible', '==', true),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
-    );
-
-    // 특정 사용자 게시물만 조회
+    // 🚀 성능 최적화: 인덱스 최적화된 쿼리
+    let q;
+    
     if (userId) {
+      // 특정 사용자 게시물: userId + createdAt 인덱스 사용
       q = query(
         collection(db, 'posts'),
         where('userId', '==', userId),
@@ -261,22 +282,88 @@ export const getPosts = async (
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
+    } else {
+      // 🚀 전체 게시물: 단순한 쿼리로 최적화 (인덱스 없이도 빠름)
+      q = query(
+        collection(db, 'posts'),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount * 2) // 더 많이 가져와서 클라이언트에서 필터링
+      );
     }
 
     const querySnapshot = await getDocs(q);
     const posts: PostData[] = [];
 
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      
+      // 🚀 클라이언트에서 isVisible 필터링 (더 빠른 쿼리)
+      if (!userId && data.isVisible === false) {
+        return; // isVisible이 false인 게시물은 건너뛰기
+      }
+      
+      // 🚀 성능 최적화: 필요한 필드만 선택하여 전송량 줄이기
       posts.push({
         id: doc.id,
-        ...doc.data(),
+        userId: data.userId,
+        content: data.content,
+        // 🚀 이미지 최적화: 썸네일만 우선 로드
+        images: data.images ? data.images.map((img: any) => ({
+          ...img,
+          // 원본 이미지는 나중에 로드
+          url: img.urls?.thumbnail || img.url
+        })) : [],
+        video: data.video || null,
+        location: data.location,
+        createdAt: data.createdAt,
+        likeCount: data.likeCount || 0,
+        bookmarkCount: data.bookmarkCount || 0,
+        comments: data.comments || 0,
+        isVisible: data.isVisible
       } as PostData);
     });
 
-    return posts;
+    // 🚀 요청한 개수만큼만 반환
+    return posts.slice(0, limitCount);
   } catch (error) {
     console.error('게시물 목록 조회 실패:', error);
     throw error;
+  }
+};
+
+/**
+ * 배치로 사용자 정보 조회 (성능 최적화)
+ */
+export const getUsersBatch = async (userIds: string[]): Promise<Record<string, any>> => {
+  try {
+    if (userIds.length === 0) return {};
+
+    // 중복 제거
+    const uniqueUserIds = [...new Set(userIds)];
+    
+    // Firestore의 'in' 쿼리는 최대 10개까지만 지원
+    const batchSize = 10;
+    const userInfoMap: Record<string, any> = {};
+
+    for (let i = 0; i < uniqueUserIds.length; i += batchSize) {
+      const batch = uniqueUserIds.slice(i, i + batchSize);
+      
+      const q = query(
+        collection(db, 'users'),
+        where('__name__', 'in', batch.map(id => doc(db, 'users', id)))
+      );
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        userInfoMap[doc.id] = doc.data();
+      });
+    }
+
+    console.log(`✅ ${uniqueUserIds.length}명의 사용자 정보 배치 조회 완료`);
+    return userInfoMap;
+  } catch (error) {
+    console.error('❌ 배치 사용자 정보 조회 실패:', error);
+    return {};
   }
 };
 
@@ -532,12 +619,12 @@ export const updatePost = async (
   userId: string,
   content: string,
   locationDetails: LocationDetails | null,
-  locationDescription: string,
   countryCode: string,
   cityCode: string,
-  hashtags: string[],
   newImages?: File[],
   remainingExistingImages?: UploadedImage[], // 남은 기존 이미지들
+  newVideo?: File | null, // 새 동영상 파일
+  existingVideo?: UploadedImage | null, // 기존 동영상
 ): Promise<boolean> => {
   try {
     console.log('📝 게시물 업데이트 시작:', postId);
@@ -575,17 +662,32 @@ export const updatePost = async (
     
     console.log('🎯 최종 이미지 목록:', finalImages.length, '개');
 
+    // 3. 동영상 처리
+    let finalVideo: UploadedImage | null = null;
+    
+    if (newVideo) {
+      // 새 동영상 업로드
+      console.log('🎥 새 동영상 업로드 시작');
+      finalVideo = await uploadVideoToImageKit(newVideo, postId);
+      console.log('✅ 새 동영상 업로드 완료:', finalVideo.url);
+    } else if (existingVideo) {
+      // 기존 동영상 유지
+      finalVideo = existingVideo;
+      console.log('📹 기존 동영상 유지:', existingVideo.url);
+    }
+    
+    console.log('🎯 최종 동영상:', finalVideo ? finalVideo.url : '없음');
 
-    // 3. 게시물 업데이트
+
+    // 4. 게시물 업데이트
     const updatedPost: any = {
       content,
       location: locationDetails || undefined,
-      locationDescription,
       countryCode,
       cityCode,
-      hashtags,
       images: finalImages,
-      updatedAt: new Date()
+      video: finalVideo, // 동영상 추가
+      updatedAt: serverTimestamp() // Firestore 서버 타임스탬프 사용
     };
 
     await updateDoc(doc(db, 'posts', postId), updatedPost);

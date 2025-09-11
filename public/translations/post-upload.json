@@ -243,33 +243,6 @@
     "th": "อัปโหลดโพสต์สำเร็จ!",
     "fil": "Matagumpay na na-upload ang post!"
   },
-  "locationDescriptionLabel": {
-    "ko": "장소 설명",
-    "en": "Place Description",
-    "vi": "Mô tả địa điểm",
-    "zh": "地点描述",
-    "ja": "場所の説明",
-    "th": "คำอธิบายสถานที่",
-    "fil": "Paglalarawan ng Lugar"
-  },
-  "locationDescriptionPlaceholder": {
-    "ko": "이 장소에 대한 설명을 작성해보세요 (예: 분위기, 특징, 추천 이유 등)",
-    "en": "Describe this place (e.g., atmosphere, features, why you recommend it)",
-    "vi": "Mô tả về địa điểm này (ví dụ: không khí, đặc điểm, lý do bạn giới thiệu)",
-    "zh": "描述这个地方（例如：氛围、特色、推荐理由等）",
-    "ja": "この場所について説明してください（例：雰囲気、特徴、おすすめする理由など）",
-    "th": "อธิบายเกี่ยวกับสถานที่นี้ (เช่น บรรยากาศ, จุดเด่น, เหตุผลที่แนะนำ)",
-    "fil": "Ilarawan ang lugar na ito (hal: kapaligiran, mga tampok, dahilan ng pagrekumenda)"
-  },
-  "locationDescriptionHint": {
-    "ko": "다른 사용자들에게 이 장소에 대한 유용한 정보를 공유해보세요",
-    "en": "Share useful information about this place with other users",
-    "vi": "Chia sẻ thông tin hữu ích về địa điểm này với người dùng khác",
-    "zh": "与其他用户分享关于这个地方的有用信息",
-    "ja": "他のユーザーにこの場所の有用な情報をシェアしましょう",
-    "th": "แบ่งปันข้อมูลที่มีประโยชน์เกี่ยวกับสถานที่นี้กับผู้ใช้อื่น",
-    "fil": "Magbahagi ng kapaki-pakinabang na impormasyon tungkol sa lugar na ito sa ibang mga user"
-  },
   "selectCountry": {
     "ko": "국가 선택",
     "en": "Select Country",
@@ -350,5 +323,86 @@
     "ja": "国と都市の選択",
     "th": "การเลือกประเทศและเมือง",
     "fil": "Pagpili ng Bansa at Lungsod"
+  },
+  "uploadVideo": {
+    "ko": "동영상 업로드",
+    "en": "Upload Video",
+    "vi": "Tải lên video",
+    "zh": "上传视频",
+    "ja": "動画アップロード",
+    "th": "อัปโหลดวิดีโอ",
+    "fil": "Mag-upload ng Video"
+  },
+  "addVideo": {
+    "ko": "동영상 추가",
+    "en": "Add Video",
+    "vi": "Thêm video",
+    "zh": "添加视频",
+    "ja": "動画を追加",
+    "th": "เพิ่มวิดีโอ",
+    "fil": "Magdagdag ng Video"
+  },
+  "videoRequired": {
+    "ko": "동영상 파일만 업로드할 수 있습니다",
+    "en": "Only video files can be uploaded",
+    "vi": "Chỉ có thể tải lên file video",
+    "zh": "只能上传视频文件",
+    "ja": "動画ファイルのみアップロード可能です",
+    "th": "สามารถอัปโหลดไฟล์วิดีโอเท่านั้น",
+    "fil": "Mga file ng video lang ang maaaring i-upload"
+  },
+  "videoSizeLimit": {
+    "ko": "동영상 파일 크기는 5MB를 초과할 수 없습니다",
+    "en": "Video file size cannot exceed 5MB",
+    "vi": "Kích thước file video không được vượt quá 5MB",
+    "zh": "视频文件大小不能超过5MB",
+    "ja": "動画ファイルサイズは5MBを超えることはできません",
+    "th": "ขนาดไฟล์วิดีโอไม่สามารถเกิน 5MB",
+    "fil": "Ang laki ng file ng video ay hindi maaaring lumampas sa 5MB"
+  },
+  "videoDurationLimit": {
+    "ko": "동영상 길이는 10초 이내여야 합니다",
+    "en": "Video duration must be within 10 seconds",
+    "vi": "Thời lượng video phải trong vòng 10 giây",
+    "zh": "视频长度必须在10秒以内",
+    "ja": "動画の長さは10秒以内である必要があります",
+    "th": "ความยาววิดีโอต้องไม่เกิน 10 วินาที",
+    "fil": "Ang haba ng video ay dapat na hindi hihigit sa 10 segundo"
+  },
+  "videoReadError": {
+    "ko": "동영상 파일을 읽을 수 없습니다",
+    "en": "Cannot read video file",
+    "vi": "Không thể đọc file video",
+    "zh": "无法读取视频文件",
+    "ja": "動画ファイルを読み取れません",
+    "th": "ไม่สามารถอ่านไฟล์วิดีโอได้",
+    "fil": "Hindi mababasa ang file ng video"
+  },
+  "videoUploadHint": {
+    "ko": "동영상은 1개만 업로드 가능하며, 10초 이내, 5MB 이하의 파일만 지원됩니다.",
+    "en": "Only 1 video can be uploaded, and only files within 10 seconds and 5MB or less are supported.",
+    "vi": "Chỉ có thể tải lên 1 video và chỉ hỗ trợ các file trong vòng 10 giây và 5MB trở xuống.",
+    "zh": "只能上传1个视频，仅支持10秒以内、5MB以下的文件。",
+    "ja": "動画は1つのみアップロード可能で、10秒以内、5MB以下のファイルのみサポートされています。",
+    "th": "สามารถอัปโหลดวิดีโอได้เพียง 1 ไฟล์ และรองรับเฉพาะไฟล์ที่ยาวไม่เกิน 10 วินาที และขนาดไม่เกิน 5MB",
+    "fil": "Maaari lamang mag-upload ng 1 video, at sinusuportahan lamang ang mga file na hindi hihigit sa 10 segundo at 5MB o mas mababa."
+  },
+  "reviewGuidelines": {
+    "ko": "솔직한 후기를 작성해주세요✨",
+    "en": "Please write honest reviews✨",
+    "vi": "Vui lòng viết đánh giá trung thực✨",
+    "zh": "请写诚实的评论✨",
+    "ja": "正直なレビューを書いてください✨",
+    "th": "กรุณาเขียนรีวิวที่ซื่อสัตย์✨",
+    "fil": "Mangyaring magsulat ng matapat na mga review✨"
+  },
+  "reviewGuidelinesContent": {
+    "ko": "실제로 방문한 경험과 느낀 점을 중심으로, 가게의 분위기와 음식 맛을 생생하게 기록해 주세요. 허위 정보나 사실과 다른 내용을 작성할 경우, 운영 정책에 따라 게시물은 사전 통보 없이 삭제될 수 있습니다. 정확한 정보를 공유해 주시면 다른 여행자에게 큰 도움이 되고, 작성자에게는 포인트 보상이 주어집니다.",
+    "en": "Please vividly record the atmosphere and taste of food based on your actual visit experience and feelings. If you write false information or content that differs from facts, posts may be deleted without prior notice according to operational policies. Sharing accurate information will be of great help to other travelers and will reward the author with points.",
+    "vi": "Vui lòng ghi lại một cách sinh động bầu không khí và hương vị món ăn dựa trên trải nghiệm và cảm nhận thực tế khi bạn đến thăm. Nếu bạn viết thông tin sai sự thật hoặc nội dung khác với sự thật, bài viết có thể bị xóa mà không cần thông báo trước theo chính sách vận hành. Chia sẻ thông tin chính xác sẽ giúp ích rất nhiều cho các du khách khác và sẽ thưởng điểm cho tác giả.",
+    "zh": "请根据您的实际访问经历和感受，生动地记录店铺的氛围和食物味道。如果您编写虚假信息或与事实不符的内容，根据运营政策，帖子可能会被事先通知删除。分享准确的信息将对其他旅行者有很大帮助，并将为作者提供积分奖励。",
+    "ja": "実際に訪問した経験と感じたことを中心に、お店の雰囲気と料理の味を生き生きと記録してください。虚偽の情報や事実と異なる内容を書いた場合、運営ポリシーに従って投稿は事前通知なしに削除される場合があります。正確な情報を共有していただければ、他の旅行者にとって大きな助けとなり、作成者にはポイント報酬が与えられます。",
+    "th": "กรุณาบันทึกบรรยากาศและรสชาติของอาหารอย่างมีชีวิตชีวาตามประสบการณ์และความรู้สึกจากการเยี่ยมชมจริง หากคุณเขียนข้อมูลเท็จหรือเนื้อหาที่แตกต่างจากข้อเท็จจริง โพสต์อาจถูกลบโดยไม่ต้องแจ้งล่วงหน้าตามนโยบายการดำเนินงาน การแบ่งปันข้อมูลที่ถูกต้องจะเป็นประโยชน์อย่างมากต่อนักท่องเที่ยวคนอื่นๆ และจะให้รางวัลคะแนนแก่ผู้เขียน",
+    "fil": "Mangyaring i-record nang buhay ang kapaligiran at lasa ng pagkain batay sa inyong tunay na karanasan at damdamin sa pagbisita. Kung magsusulat kayo ng maling impormasyon o nilalaman na naiiba sa katotohanan, ang mga post ay maaaring tanggalin nang walang paunang abiso ayon sa mga patakaran sa pagpapatakbo. Ang pagbabahagi ng tumpak na impormasyon ay magiging malaking tulong sa ibang mga manlalakbay at magbibigay ng puntos na gantimpala sa may-akda."
   }
 }

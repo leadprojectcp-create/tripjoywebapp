@@ -10,23 +10,55 @@
   z-index: 1000;
 }
 
+.app-bar-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .app-bar-left {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
+.location-selector {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 12px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  min-width: 300px;
+}
+
+.location-icon {
+  display: flex;
+  align-items: center;
+}
+
+.location-text {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.location-arrow {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
 .app-bar-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 5px;
 }
 
-/* AppBar에서 사용되는 LanguageSelector 스타일 조정 */
-.app-bar .language-selector {
-  margin: 0;
-  margin-top: 0;
-}
 
 .back-button {
   background: none;
@@ -63,51 +95,105 @@
   padding-top: 60px;
 }
 
-/* 모바일 메시지 버튼 */
-.mobile-message-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #666;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
 
-.mobile-message-button:hover {
-  background-color: #f5f5f5;
-}
-
-/* 모바일 햄버거 메뉴 버튼 */
+/* 햄버거 메뉴 버튼 (모바일과 데스크톱 모두) */
 .mobile-menu-button {
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-  display: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
 }
 
-.mobile-menu-button:hover {
-  background-color: #f5f5f5;
+.menu-text {
+  font-size: 14px;
+  font-weight: 500;
 }
 
-/* 데스크톱 언어 선택기 */
-.desktop-language-selector {
-  display: block;
+
+.mobile-menu-button.active {
+  font-weight: 600;
 }
 
-/* 모바일 언어 선택기 */
-.mobile-language-selector {
-  display: none;
+/* 드롭다운 메뉴 컨테이너 */
+.menu-dropdown-container {
+  position: relative;
+  display: inline-block;
 }
+
+/* 드롭다운 메뉴 */
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  margin-top: 8px;
+}
+
+.menu-dropdown-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  min-width: 200px;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.menu-dropdown-content button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.menu-dropdown-content button:hover {
+  background-color: #f8f9fa;
+}
+
+.menu-dropdown-content button:last-child {
+  border-bottom: none;
+}
+
+.menu-dropdown-content button svg {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* 모바일 메뉴 오버레이 */
 .mobile-menu-overlay {
@@ -277,32 +363,10 @@
     height: 26px;
   }
   
-  .mobile-message-button,
   .mobile-menu-button {
     display: flex;
   }
   
-  .mobile-language-selector {
-    display: block;
-  }
-  
-  .desktop-language-selector {
-    display: none;
-  }
-  
-  /* 모바일에서 언어 선택기 스타일 조정 */
-  .mobile-language-selector .language-selector {
-    margin: 0;
-  }
-  
-  /* 모바일에서 드롭다운이 제대로 표시되도록 z-index 조정 */
-  .mobile-language-selector .language-dropdown {
-    z-index: 10000;
-  }
-  
-  .mobile-language-selector .language-options {
-    z-index: 10001;
-  }
 }
 
 /* 데스크톱 메뉴 스타일 */
@@ -332,38 +396,6 @@
   font-weight: 600;
 }
 
-/* 데스크톱 인증 버튼들 */
-.desktop-auth-buttons {
-  display: none;
-}
-
-.desktop-login-button,
-.desktop-logout-button {
-  background: none;
-  border: 1px solid #e0e0e0;
-  cursor: pointer;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: #333;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.desktop-login-button:hover {
-  background-color: #f8f9fa;
-  border-color: #ff6b35;
-  color: #ff6b35;
-}
-
-.desktop-logout-button:hover {
-  background-color: #f8f9fa;
-  border-color: #dc3545;
-  color: #dc3545;
-}
 
 /* AppBar 컨테이너 스타일 */
 .app-bar-container {
@@ -374,45 +406,217 @@
   height: 100%;
 }
 
-/* 데스크톱에서 메뉴 표시 */
-@media (min-width: 1024px) {
-  .app-bar {
-    height: 75px;
-  }
-  
-  .app-bar-container {
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-  
-  .desktop-menu {
-    display: flex;
-  }
-  
-  .desktop-language-selector {
-    display: block;
-  }
+/* 데스크톱 기본 스타일 (미디어 쿼리 없이) */
+.app-bar {
+  height: 75px;
+}
 
-  .desktop-auth-buttons {
-    display: block;
-  }
-  
-  .mobile-message-button,
-  .mobile-menu-button {
-    display: none;
-  }
-  
-  .mobile-language-selector {
-    display: none;
-  }
+.app-bar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.app-bar-row-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.app-bar-row-2 {
+  display: none;
+}
+
+.pc-location {
+  display: flex !important;
+}
+
+.app-bar-right {
+  gap: 24px;
+}
+
+.desktop-menu {
+  display: flex;
+}
+
+
+.mobile-menu-button {
+  display: flex;
 }
 
 @media (max-width: 480px) {
+  .app-bar {
+    height: auto; /* 자동 높이 */
+    /* min-height: 60px; */ /* 기본 최소 높이 (위치 선택기 없을 때) */
+    border-bottom: none; /* 모바일에서는 하단 테두리 제거 */
+  }
+
+  /* Dashboard 페이지일 때만 2줄 높이 적용 */
+  .app-bar:has(.app-bar-row-2) {
+    min-height: 100px; /* 2줄을 위한 최소 높이 */
+  }
+
   .app-bar-container {
-    padding: 0 12px;
+    display: flex;
+    flex-direction: column; /* 세로 배치 */
+    align-items: flex-start;
+    max-width: none; /* 모바일에서는 최대 넓이 제한 해제 */
+    margin: 0; /* 모바일에서는 중앙 정렬 해제 */
   }
   
+  .app-bar-row-1 {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
   .app-bar-left {
     gap: 12px;
+    justify-content: flex-start;
+    flex-wrap: nowrap !important; /* 요소들이 다음 줄로 넘어가지 않도록 */
+  }
+
+  .app-bar-right {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .app-bar-row-2 {
+    width: 100%;
+    margin-top: 8px;
+    display: block; /* 모바일에서는 2번째 줄 표시 */
+  }
+
+  .app-bar-row-2 .location-selector {
+    width: 100%; /* app-bar 컨테이너 안에서 100% */
+    display: flex !important; /* 강제로 표시 */
+    /* PC와 동일한 스타일 유지 - 둥근 모서리와 테두리 */
+  }
+
+  /* 모바일에서 PC용 위치 선택기 완전히 숨김 */
+  .pc-location {
+    display: none !important;
+  }
+
+  /* 모바일에서 데스크톱 메뉴 숨김 */
+  .desktop-menu {
+    display: none;
+  }
+  
+
+  /* 모바일에서 모바일 버튼 표시 */
+  .mobile-menu-button {
+    display: block;
+    padding: 8px;
+    border-radius: 50%;
+  }
+  
+  /* 모바일에서 메뉴 텍스트 숨김 */
+  .menu-text {
+    display: none;
+  }
+  
+}
+
+/* 로그아웃 확인 팝업 */
+.logout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.logout-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.logout-modal-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.logout-modal-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.logout-modal-content p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.logout-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.logout-cancel-btn,
+.logout-confirm-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.logout-cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.logout-cancel-btn:hover {
+  background-color: #e8e8e8;
+}
+
+.logout-confirm-btn {
+  background-color: #ff4444;
+  color: white;
+}
+
+.logout-confirm-btn:hover {
+  background-color: #e63939;
+}
+
+/* 팝업 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

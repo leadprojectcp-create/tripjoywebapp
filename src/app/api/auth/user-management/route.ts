@@ -12,19 +12,34 @@ const initializeFirebaseAdmin = () => {
     try {
       console.log('🔄 Firebase Admin SDK 초기화 시작...');
       
-      // 환경 변수에서 서비스 계정 키 가져오기
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
+      // 개별 환경 변수에서 서비스 계정 정보 가져오기
+      const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY;
       
-      if (!serviceAccount.project_id) {
-        throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY 환경 변수가 설정되지 않았습니다.');
+      if (projectId && clientEmail && privateKey) {
+        // 서비스 계정 키가 있는 경우
+        const serviceAccount = {
+          projectId,
+          clientEmail,
+          privateKey: privateKey.replace(/\\n/g, '\n'),
+        };
+        
+        initializeApp({
+          credential: cert(serviceAccount),
+          projectId: projectId,
+        });
+        
+        console.log('✅ Firebase Admin SDK 초기화 완료 (서비스 계정 사용)');
+      } else {
+        console.warn('⚠️ Firebase Admin SDK 환경 변수가 불완전합니다. 기본 프로젝트로 초기화합니다.');
+        // 기본 Firebase 프로젝트로 초기화
+        initializeApp({
+          projectId: projectId || 'tripjoy-d309f',
+        });
+        
+        console.log('✅ Firebase Admin SDK 초기화 완료 (기본 프로젝트)');
       }
-      
-      initializeApp({
-        credential: cert(serviceAccount),
-        projectId: serviceAccount.project_id,
-      });
-      
-      console.log('✅ Firebase Admin SDK 초기화 완료');
     } catch (error) {
       console.error('❌ Firebase Admin SDK 초기화 실패:', error);
       throw error;

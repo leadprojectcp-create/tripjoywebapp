@@ -164,9 +164,10 @@
   }
   
   .content-grid {
-    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
+    grid-template-columns: 1fr 1fr; /* 모바일에서는 두 개씩 */
     justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
+    gap: 8px; /* 카드 간격 줄임 */
   }
   
   .top-section {
@@ -257,10 +258,10 @@
   }
   
   .content-grid {
-    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
+    grid-template-columns: 1fr 1fr; /* 모바일에서는 두 개씩 */
     justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
-    gap: 16px;
+    gap: 8px; /* 카드 간격 줄임 */
   }
   
   .main-title {
@@ -273,7 +274,7 @@
 
 /* Popular Destinations - 공통 스타일 */
 .popular-destinations {
-  margin: 30px 0;
+  margin: 15px 0;
   width: 800px; /* 800px로 고정 */
   max-width: 100%; /* 반응형을 위한 최대 너비 */
   box-sizing: border-box; /* 패딩 포함한 너비 계산 */
@@ -382,6 +383,18 @@
   
   .top-section {
     text-align: left; /* 왼쪽 정렬 확실히 */
+  }
+}
+
+/* 모바일 스타일 (480px 이하) */
+@media (max-width: 480px) {
+  .main-content {
+    margin-top: 100px; /* 모바일 2줄 AppBar 높이 반영 */
+    min-height: calc(100vh - 100px);
+  }
+  
+  .body-content {
+    min-height: calc(100vh - 100px);
   }
 }
   

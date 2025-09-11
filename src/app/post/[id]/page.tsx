@@ -403,7 +403,7 @@ export default function PostDetailPage() {
           <AppBar 
             showBackButton={true}
             showLogo={false}
-            showLanguageSelector={true}
+            
           />
           
           {/* Body Content */}

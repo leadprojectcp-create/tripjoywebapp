@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../services/interactionService';
+import { toggleLike, checkLikeStatus } from '../services/interactionService';
 import styles from './PostCard.module.css';
 
 interface PostCardProps {
@@ -17,10 +17,12 @@ interface PostCardProps {
     photoUrl?: string;
     gender?: string;
     birthDate?: string;
+    nationality?: string;
+    city?: string;
   };
   showUserInfo?: boolean; // user-info 표시 여부
   cardClassName?: string; // 각 페이지별 고유 클래스명
-  onInteractionChange?: (postId: string, type: 'like' | 'bookmark', isActive: boolean) => void; // 상호작용 변경 콜백
+  onInteractionChange?: (postId: string, type: 'like', isActive: boolean) => void; // 상호작용 변경 콜백
   showSettings?: boolean; // 설정 메뉴 표시 여부
   onEdit?: (postId: string) => void; // 수정 콜백
   onDelete?: (postId: string) => void; // 삭제 콜백
@@ -42,17 +44,67 @@ export const PostCard: React.FC<PostCardProps> = ({
 
   const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
   const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
-  const [bookmarksCount, setBookmarksCount] = useState(post.bookmarkCount || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const isMountedRef = useRef(true);
+  
+  // 국가/도시 데이터 상태
+  const [countries, setCountries] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
+
+  // 국가 데이터 로드
+  useEffect(() => {
+    const loadCountries = async () => {
+      try {
+        const response = await fetch('/data/countries.json');
+        const data = await response.json();
+        setCountries(data.countries || []);
+      } catch (error) {
+        console.error('❌ 국가 데이터 로드 실패:', error);
+      }
+    };
+
+    loadCountries();
+  }, []);
+
+  // 도시 데이터 로드 (게시물 위치의 국가가 변경될 때)
+  useEffect(() => {
+    const loadCities = async (countryCode: string) => {
+      if (!countryCode) {
+        setCities([]);
+        return;
+      }
+
+      try {
+        const selectedCountryData = countries.find(c => c.code === countryCode);
+        if (!selectedCountryData) return;
+
+        const countryFileMap: Record<string, string> = {
+          'ko': 'kr', 'en': 'us', 'vi': 'vn', 'zh': 'cn',
+          'ja': 'jp', 'th': 'th', 'fil': 'ph'
+        };
+
+        const fileName = countryFileMap[selectedCountryData.name];
+        if (!fileName) return;
+
+        const response = await fetch(`/data/cities-${fileName}.json`);
+        const data = await response.json();
+        setCities(data.cities || []);
+      } catch (error) {
+        console.error('❌ 도시 데이터 로드 실패:', error);
+        setCities([]);
+      }
+    };
+
+    // 게시물 위치의 국가 코드로 도시 데이터 로드
+    if (post.location?.nationality) {
+      loadCities(post.location.nationality);
+    }
+  }, [post.location?.nationality, countries]);
 
   // 국가코드를 현재 언어의 국가명으로 변환하는 함수
   const translateCountry = (countryCode: string): string => {
@@ -63,11 +115,36 @@ export const PostCard: React.FC<PostCardProps> = ({
       return countryCode;
     }
     
-    try {
-      return t(`countries.${countryCode}`);
-    } catch (error) {
-      return countryCode; // 번역이 없으면 원본 반환
+    const country = countries.find(c => c.code === countryCode);
+    return country?.names[currentLanguage] || country?.names['en'] || countryCode;
+  };
+
+  // 도시코드를 현재 언어의 도시명으로 변환하는 함수
+  const translateCity = (cityCode: string): string => {
+    if (!cityCode) return '';
+    
+    const city = cities.find(c => c.code === cityCode);
+    return city?.names[currentLanguage] || city?.names['en'] || cityCode;
+  };
+
+  // 게시물 위치 정보를 번역하는 함수
+  const translatePostLocation = (postLocation: any): string => {
+    if (!postLocation) return '';
+    
+    // 국가/도시 코드가 있으면 번역하여 표시
+    if (postLocation.nationality && postLocation.city) {
+      const countryName = translateCountry(postLocation.nationality);
+      const cityName = translateCity(postLocation.city);
+      return `${countryName} · ${cityName}`;
     }
+    
+    // 장소명이 있으면 그대로 표시
+    if (postLocation.name) {
+      return postLocation.name;
+    }
+    
+    // 기본값 없음
+    return '';
   };
 
   // 성별을 현재 언어로 번역하는 함수
@@ -156,6 +233,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     };
   }, [post.images]); // post.images가 변경될 때만 재계산
 
+
   // 🚀 스크롤 위치 확인 함수 (useCallback으로 최적화 - 무한 렌더링 방지)
   const checkScrollPosition = useCallback(() => {
     try {
@@ -220,24 +298,18 @@ export const PostCard: React.FC<PostCardProps> = ({
       // 컴포넌트 언마운트 시 상태 초기화
       isMountedRef.current = false;
       setShowShareMenu(false);
-      setShowImageModal(false);
       setShowSettingsMenu(false);
     };
   }, []);
 
-  // 좋아요와 북마크 상태 초기화
+  // 좋아요 상태 초기화
   useEffect(() => {
     const initializeInteractionStatus = async () => {
       if (!user || !post.id) return;
       
       try {
-        const [likedStatus, bookmarkedStatus] = await Promise.all([
-          checkLikeStatus(post.id, user.uid),
-          checkBookmarkStatus(post.id, user.uid)
-        ]);
-        
+        const likedStatus = await checkLikeStatus(post.id, user.uid);
         setIsLiked(likedStatus);
-        setIsBookmarked(bookmarkedStatus);
       } catch (error) {
         console.error('상호작용 상태 초기화 실패:', error);
       }
@@ -275,34 +347,6 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   }, [user, post.id, isLoading, isLiked]);
 
-  // 북마크 토글 핸들러
-  const handleBookmarkToggle = useCallback(async () => {
-    if (!user || !post.id || isLoading) return;
-    
-    setIsLoading(true);
-    
-    // 낙관적 업데이트 (UI 반응성을 위해)
-    const optimisticIsBookmarked = !isBookmarked;
-    setIsBookmarked(optimisticIsBookmarked);
-    
-    try {
-      const result = await toggleBookmark(post.id, user.uid);
-      // 서버 응답으로 최종 상태 업데이트 (서버가 진실의 원천)
-      setIsBookmarked(result.isBookmarked);
-      setBookmarksCount(result.newCount);
-      
-      // 콜백 호출 (상위 컴포넌트에 상태 변경 알림)
-      if (onInteractionChange && post.id) {
-        onInteractionChange(post.id, 'bookmark', result.isBookmarked);
-      }
-    } catch (error) {
-      console.error('북마크 토글 실패:', error);
-      // 에러 발생 시 원래 상태로 복원
-      setIsBookmarked(isBookmarked);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, post.id, isLoading, isBookmarked]);
 
   // 공유 메뉴 토글 핸들러
   const handleShareToggle = useCallback(() => {
@@ -336,14 +380,10 @@ export const PostCard: React.FC<PostCardProps> = ({
     setShowShareMenu(false);
   }, [post.id, post.content, t]);
 
-  // 이미지 클릭 핸들러 (팝업 열기)
-  const handleImageClick = useCallback((imageIndex: number) => {
-    // 유효한 인덱스인지 확인
-    if (imageUrls.medium && imageIndex >= 0 && imageIndex < imageUrls.medium.length) {
-      setSelectedImageIndex(imageIndex);
-      setShowImageModal(true);
-    }
-  }, [imageUrls.medium]);
+  // 이미지 클릭 핸들러 (상세보기 페이지로 이동)
+  const handleImageClick = useCallback(() => {
+    router.push(`/post/${post.id}`);
+  }, [post.id, router]);
 
   // dot indicator 클릭 핸들러
   const handleDotClick = useCallback((index: number) => {
@@ -380,10 +420,6 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   }, []);
 
-  // 이미지 모달 닫기
-  const handleCloseImageModal = useCallback(() => {
-    setShowImageModal(false);
-  }, []);
 
   // 프로필 클릭 핸들러 (프로필 페이지로 이동)
   const handleProfileClick = useCallback(() => {
@@ -392,24 +428,6 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   }, [post.userId, router]);
 
-  // 채팅 시작 핸들러
-  const handleChatClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // 프로필 클릭 이벤트 방지
-    if (post.userId && user?.uid && post.userId !== user.uid) {
-      // 중복 클릭 방지를 위한 디바운싱
-      const currentTime = Date.now();
-      const lastClickTime = (handleChatClick as any).lastClickTime || 0;
-      
-      if (currentTime - lastClickTime < 1000) { // 1초 내 중복 클릭 방지
-        console.log('🚫 채팅 버튼 중복 클릭 방지');
-        return;
-      }
-      
-      (handleChatClick as any).lastClickTime = currentTime;
-      console.log('💬 채팅 시작:', post.userId);
-      router.push(`/chat?userId=${post.userId}`);
-    }
-  }, [post.userId, user?.uid, router]);
 
 
   // 날짜 포맷팅
@@ -458,7 +476,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           src={imageUrls.original[0]} 
           alt="게시물 이미지"
           loading="lazy"
-          onClick={() => handleImageClick(0)}
+          onClick={handleImageClick}
           style={{ cursor: 'pointer' }}
           onError={(e) => {
             try {
@@ -487,6 +505,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     </>
   );
 
+
   // 다중 이미지 슬라이더 렌더링
   const renderImageSlider = () => (
     <>
@@ -496,7 +515,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           onClick={() => scrollSlider('left')}
           aria-label="이전 이미지"
         >
-          &lt;
+          ‹
         </button>
         <div 
           className={`${styles.cardImage} ${styles.imageSlider}`} 
@@ -512,7 +531,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 src={imageUrl} 
                 alt={`게시물 이미지 ${index + 1}`}
                 loading="lazy"
-                onClick={() => handleImageClick(index)}
+                onClick={handleImageClick}
                 style={{ cursor: 'pointer' }}
                 onError={(e) => {
                   try {
@@ -541,7 +560,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           onClick={() => scrollSlider('right')}
           aria-label="다음 이미지"
         >
-          &gt;
+          ›
         </button>
       </div>
       {/* Dot Indicator - 이미지 슬라이더 컨테이너 밖에 표시 */}
@@ -572,6 +591,14 @@ export const PostCard: React.FC<PostCardProps> = ({
             </div>
             <div className={styles.userDetails}>
               <div className={styles.userName}>{userInfo.name}</div>
+              {translatePostLocation(post.location) && (
+                <div className={styles.userLocation}>
+                  <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
+                  <span className={styles.locationText}>
+                    {translatePostLocation(post.location)}
+                  </span>
+                </div>
+              )}
             </div>
             
           </div>
@@ -586,14 +613,8 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
 
-        {/* 상세보기 버튼 */}
-        <button 
-          className={styles.detailBtn}
-          onClick={() => router.push(`/post/${post.id}`)}
-          title={t('viewDetail') || '상세보기'}
-        >
-          {t('viewDetail') || '상세보기'}
-        </button>
+        {/* 날짜 표시 */}
+        <span className={styles.dateBadge}>{formatDate(post.createdAt)}</span>
 
         {/* 설정 메뉴 (본인 게시물인 경우에만 표시) */}
         {showSettings && (
@@ -621,17 +642,21 @@ export const PostCard: React.FC<PostCardProps> = ({
       </div>
 
       {/* 이미지 영역 */}
-      {imageUrls.thumbnails.length === 0 ? (
-        <div className={`${styles.cardImage} ${styles.singleImage}`}>
-          <div className={styles.imagePlaceholder}>
-            📷
-          </div>
-        </div>
-      ) : imageUrls.thumbnails.length === 1 ? (
-        renderSingleImage()
-      ) : (
-        renderImageSlider()
-      )}
+      {(() => {
+        if (imageUrls.thumbnails.length === 0) {
+          return (
+            <div className={`${styles.cardImage} ${styles.singleImage}`}>
+              <div className={styles.imagePlaceholder}>
+                📷
+              </div>
+            </div>
+          );
+        } else if (imageUrls.thumbnails.length === 1) {
+          return renderSingleImage();
+        } else {
+          return renderImageSlider();
+        }
+      })()}
 
       {/* 카드 푸터 */}
       <div className={styles.cardFooter}>
@@ -653,40 +678,6 @@ export const PostCard: React.FC<PostCardProps> = ({
               </span>
               <span className={styles.actionCount}>{likesCount}</span>
             </button>
-            
-            <button 
-              className={`${styles.actionBtn} ${isBookmarked ? styles.bookmarked : ''}`}
-              onClick={handleBookmarkToggle}
-              disabled={isLoading}
-            >
-              <span className={styles.actionIcon}>
-                <img 
-                  src={isBookmarked ? "/icons/scrap_active.svg" : "/icons/scrap.svg"} 
-                  alt={isBookmarked ? "스크랩 취소" : "스크랩"}
-                  width="20"
-                  height="20"
-                />
-              </span>
-              <span className={styles.actionCount}>{bookmarksCount}</span>
-            </button>
-            
-            {/* 채팅 버튼 (본인 게시물이 아닌 경우에만 표시) */}
-            {user?.uid && post.userId !== user.uid && (
-              <button 
-                className={styles.actionBtn}
-                onClick={handleChatClick}
-                title="채팅하기"
-              >
-                <span className={styles.actionIcon}>
-                  <img 
-                    src="/icons/message.svg" 
-                    alt="채팅하기"
-                    width="20"
-                    height="20"
-                  />
-                </span>
-              </button>
-            )}
           </div>
           
           <button 
@@ -724,7 +715,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 
         <div className={styles.locationInfo}>
           {/* 게시물 내용 */}
-          <div className={`${styles.postContent} ${!post.content ? styles.dateOnly : ''}`}>
+          <div className={styles.postContent}>
             {post.content && (
               <span className={styles.postText}>
                 {post.content.length > 100 
@@ -732,66 +723,10 @@ export const PostCard: React.FC<PostCardProps> = ({
                   : post.content}
               </span>
             )}
-            <span className={styles.dateBadge}>{formatDate(post.createdAt)}</span>
           </div>
-          
-
-          
-          {/* 해시태그 */}
-          {post.hashtags.length > 0 && (
-            <div className={styles.hashtags}>
-              {post.hashtags.join(' ')}
-            </div>
-          )}
         </div>
       </div>
 
-      {/* 이미지 모달 */}
-      {showImageModal && imageUrls.medium && imageUrls.medium.length > 0 && selectedImageIndex < imageUrls.medium.length && (
-        <div className={styles.imageModalOverlay} onClick={handleCloseImageModal}>
-          <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalCloseBtn} onClick={handleCloseImageModal}>
-              ✕
-            </button>
-            <div className={styles.modalImageContainer}>
-              <img 
-                src={imageUrls.medium[selectedImageIndex]} 
-                alt={`게시물 이미지 ${selectedImageIndex + 1}`}
-                className={styles.modalImage}
-              />
-              {imageUrls.medium.length > 1 && (
-                <div className={styles.modalNavigation}>
-                  <button 
-                    className={`${styles.modalNavBtn} ${styles.prev}`}
-                    onClick={() => setSelectedImageIndex(prev => {
-                      const maxIndex = imageUrls.medium.length - 1;
-                      return prev > 0 ? prev - 1 : maxIndex;
-                    })}
-                    disabled={imageUrls.medium.length <= 1}
-                  >
-                    ‹
-                  </button>
-                  <button 
-                    className={`${styles.modalNavBtn} ${styles.next}`}
-                    onClick={() => setSelectedImageIndex(prev => {
-                      const maxIndex = imageUrls.medium.length - 1;
-                      return prev < maxIndex ? prev + 1 : 0;
-                    })}
-                    disabled={imageUrls.medium.length <= 1}
-                  >
-                    ›
-                  </button>
-                </div>
-              )}
-              {imageUrls.medium.length > 1 && (
-                <span className={styles.modalImageCounter}>
-                  {selectedImageIndex + 1} / {imageUrls.medium.length}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

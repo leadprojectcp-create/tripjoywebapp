@@ -461,7 +461,7 @@ function ProfileContent() {
           <AppBar 
             showBackButton={false}
             showLogo={true}
-            showLanguageSelector={true}
+            
           />
           <div className="body-content">
             
@@ -486,7 +486,7 @@ function ProfileContent() {
             <AppBar 
               showBackButton={false}
               showLogo={true}
-              showLanguageSelector={true}
+              
             />
             
             {/* Body Content */}

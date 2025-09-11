@@ -12,18 +12,17 @@ import { AuthGuard } from '../components/AuthGuard';
 import { AppBar } from '../components/AppBar';
 
 import GoogleMapsLocationPicker, { LocationDetails } from '../components/GoogleMapsLocationPicker';
-import CountryAndCitySelector from '../components/CountryAndCitySelector';
+import PostUploadCountryCitySelector from '../components/PostUploadCountryCitySelector';
 import styles from './page.module.css';
 
 interface PostData {
   content: string;
   location: string;
   locationDetails: LocationDetails | null;
-  locationDescription: string; // 위치에 대한 추가 설명
   countryCode: string;
   cityCode: string;
   images: File[];
-  hashtags: string;
+  video: File | null;
 }
 
 interface PreviewImage {
@@ -31,6 +30,13 @@ interface PreviewImage {
   url: string;
   isExisting?: boolean; // 기존 이미지인지 새 이미지인지 구분
   originalUrl?: string; // 기존 이미지의 원본 URL (ImageKit 삭제용)
+}
+
+interface PreviewVideo {
+  file: File;
+  url: string;
+  isExisting?: boolean; // 기존 동영상인지 새 동영상인지 구분
+  originalUrl?: string; // 기존 동영상의 원본 URL (ImageKit 삭제용)
 }
 
 
@@ -49,20 +55,23 @@ const PostUploadContent: React.FC = () => {
     content: '',
     location: '',
     locationDetails: null,
-    locationDescription: '',
     countryCode: '',
     cityCode: '',
     images: [],
-    hashtags: '',
+    video: null,
   });
 
   const [previewImages, setPreviewImages] = useState<PreviewImage[]>([]);
+  const [previewVideo, setPreviewVideo] = useState<PreviewVideo | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deletedExistingImages, setDeletedExistingImages] = useState<string[]>([]); // 삭제된 기존 이미지 URL들
+  const [deletedExistingVideo, setDeletedExistingVideo] = useState<string | null>(null); // 삭제된 기존 동영상 URL
+  const [existingPost, setExistingPost] = useState<PostServiceData | null>(null); // 기존 게시물 데이터
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   // 수정 모드일 때 기존 게시물 데이터 로드
   useEffect(() => {
@@ -80,39 +89,50 @@ const PostUploadContent: React.FC = () => {
           return;
         }
 
-        const existingPost = postDoc.data() as PostServiceData;
+        const existingPostData = postDoc.data() as PostServiceData;
+        setExistingPost(existingPostData); // 상태에 저장
         
         // 권한 확인
-        if (existingPost.userId !== user.uid) {
+        if (existingPostData.userId !== user.uid) {
           console.error('❌ 수정 권한이 없습니다:', editPostId);
           alert('이 게시물을 수정할 권한이 없습니다.');
           router.push('/profile');
           return;
         }
 
-        console.log('✅ 기존 게시물 데이터:', existingPost);
+        console.log('✅ 기존 게시물 데이터:', existingPostData);
 
         // 기존 데이터로 폼 채우기
         setPostData({
-          content: existingPost.content || '',
-          location: existingPost.location?.name || '',
-          locationDetails: existingPost.location as unknown as LocationDetails || null,
-          locationDescription: '',
+          content: existingPostData.content || '',
+          location: existingPostData.location?.name || '',
+          locationDetails: existingPostData.location as unknown as LocationDetails || null,
           countryCode: '',
           cityCode: '',
           images: [], // 기존 이미지는 File 객체가 아니므로 빈 배열
-          hashtags: existingPost.hashtags?.join(' ') || '',
+          video: null, // 기존 동영상은 File 객체가 아니므로 null
         });
 
         // 기존 이미지들을 미리보기로 표시 (URL만)
-        if (existingPost.images && existingPost.images.length > 0) {
-          const existingPreviews: PreviewImage[] = existingPost.images.map((image, index) => ({
+        if (existingPostData.images && existingPostData.images.length > 0) {
+          const existingPreviews: PreviewImage[] = existingPostData.images.map((image, index) => ({
             file: new File([], `existing_image_${index}`, { type: 'image/jpeg' }), // 더미 파일
             url: image.url,
             isExisting: true, // 기존 이미지 표시
             originalUrl: image.url // ImageKit 삭제용 원본 URL
           }));
           setPreviewImages(existingPreviews);
+        }
+
+        // 기존 동영상을 미리보기로 표시 (URL만)
+        if (existingPostData.video) {
+          const existingVideoPreview: PreviewVideo = {
+            file: new File([], 'existing_video', { type: 'video/mp4' }), // 더미 파일
+            url: existingPostData.video.url,
+            isExisting: true,
+            originalUrl: existingPostData.video.url // 기존 동영상 URL 저장
+          };
+          setPreviewVideo(existingVideoPreview);
         }
 
 
@@ -199,6 +219,96 @@ const PostUploadContent: React.FC = () => {
     event.target.value = '';
   };
 
+  // 동영상 업로드 핸들러
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 동영상 파일만 허용
+    if (!file.type.startsWith('video/')) {
+      alert(t('videoRequired'));
+      return;
+    }
+
+    // 파일 크기 제한 (5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert(t('videoSizeLimit'));
+      return;
+    }
+
+    // 동영상 길이 확인 (10초 이내)
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    
+    video.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(video.src);
+      const duration = video.duration;
+      
+      if (duration > 10) {
+        alert(t('videoDurationLimit'));
+        return;
+      }
+
+      // 새 동영상을 미리보기에 추가
+      const newVideoPreview: PreviewVideo = {
+        file,
+        url: URL.createObjectURL(file),
+        isExisting: false
+      };
+
+      setPreviewVideo(newVideoPreview);
+      setPostData(prev => ({
+        ...prev,
+        video: file
+      }));
+
+      // 파일 입력 초기화
+      if (videoInputRef.current) {
+        videoInputRef.current.value = '';
+      }
+    };
+
+    video.onerror = () => {
+      alert(t('videoReadError'));
+      window.URL.revokeObjectURL(video.src);
+    };
+
+    video.src = URL.createObjectURL(file);
+  };
+
+  // 동영상 제거 핸들러
+  const handleVideoRemove = async () => {
+    if (!previewVideo) return;
+
+    if (previewVideo.isExisting && previewVideo.originalUrl) {
+      // 기존 동영상인 경우 ImageKit에서 삭제하고 삭제 목록에 추가
+      try {
+        console.log('🗑️ 기존 동영상 삭제 시작:', previewVideo.originalUrl);
+        await deleteImageFromImageKit(previewVideo.originalUrl);
+        console.log('✅ ImageKit에서 동영상 삭제 완료:', previewVideo.originalUrl);
+        
+        // 삭제된 기존 동영상 목록에 추가
+        setDeletedExistingVideo(previewVideo.originalUrl);
+      } catch (error) {
+        console.warn('⚠️ ImageKit 동영상 삭제 실패 (계속 진행):', error);
+        // 삭제 실패해도 UI에서는 제거 (나중에 정리)
+        setDeletedExistingVideo(previewVideo.originalUrl);
+      }
+    } else {
+      // 새 동영상인 경우 URL 해제
+      URL.revokeObjectURL(previewVideo.url);
+    }
+    
+    // 로컬 상태에서 동영상 제거
+    setPostData(prev => ({
+      ...prev,
+      video: null
+    }));
+
+    setPreviewVideo(null);
+  };
+
 
 
   // 위치 선택 핸들러
@@ -245,8 +355,6 @@ const PostUploadContent: React.FC = () => {
     setUploadProgress(0);
 
     try {
-      const hashtags = postData.hashtags.split(' ').filter(tag => tag.trim() !== '');
-
       if (isEditMode && editPostId) {
         // 수정 모드
         console.log('📝 게시물 수정 시작:', editPostId);
@@ -284,12 +392,12 @@ const PostUploadContent: React.FC = () => {
           user.uid,
           postData.content,
           postData.locationDetails,
-          postData.locationDescription,
           postData.countryCode,
           postData.cityCode,
-          hashtags,
           newImages,
-          remainingExistingImages
+          remainingExistingImages,
+          postData.video, // 새 동영상 파일
+          existingPost?.video // 기존 동영상
         );
 
         if (success) {
@@ -305,10 +413,8 @@ const PostUploadContent: React.FC = () => {
           content: postData.content,
           location: postData.location,
           locationDetails: postData.locationDetails,
-          locationDescription: postData.locationDescription,
           countryCode: postData.countryCode,
           cityCode: postData.cityCode,
-          hashtags: hashtags,
           imageCount: postData.images.length,
           user: user.uid
         });
@@ -324,13 +430,12 @@ const PostUploadContent: React.FC = () => {
           postData.content,
           newImageFiles,
           postData.locationDetails,
-          postData.locationDescription,
-          postData.hashtags,
           {
             countryCode: postData.countryCode,
             cityCode: postData.cityCode
           },
-          (progress) => {
+          postData.video, // 동영상 파일 전달
+          (progress: number) => {
             setUploadProgress(progress);
           }
         );
@@ -375,10 +480,16 @@ const PostUploadContent: React.FC = () => {
               {isEditMode ? '게시물 수정' : t('createPost')}
             </h1>
 
+            {/* 안내 사항 */}
+            <div className={styles['guidelines-notice']}>
+              <h3 className={styles['guidelines-title']}>{t('reviewGuidelines')}</h3>
+              <p className={styles['guidelines-content']}>{t('reviewGuidelinesContent')}</p>
+            </div>
+
             {/* 국가/도시 선택 */}
             <div className={styles['form-group']}>
               <label className={styles['form-label']}>{t('countryAndCitySelection')}</label>
-              <CountryAndCitySelector
+              <PostUploadCountryCitySelector
                 selectedCountry={postData.countryCode}
                 selectedCity={postData.cityCode}
                 onSelectionChange={handleCountryCitySelect}
@@ -445,6 +556,60 @@ const PostUploadContent: React.FC = () => {
               </div>
             </div>
 
+            {/* 동영상 업로드 */}
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>{t('uploadVideo')}</label>
+              <div className={styles['video-upload-hint']}>
+                {t('videoUploadHint')}
+              </div>
+              
+              {/* 숨겨진 동영상 파일 입력 */}
+              <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/*"
+                onChange={handleVideoUpload}
+                className={styles['file-input']}
+                style={{ display: 'none' }}
+              />
+              
+              {/* 동영상 미리보기 컨테이너 */}
+              <div className={styles['video-upload-container']}>
+                {/* 동영상 미리보기 */}
+                {previewVideo && (
+                  <div className={styles['video-preview-wrapper']}>
+                    <video
+                      src={previewVideo.url}
+                      controls
+                      className={styles['video-preview']}
+                    />
+                    <button
+                      type="button"
+                      className={styles['remove-video-btn']}
+                      onClick={handleVideoRemove}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                
+                {/* 동영상 추가 버튼 */}
+                {!previewVideo && (
+                  <button
+                    type="button"
+                    onClick={() => videoInputRef.current?.click()}
+                    className={styles['add-video-btn']}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="23 7 16 12 23 17 23 7" stroke="currentColor" strokeWidth="2"/>
+                      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                    <span>{t('addVideo')}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* 게시글 내용 */}
             <div className={styles['form-group']}>
               <label className={styles['form-label']}>{t('postContent')}</label>
@@ -471,43 +636,8 @@ const PostUploadContent: React.FC = () => {
 
             {/* 선택된 위치 표시는 GoogleMapsLocationPicker 내부에서 처리 */}
 
-            {/* 위치 설명 (위치가 선택된 경우에만 표시) */}
-            {postData.locationDetails && (
-              <div className={`${styles['form-group']} ${styles['location-description-group']}`}>
-                <label className={styles['form-label']}>{t('locationDescriptionLabel')}</label>
-                <textarea
-                  value={postData.locationDescription}
-                  onChange={(e) => handleInputChange('locationDescription', e.target.value)}
-                  placeholder={t('locationDescriptionPlaceholder')}
-                  className={`${styles['form-textarea']} ${styles['location-description-textarea']}`}
-                  rows={3}
-                  maxLength={200}
-                />
-                <div className={styles['char-count']}>
-                  {postData.locationDescription.length}/200
-                </div>
-                <div className={styles['location-description-hint']}>
-                  {t('locationDescriptionHint')}
-                </div>
-              </div>
-            )}
 
 
-            {/* 해시태그 */}
-            <div className={styles['form-group']}>
-              <label className={styles['form-label']}>{t('hashtags')}</label>
-              <input
-                type="text"
-                value={postData.hashtags}
-                onChange={(e) => handleInputChange('hashtags', e.target.value)}
-                placeholder={t('hashtagsPlaceholder')}
-                className={`${styles['form-input']} ${styles['hashtags-input']}`}
-                maxLength={200}
-              />
-              <div className={styles['hashtags-hint']}>
-                {t('hashtagsHint')}
-              </div>
-            </div>
 
 
             {/* 제출 버튼 */}

@@ -214,7 +214,7 @@ export default function MyActivity() {
           <AppBar 
             showBackButton={false}
             showLogo={true}
-            showLanguageSelector={true}
+            
           />
           
           {/* Body Content */}

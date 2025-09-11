@@ -28,7 +28,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  padding: 8px 0;
 }
 
 /* 사용자 정보 */
@@ -39,8 +39,8 @@
 
 /* 사용자 아바타 */
 .userAvatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #e9ecef;
   display: flex;
@@ -111,6 +111,25 @@
   color: #333;
 }
 
+.userLocation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.locationIcon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.locationText {
+  font-size: 12px;
+  color: #666;
+  font-weight: 400;
+}
+
 /* 카드 이미지 - 기본 스타일 */
 .cardImage {
   min-width: 300px; /* 최소 너비 300px */
@@ -147,6 +166,53 @@
   top: 50%;
   left: 0;
   transform: translateY(-50%); /* 세로 중앙 정렬 */
+}
+
+/* 동영상 컨테이너 */
+.videoContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 동영상 컨테이너 스타일만 유지 */
+
+/* 동영상 스타일 - 이미지와 동일하게 */
+.cardImage.singleImage video {
+  width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+  height: auto;
+  min-height: 0;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  object-fit: cover; /* 이미지와 동일하게 cover 사용 */
+  background-color: transparent !important;
+}
+
+/* 동영상 컨테이너 */
+.videoContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 동영상 썸네일 스타일 */
+.videoThumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+/* 동영상 요소 스타일 */
+.videoElement {
+  border-radius: 8px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
 }
 
 /* 이미지 슬라이더 스타일 - 300x300 정방형 */
@@ -295,8 +361,8 @@
   transform: translateY(-50%);
   width: 32px;
   height: 32px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -311,8 +377,8 @@
 }
 
 .sliderArrow:hover {
-  background-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 1);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -624,33 +690,31 @@
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: #f5f5f5;
   border: none;
   border-radius: 50%;
   color: #333;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 32px;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   transition: all 0.2s ease;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .contentCard .sliderArrow:hover {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #e0e0e0;
   opacity: 1;
 }
 
 .contentCard .sliderArrow.left {
-  left: -20px;
   z-index: 2000;
 }
 
 .contentCard .sliderArrow.right {
-  right: -20px;
   z-index: 2000;
 }
 
@@ -785,6 +849,13 @@
     box-sizing: border-box;
   }
   
+  /* Dashboard에서 2개씩 나오는 경우를 위한 스타일 */
+  .dashboard-container .contentCard {
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+  }
+  
   .actionBtn {
     padding: 4px 8px 4px 0 !important; /* 모바일에서도 왼쪽 여백 제거 */
   }
@@ -799,6 +870,11 @@
     margin: 0;
   }
   
+  /* Dashboard에서 2개씩 나오는 경우 이미지 크기 조정 */
+  .dashboard-container .imageSliderContainer {
+    aspect-ratio: 1 / 1;
+  }
+  
   .cardImage.singleImage {
     width: 100%;
     height: auto;
@@ -811,6 +887,11 @@
     border-radius: 5px;
   }
   
+  /* Dashboard에서 2개씩 나오는 경우 단일 이미지 크기 조정 */
+  .dashboard-container .cardImage.singleImage {
+    aspect-ratio: 1 / 1;
+  }
+  
   .cardImage.imageSlider {
     width: 100%;
     height: auto;
@@ -821,6 +902,11 @@
     margin: 0;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+  }
+  
+  /* Dashboard에서 2개씩 나오는 경우 이미지 슬라이더 크기 조정 */
+  .dashboard-container .cardImage.imageSlider {
+    aspect-ratio: 1 / 1;
   }
   
   .cardImage.multipleImages {
@@ -843,6 +929,11 @@
     scroll-snap-align: center;
   }
   
+  /* Dashboard에서 2개씩 나오는 경우 이미지 아이템 크기 조정 */
+  .dashboard-container .cardImage.imageSlider .imageItem {
+    aspect-ratio: 1 / 1;
+  }
+  
   .cardImage.singleImage img,
   .cardImage.imageSlider .imageItem img,
   .contentCard .cardImage img,
@@ -856,6 +947,37 @@
     top: 50%;
     left: 0;
     transform: translateY(-50%);
+  }
+  
+  /* 모바일에서 동영상도 이미지와 동일한 스타일 */
+  .cardImage.singleImage video {
+    width: 100%; /* 부모 컨테이너 너비에 맞춤 */
+    height: auto;
+    min-height: 0;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    object-fit: cover; /* 이미지와 동일하게 cover 사용 */
+  }
+  
+  /* Dashboard에서 2개씩 나오는 경우 이미지 크기 조정 */
+  .dashboard-container .cardImage.singleImage img,
+  .dashboard-container .cardImage.imageSlider .imageItem img,
+  .dashboard-container .contentCard .cardImage img,
+  .dashboard-container .contentCard .imageItem img,
+  .dashboard-container .imageItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Dashboard에서 동영상도 이미지와 동일한 스타일 */
+  .dashboard-container .cardImage.singleImage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지와 동일하게 cover 사용 */
   }
   
   /* 모바일에서도 이미지가 컨테이너를 넘어서 표시되도록 */
@@ -895,7 +1017,7 @@
   }
   
   .cardHeader, .cardFooter {
-    padding: 12px 0;
+    padding: 6px 0;
   }
   
   .actionBtn {

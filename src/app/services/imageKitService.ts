@@ -52,77 +52,7 @@ export const getImageKitAuthToken = async (): Promise<{
   }
 };
 
-/**
- * 이미지를 가로 450px로 리사이즈하고 세로는 비율 유지하는 함수
- */
-const resizeImageToWidth = (file: File, targetWidth: number = 450): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-
-    img.onload = () => {
-      if (!ctx) {
-        reject(new Error('Canvas context를 가져올 수 없습니다.'));
-        return;
-      }
-
-      // 원본 이미지 크기
-      const { width: originalWidth, height: originalHeight } = img;
-      
-      // 가로를 450px로 맞추고 세로는 비율 유지
-      const aspectRatio = originalHeight / originalWidth;
-      const targetHeight = Math.round(targetWidth * aspectRatio);
-
-      // Canvas 크기 설정
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-
-      console.log('🖼️ 이미지 리사이즈 정보:');
-      console.log(`   원본 크기: ${originalWidth}x${originalHeight}`);
-      console.log(`   비율: ${aspectRatio.toFixed(3)}`);
-      console.log(`   최종 크기: ${targetWidth}x${targetHeight}`);
-
-      // 배경을 흰색으로 채우기
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, targetWidth, targetHeight);
-
-      // 이미지를 비율 유지하며 리사이즈하여 그리기
-      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-      // Canvas를 Blob으로 변환 (JPEG, 90% 품질)
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('이미지 변환에 실패했습니다.'));
-          return;
-        }
-
-        // Blob을 File로 변환
-        const resizedFile = new File([blob], file.name, {
-          type: 'image/jpeg',
-          lastModified: Date.now(),
-        });
-
-        console.log('✅ 이미지 리사이즈 완료:', {
-          원본크기: `${originalWidth}x${originalHeight}`,
-          리사이즈크기: `${targetWidth}x${targetHeight}`,
-          원본용량: `${(file.size / 1024).toFixed(1)}KB`,
-          리사이즈용량: `${(resizedFile.size / 1024).toFixed(1)}KB`,
-          압축률: `${((1 - resizedFile.size / file.size) * 100).toFixed(1)}%`
-        });
-
-        resolve(resizedFile);
-      }, 'image/jpeg', 0.9);
-    };
-
-    img.onerror = () => {
-      reject(new Error('이미지 로드에 실패했습니다.'));
-    };
-
-    // 이미지 로드 시작
-    img.src = URL.createObjectURL(file);
-  });
-};
+// 🗑️ 이미지 리사이즈 함수 제거됨 - 원본 해상도 보존을 위해
 
 /**
  * ImageKit에서 이미지 삭제 (서버 API 통해)
@@ -230,23 +160,116 @@ export const uploadImage = async (
       onProgress?.(20, '기존 이미지 삭제 완료');
     }
 
-    // 1단계: 이미지 리사이즈 (20-60%)
-    onProgress?.(30, '이미지 처리 중...');
-    const resizedFile = await resizeImageToWidth(file, 450);
-    onProgress?.(60, '이미지 처리 완료');
-    
-    // 2단계: 업로드 (60-100%)
-    onProgress?.(70, '업로드 시작...');
+    // 1단계: 원본 이미지 업로드 (20-100%)
+    onProgress?.(30, '원본 이미지 업로드 중...');
     const profileFolder = `profile/${userId}`;
     console.log('📁 프로필 이미지 업로드 폴더:', profileFolder);
     
-    const uploadedImage = await uploadImageToImageKit(resizedFile, profileFolder);
+    const uploadedImage = await uploadImageToImageKit(file, profileFolder);
     onProgress?.(100, '업로드 완료');
     
     return uploadedImage.url;
   } catch (error) {
     console.error('프로필 이미지 업로드 실패:', error);
     onProgress?.(0, '업로드 실패');
+    throw error;
+  }
+};
+
+/**
+ * ImageKit에 동영상 업로드
+ */
+export const uploadVideoToImageKit = async (
+  file: File,
+  postId: string,
+  fileName?: string
+): Promise<UploadedImage> => {
+  try {
+    console.log('🎥 ImageKit 동영상 업로드 시작:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type
+    });
+
+    if (!IMAGEKIT_PUBLIC_KEY) {
+      throw new Error('ImageKit Public Key가 설정되지 않았습니다. .env 파일을 확인해주세요.');
+    }
+
+    // 인증 토큰 가져오기
+    const authToken = await getImageKitAuthToken();
+
+    // 파일명 생성 (중복 방지를 위해 timestamp 추가)
+    const timestamp = Date.now();
+    const extension = file.name.split('.').pop();
+    const finalFileName = fileName || `video_${timestamp}.${extension}`;
+
+    // 폴더 경로: tripjoy/{postId}/videos/
+    const folder = `tripjoy/${postId}/videos`;
+
+    // FormData 생성
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('fileName', finalFileName);
+    formData.append('folder', folder);
+    formData.append('publicKey', IMAGEKIT_PUBLIC_KEY);
+    formData.append('signature', authToken.signature);
+    formData.append('expire', authToken.expire.toString());
+    formData.append('token', authToken.token);
+    formData.append('useOriginalFileName', 'true'); // 원본 파일명 사용
+    formData.append('overwriteFile', 'false'); // 파일 덮어쓰기 방지
+    
+
+    console.log('📤 ImageKit 동영상 업로드 요청:', {
+      fileName: finalFileName,
+      folder: folder,
+      fileSize: file.size,
+      fileType: file.type,
+      useOriginalFileName: true,
+      overwriteFile: false
+    });
+
+    // ImageKit 업로드 요청
+    const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`ImageKit 동영상 업로드 실패: ${errorData.message}`);
+    }
+
+    const result: ImageKitUploadResponse = await response.json();
+
+    console.log('✅ ImageKit 동영상 업로드 완료:', {
+      fileId: result.fileId,
+      url: result.url,
+      size: result.size,
+      width: result.width,
+      height: result.height,
+      dimensions: `${result.width} x ${result.height}`,
+      originalFileName: file.name,
+      originalFileSize: file.size,
+      isOriginalPreserved: result.width && result.height ? '원본 해상도 보존됨' : '해상도 변환됨'
+    });
+
+    // 동영상 썸네일 생성 (1프레임 추출)
+    const thumbnailUrl = await extractVideoThumbnail(file, postId, result.fileId);
+
+    return {
+      id: result.fileId,
+      url: result.url,
+      originalName: file.name,
+      size: result.size,
+      width: result.width,
+      height: result.height,
+      urls: {
+        original: result.url,
+        thumbnail: thumbnailUrl,
+      },
+    };
+  } catch (error) {
+    console.error('ImageKit 동영상 업로드 실패:', error);
     throw error;
   }
 };
@@ -291,11 +314,18 @@ export const uploadImageToImageKit = async (
     formData.append('signature', authToken.signature);
     formData.append('expire', authToken.expire.toString());
     formData.append('token', authToken.token);
+    
+    // 🖼️ 이미지 원본 해상도 보존 설정
+    formData.append('useOriginalFileName', 'true'); // 원본 파일명 사용
+    formData.append('overwriteFile', 'false'); // 파일 덮어쓰기 방지
 
-    console.log('📤 ImageKit 업로드 시작:', {
+    console.log('📤 ImageKit 이미지 업로드 요청:', {
       fileName: finalFileName,
       folder: folder,
       fileSize: file.size,
+      fileType: file.type,
+      useOriginalFileName: true,
+      overwriteFile: false,
       publicKey: IMAGEKIT_PUBLIC_KEY?.substring(0, 10) + '...'
     });
 
@@ -311,6 +341,18 @@ export const uploadImageToImageKit = async (
     }
 
     const result: ImageKitUploadResponse = await response.json();
+
+    console.log('✅ ImageKit 이미지 업로드 완료:', {
+      fileId: result.fileId,
+      url: result.url,
+      size: result.size,
+      width: result.width,
+      height: result.height,
+      dimensions: `${result.width} x ${result.height}`,
+      originalFileName: file.name,
+      originalFileSize: file.size,
+      isOriginalPreserved: result.width && result.height ? '원본 해상도 보존됨' : '해상도 변환됨'
+    });
 
     // 다양한 크기의 URL 생성
     const baseUrl = result.url;
@@ -436,5 +478,85 @@ export const deleteFolderFromImageKit = async (folderPath: string): Promise<bool
   } catch (error) {
     console.error('❌ ImageKit 폴더 삭제 실패:', error);
     return false;
+  }
+};
+
+// 동영상에서 1프레임을 썸네일로 추출하는 함수
+export const extractVideoThumbnail = async (videoFile: File, postId: string, fileId: string): Promise<string> => {
+  try {
+    console.log('🎬 동영상 썸네일 추출 시작:', { fileName: videoFile.name, postId, fileId });
+    
+    // 동영상 요소 생성
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    
+    // 동영상 URL 생성
+    const videoUrl = URL.createObjectURL(videoFile);
+    video.src = videoUrl;
+    
+    return new Promise((resolve, reject) => {
+      video.onloadedmetadata = () => {
+        // 1초 지점에서 썸네일 추출
+        video.currentTime = 1;
+      };
+      
+      video.onseeked = () => {
+        try {
+          // 캔버스 생성
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            throw new Error('Canvas context를 생성할 수 없습니다');
+          }
+          
+          // 캔버스 크기 설정 (480px 너비로 조정)
+          const maxWidth = 480;
+          const aspectRatio = video.videoHeight / video.videoWidth;
+          canvas.width = maxWidth;
+          canvas.height = maxWidth * aspectRatio;
+          
+          // 동영상 프레임을 캔버스에 그리기
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // 캔버스를 PNG Blob으로 변환
+          canvas.toBlob(async (blob) => {
+            if (!blob) {
+              throw new Error('썸네일 Blob 생성 실패');
+            }
+            
+            console.log('🎬 썸네일 Blob 생성 성공:', { size: blob.size, type: blob.type });
+            
+            // Blob을 File 객체로 변환
+            const thumbnailFile = new File([blob], `thumbnail_${fileId}.png`, { type: 'image/png' });
+            
+            // 썸네일을 ImageKit에 업로드
+            const uploadedThumbnail = await uploadImageToImageKit(thumbnailFile, postId, `thumbnail_${fileId}`);
+            
+            console.log('✅ 동영상 썸네일 업로드 완료:', uploadedThumbnail.url);
+            
+            // 메모리 정리
+            URL.revokeObjectURL(videoUrl);
+            
+            resolve(uploadedThumbnail.url);
+          }, 'image/png', 0.9);
+          
+        } catch (error) {
+          console.error('❌ 썸네일 추출 실패:', error);
+          URL.revokeObjectURL(videoUrl);
+          reject(error);
+        }
+      };
+      
+      video.onerror = (error) => {
+        console.error('❌ 동영상 로드 실패:', error);
+        URL.revokeObjectURL(videoUrl);
+        reject(error);
+      };
+    });
+    
+  } catch (error) {
+    console.error('❌ 동영상 썸네일 추출 실패:', error);
+    throw error;
   }
 };

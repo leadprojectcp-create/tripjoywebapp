@@ -207,23 +207,26 @@
   }
 }
 
-/* 모바일 전용 모달 (480px 이하) */
+/* 기존 드롭다운 숨기기 (모든 화면에서) */
+.country-city-selector {
+  display: none;
+}
+
+/* 모달 오버레이 (공통) */
+.location-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+}
+
+/* 모바일 모달 (480px 이하) - 하단에서 올라오기 */
 @media (max-width: 480px) {
-  /* 기존 드롭다운 숨기기 */
-  .country-city-selector {
-    display: none;
-  }
-  
-  /* 모바일 모달 오버레이 */
   .location-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    display: flex;
     align-items: flex-end;
   }
   
@@ -242,6 +245,32 @@
   .location-modal.open {
     transform: translateY(0);
   }
+}
+
+/* PC 모달 (481px 이상) - 중앙 팝업 */
+@media (min-width: 481px) {
+  .location-modal-overlay {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .location-modal {
+    width: 90%;
+    max-width: 600px;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    transform: scale(0.9);
+    transition: transform 0.3s ease-out;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .location-modal.open {
+    transform: scale(1);
+  }
+}
   
   .modal-header {
     display: flex;
@@ -419,7 +448,6 @@
     font-weight: 700;
     color: #1B1C1F;
   }
-}
 
 /* PC용 메인 타이틀 */
 .pc-main-title {

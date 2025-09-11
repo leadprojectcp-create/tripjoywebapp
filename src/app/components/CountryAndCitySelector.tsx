@@ -212,10 +212,8 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
     return flagMap[countryCode] || '🌍';
   };
 
-  // 모바일 모달 관련 함수들
+  // 모달 관련 함수들 (PC/모바일 공통)
   const handleTitleClick = () => {
-    if (!isMobile) return;
-    
     setTempSelectedCountry(currentCountry);
     setTempSelectedCity(currentCity);
     setIsLocationModalOpen(true);
@@ -328,145 +326,23 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   // 외부에서 모달을 열 수 있도록 ref 노출
   useImperativeHandle(ref, () => ({
     openMobileModal: () => {
-      if (isMobile) {
-        handleTitleClick();
-      }
+      handleTitleClick(); // PC에서도 모바일 모달 사용
     }
   }));
 
   return (
     <>
-      {isMobile ? (
-        // 모바일: 숨겨진 컴포넌트 (모든 기능은 유지하되 UI는 숨김)
-        <div style={{ display: 'none' }}>
-          <div className={styles['mobile-title']} onClick={handleTitleClick}>
-            <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
-            {getSelectedLocationText()}
-            <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
-          </div>
+      {/* 숨겨진 컴포넌트 (모든 기능은 유지하되 UI는 숨김) */}
+      <div style={{ display: 'none' }}>
+        <div className={styles['mobile-title']} onClick={handleTitleClick}>
+          <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
+          {getSelectedLocationText()}
+          <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
         </div>
-      ) : (
-        // PC: 드롭다운만 (제목은 dashboard에서 처리)
-        <div>
-          <div className={`${styles['country-city-selector']} ${className}`}>
-            {/* Country Selector */}
-            <div className={styles['selector-group']} ref={countryDropdownRef}>
-              <div className={styles['custom-dropdown']}>
-                <button
-                  type="button"
-                  className={`${styles['dropdown-trigger']} ${isCountryDropdownOpen ? styles['open'] : ''}`}
-                  onClick={() => !loadingCountries && setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                  disabled={loadingCountries}
-                >
-                  <span className={styles['dropdown-text']}>
-                    {currentCountry && getSelectedCountryName() 
-                      ? (
-                        <span className={styles['country-with-flag']}>
-                          <span>{getCountryFlag(currentCountry)}</span>
-                          <span>{getSelectedCountryName()}</span>
-                        </span>
-                      )
-                      : (
-                        <span className={styles['all-option']}>
-                          {loadingCountries ? t('loading') : t('allCountries')}
-                        </span>
-                      )
-                    }
-                  </span>
-                  <svg className={styles['dropdown-arrow']} width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                
-                {isCountryDropdownOpen && !loadingCountries && (
-                  <div className={styles['dropdown-menu']}>
-                    <button
-                      type="button"
-                      className={`${styles['dropdown-item']} ${currentCountry === '' ? styles['selected'] : ''}`}
-                      onClick={() => handleCountrySelect('')}
-                    >
-                      <span className={styles['all-option']}>
-                        {t('allCountries')}
-                      </span>
-                    </button>
-                    {countries.map((country) => (
-                      <button
-                        key={country.code}
-                        type="button"
-                        className={`${styles['dropdown-item']} ${currentCountry === country.code ? styles['selected'] : ''}`}
-                        onClick={() => handleCountrySelect(country.code)}
-                      >
-                        <span className={styles['country-with-flag']}>
-                          <span>{getCountryFlag(country.code)}</span>
-                          <span>{country.names[currentLanguage] || country.names['en']}</span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+      </div>
 
-            {/* City Selector */}
-            <div className={styles['selector-group']} ref={cityDropdownRef}>
-              <div className={styles['custom-dropdown']}>
-                <button
-                  type="button"
-                  className={`${styles['dropdown-trigger']} ${isCityDropdownOpen ? styles['open'] : ''}`}
-                  onClick={() => (!currentCountry || loadingCities) ? null : setIsCityDropdownOpen(!isCityDropdownOpen)}
-                  disabled={!currentCountry || loadingCities}
-                >
-                  <span className={styles['dropdown-text']}>
-                    {currentCity && getSelectedCityName()
-                      ? getSelectedCityName()
-                      : (
-                        <span className={styles['all-option']}>
-                          {!currentCountry 
-                            ? t('selectCountryFirst') 
-                            : loadingCities 
-                            ? t('loading') 
-                            : t('allCities')
-                          }
-                        </span>
-                      )
-                    }
-                  </span>
-                  <svg className={styles['dropdown-arrow']} width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                
-                {isCityDropdownOpen && currentCountry && !loadingCities && (
-                  <div className={styles['dropdown-menu']}>
-                    <button
-                      type="button"
-                      className={`${styles['dropdown-item']} ${currentCity === '' ? styles['selected'] : ''}`}
-                      onClick={() => handleCitySelect('')}
-                    >
-                      <span className={styles['all-option']}>
-                        {t('allCities')}
-                      </span>
-                    </button>
-                    {cities.map((city) => (
-                      <button
-                        key={city.code}
-                        type="button"
-                        className={`${styles['dropdown-item']} ${currentCity === city.code ? styles['selected'] : ''}`}
-                        onClick={() => handleCitySelect(city.code)}
-                      >
-                        {city.names[currentLanguage] || city.names['en']}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 모바일 모달 */}
-      {isMobile && isLocationModalOpen && (
+      {/* 모달 (PC는 중앙 팝업, 모바일은 하단 슬라이드) */}
+      {isLocationModalOpen && (
         <div className={styles['location-modal-overlay']} onClick={handleCancelSelection}>
           <div className={`${styles['location-modal']} ${isLocationModalOpen ? styles['open'] : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles['modal-header']}>

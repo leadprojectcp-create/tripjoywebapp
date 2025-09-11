@@ -187,5 +187,23 @@
     "ja": "確認",
     "th": "ยืนยัน",
     "fil": "Kumpirmahin"
+  },
+  "tripTour": {
+    "ko": "트립투어",
+    "en": "Trip Tour",
+    "vi": "Chuyến du lịch",
+    "zh": "旅行团",
+    "ja": "トリップツアー",
+    "th": "ทริปทัวร์",
+    "fil": "Trip Tour"
+  },
+  "login": {
+    "ko": "로그인",
+    "en": "Login",
+    "vi": "Đăng nhập",
+    "zh": "登录",
+    "ja": "ログイン",
+    "th": "เข้าสู่ระบบ",
+    "fil": "Mag-login"
   }
 }

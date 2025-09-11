@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
-import { PostCard } from "../components/PostCard";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
-import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
+import { getPosts, PostData, getPostsByCountry, getPostsByCity, getUsersBatch } from "../services/postService";
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../services/firebase";
 import CountryAndCitySelector, { CountryAndCitySelectorRef } from "../components/CountryAndCitySelector";
+import { PostCard } from "../components/PostCard";
 import styles from "./style.module.css";
 
 export default function Dashboard() {
@@ -34,32 +34,19 @@ export default function Dashboard() {
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   
-  // 모바일 감지
-  const [isMobile, setIsMobile] = useState(false);
-  
-  // 모바일 모달 상태
+  // 위치 선택 관련
   const [locationText, setLocationText] = useState('');
   const countryCitySelectorRef = useRef<CountryAndCitySelectorRef>(null);
-
-  // 모바일 감지 useEffect
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 480);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  
 
   // 로그인 상태와 관계없이 Dashboard는 접근 가능
   // (게시물 읽기는 로그인 불필요)
 
-  // 게시물 데이터 로드
+  // 🚀 게시물 데이터 즉시 로드 (캐싱 없음!)
   useEffect(() => {
     const loadPosts = async () => {
       setIsLoading(true);
+      
       try {
         let postsData: PostData[];
         
@@ -76,6 +63,17 @@ export default function Dashboard() {
         
         console.log('✅ 게시물 데이터 로드 완료:', postsData.length);
         setPosts(postsData);
+        
+        // 🚀 병렬로 사용자 정보 조회 (UI 블로킹 없음!)
+        if (postsData.length > 0) {
+          const userIds = postsData.map(post => post.userId);
+          // 사용자 정보는 백그라운드에서 로드하고 UI는 즉시 표시
+          getUsersBatch(userIds).then(userInfoMap => {
+            setUserInfoCache(prev => ({ ...prev, ...userInfoMap }));
+          }).catch(error => {
+            console.error('❌ 사용자 정보 로드 실패:', error);
+          });
+        }
       } catch (error) {
         console.error('❌ 게시물 로드 실패:', error);
       } finally {
@@ -83,68 +81,40 @@ export default function Dashboard() {
       }
     };
 
-    if (!authLoading) {
-      loadPosts();
-    }
-  }, [selectedCountry, selectedCity, authLoading]);
+    // 🚀 인증 로딩을 기다리지 않고 즉시 로드!
+    loadPosts();
+  }, [selectedCountry, selectedCity]);
 
-  // 국가/도시 선택 핸들러
+  // 위치 선택 관련 함수들
   const handleCountryCitySelect = (countryCode: string, cityCode: string) => {
-    console.log('🔄 필터 변경:', { countryCode, cityCode });
+    console.log('🔄 위치 변경:', { countryCode, cityCode });
     setSelectedCountry(countryCode);
     setSelectedCity(cityCode);
   };
 
-  // CountryAndCitySelector로부터 location text 받기
   const handleLocationTextChange = (text: string) => {
     setLocationText(text);
+    // AppBar에 위치 텍스트 업데이트 전달
+    window.dispatchEvent(new CustomEvent('locationTextChanged', { 
+      detail: { text } 
+    }));
   };
 
-  // 모바일 타이틀 클릭 핸들러 (CountryAndCitySelector의 모달을 열기 위해)
-  const handleMobileTitleClick = () => {
-    if (!isMobile) return;
-    countryCitySelectorRef.current?.openMobileModal();
-  };
-
-
-  // 사용자 정보 캐시
-  const getUserInfo = async (userId: string) => {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setUserInfoCache(prev => ({
-          ...prev,
-          [userId]: userData
-        }));
-        return userData;
-      }
-    } catch (error) {
-      console.error('❌ 사용자 정보 로드 실패:', error);
-    }
-    return null;
-  };
-
-  // 사용자 정보가 아직 캐시되지 않은 게시물들에 대해 비동기로 가져오기
+  // AppBar에서 모달 열기 이벤트 수신
   useEffect(() => {
-    const fetchMissingUserInfo = async () => {
-      const missingUserIds = posts
-        .map(post => post.userId)
-        .filter(userId => !userInfoCache[userId]);
-
-      if (missingUserIds.length > 0) {
-        console.log('🔄 사용자 정보 가져오는 중...', missingUserIds);
-        
-        for (const userId of missingUserIds) {
-          await getUserInfo(userId);
-        }
-      }
+    const handleOpenLocationModal = () => {
+      countryCitySelectorRef.current?.openMobileModal();
     };
 
-    if (posts.length > 0) {
-      fetchMissingUserInfo();
-    }
-  }, [posts, userInfoCache]);
+    window.addEventListener('openLocationModal', handleOpenLocationModal);
+    
+    return () => {
+      window.removeEventListener('openLocationModal', handleOpenLocationModal);
+    };
+  }, []);
+
+
+
 
   return (
     <>
@@ -153,7 +123,6 @@ export default function Dashboard() {
         <AppBar 
           showBackButton={false}
           showLogo={true}
-          showLanguageSelector={true}
         />
         
         {/* Body Content */}
@@ -162,29 +131,6 @@ export default function Dashboard() {
           <div className={styles['main-content']}>
               {/* Top Section */}
               <div className={styles['top-section']}>
-                {/* 어디로 떠나세요? 텍스트 */}
-                {isMobile ? (
-                  // 모바일: 클릭 가능한 타이틀
-                  <div className={styles['mobile-title']} onClick={handleMobileTitleClick}>
-                    <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
-                    <span>{locationText || t('whereToGo')}</span>
-                    <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
-                  </div>
-                ) : (
-                  // PC: 일반 타이틀
-                  <div className={styles['where-to-go-title']}>
-                    <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
-                    <span>{t('whereToGo')}</span>
-                  </div>
-                )}
-                
-                <CountryAndCitySelector
-                  ref={countryCitySelectorRef}
-                  selectedCountry={selectedCountry}
-                  selectedCity={selectedCity}
-                  onSelectionChange={handleCountryCitySelect}
-                  onLocationTextChange={handleLocationTextChange}
-                />
               </div>
 
               {/* Popular Destinations */}
@@ -264,6 +210,15 @@ export default function Dashboard() {
         
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
+        
+        {/* 위치 선택 컴포넌트 (모달 기능) */}
+        <CountryAndCitySelector
+          ref={countryCitySelectorRef}
+          selectedCountry={selectedCountry}
+          selectedCity={selectedCity}
+          onSelectionChange={handleCountryCitySelect}
+          onLocationTextChange={handleLocationTextChange}
+        />
       </div>
     </>
   );

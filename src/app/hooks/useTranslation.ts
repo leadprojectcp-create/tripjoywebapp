@@ -87,8 +87,8 @@ export const useTranslation = () => {
     const loadTranslations = async () => {
       try {
         // 여러 번역 파일 로드
-        const [sidebarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse, postcardResponse] = await Promise.all([
-          fetch('/translations/sidebar.json'),
+        const [appbarResponse, authResponse, signupResponse, termsResponse, userinfoResponse, profileResponse, profileEditResponse, postUploadResponse, dashboardResponse, myActivityResponse, alertResponse, noticeResponse, faqResponse, footerResponse, postcardResponse] = await Promise.all([
+          fetch('/translations/appbar.json'),
           fetch('/translations/auth.json'),
           fetch('/translations/signup.json'),
           fetch('/translations/terms.json'),
@@ -105,7 +105,7 @@ export const useTranslation = () => {
           fetch('/translations/postcard.json')
         ]);
         
-        const sidebarData = await sidebarResponse.json();
+        const appbarData = await appbarResponse.json();
         const authData = await authResponse.json();
         const signupData = await signupResponse.json();
         const termsData = await termsResponse.json();
@@ -124,7 +124,7 @@ export const useTranslation = () => {
         
         // 번역 데이터 병합
         const mergedTranslations = { 
-          ...sidebarData, 
+          ...appbarData, 
           ...authData, 
           ...signupData, 
           ...termsData, 

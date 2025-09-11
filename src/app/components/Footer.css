@@ -3,17 +3,20 @@
 .footer {
   background-color: #ffffff;
   border-top: 1px solid #e9ecef;
-  margin-left: 250px; /* 사이드바 너비만큼 마진 */
   padding-bottom: 80px;
   font-size: 14px;
   color: #666;
-  width: calc(100% - 250px);
+  width: 100%;
   box-sizing: border-box;
 }
 
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 .footer-content {
-  max-width: 1200px;
-  padding: 0 40px;
+  width: 100%;
 }
 
 .footer-sections {
@@ -113,6 +116,28 @@
   align-items: flex-start;
 }
 
+.footer-right-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+
+/* Footer에서 사용되는 LanguageSelector 스타일 조정 */
+.footer .language-selector {
+  margin: 0;
+}
+
+/* Footer에서 드롭다운이 위로 열리도록 z-index 조정 */
+.footer .language-dropdown {
+  z-index: 1000;
+}
+
+.footer .language-options {
+  z-index: 1001;
+}
+
 .company-info {
   flex: 1;
   margin-right: 40px;
@@ -138,12 +163,7 @@
 
 /* 모바일 반응형 */
 @media (max-width: 1024px) {
-  .footer {
-    margin-left: 0;
-    width: 100%;
-  }
-  
-  .footer-content {
+  .footer-container {
     padding: 0 20px;
   }
   
@@ -163,7 +183,7 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 30px 0 80px 0;
+    padding: 0 0 80px 0;
   }
   
   .footer-content {

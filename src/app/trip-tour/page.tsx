@@ -27,7 +27,6 @@ export default function TripTourPage() {
           <AppBar 
             showBackButton={false}
             showLogo={true}
-            showLanguageSelector={true}
           />
           
           {/* Body Content */}
