@@ -298,7 +298,7 @@
   }
   
   .location-input {
-    font-size: 16px; /* iOS zoom 방지 */
+    font-size: 14px;
   }
   
   .google-map,
@@ -325,7 +325,7 @@
   padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 14px;
   background: white;
   color: #333;
   transition: all 0.2s ease;
@@ -372,8 +372,17 @@
     margin-top: 12px;
   }
   
-  .location-name-input,
+  .location-name-input {
+    padding: 14px;
+  }
+  
   .location-address-group {
     padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .location-name-input {
+    padding: 12px;
   }
 }

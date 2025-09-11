@@ -154,7 +154,7 @@
   overflow: hidden; /* 이미지가 컨테이너를 넘지 않도록 */
   flex-shrink: 0; /* 크기 고정 */
   position: relative; /* 절대 위치 이미지를 위한 기준점 */
-  border-radius: 5px;
+  border-radius: 12px;
 }
 
 .cardImage.singleImage img {
@@ -333,7 +333,7 @@
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: -15px;
   position: relative;
   z-index: 10;
 }
@@ -342,7 +342,7 @@
 .cardImage.singleImage .dotIndicator,
 .imageSliderContainer .dotIndicator {
   display: flex;
-  margin-top: 12px;
+  margin-top: -15px;
   justify-content: center;
 }
 
@@ -767,7 +767,7 @@
 
 .cardImage.singleImage .imagePlaceholder {
   font-size: 72px;
-  border-radius: 5px;
+  border-radius: 12px;
 }
 
 /* 중복 스타일 제거됨 - 위쪽에 이미 정의되어 있음 */
@@ -849,6 +849,11 @@
     box-sizing: border-box;
   }
   
+  .userAvatar {
+    width: 30px;
+    height: 30px;
+  }
+  
   /* Dashboard에서 2개씩 나오는 경우를 위한 스타일 */
   .dashboard-container .contentCard {
     width: 100%;
@@ -884,7 +889,7 @@
     max-width: 100%;
     margin: 0;
     position: relative;
-    border-radius: 5px;
+    border-radius: 12px;
   }
   
   /* Dashboard에서 2개씩 나오는 경우 단일 이미지 크기 조정 */
@@ -984,7 +989,7 @@
   .cardImage.singleImage,
   .imageSliderContainer {
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 12px;
   }
   
   /* 모바일에서 슬라이더 스크롤 활성화 */

@@ -9,32 +9,192 @@
   padding: 0;
 }
 
-/* Body Content (AppBar 아래의 Sidebar + Main Content) */
+/* Body Content */
 .body-content {
   display: flex;
   flex: 1;
-  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
-  justify-content: flex-start; /* 왼쪽부터 정렬 */
+  min-height: calc(100vh - 60px);
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 /* 메인 콘텐츠 */
 .mainContent {
-  flex: 1; /* 남은 공간 모두 사용 */
-  margin-left: 300px; /* 왼쪽 사이드바 너비만큼 여백 */
-  padding: 30px 0; /* 좌우 패딩 추가 */
-  margin-top: 60px; /* AppBar 높이만큼 아래로 */
-  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 30px 0;
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
-  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+  box-sizing: border-box;
 }
 
 /* 게시물 상세 컨테이너 */
 .postDetailContainer {
-  width: 800px; /* 800px로 고정 */
-  max-width: 100%; /* 반응형을 위한 최대 너비 */
-  text-align: left; /* 왼쪽 정렬 */
-  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* 두 컬럼 레이아웃 - 정확히 이등분 */
+.twoColumnLayout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rightColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detailInfoSection {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+}
+
+/* 사용자 정보 카드 - 기존 스타일 유지 (가로 배치) */
+.userInfoCard {
+  background: white;
+  border-radius: 12px;
+}
+
+.userInfoCard .userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userInfoCard .userAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.userInfoCard .userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userInfoCard .userDetails {
+  flex: 1;
+}
+
+.userInfoCard .userName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1B1C1F;
+  margin-bottom: 2px;
+}
+
+.userInfoCard .userLocation {
+  color: #999;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 세로 긴 PostCard 스타일 */
+.verticalPostCard {
+  background: white;
+  border-radius: 12px;
+  aspect-ratio: 9/16;
+  display: flex;
+  flex-direction: column;
+}
+
+.verticalPostCard .formGroup {
+}
+
+.verticalPostCard .formLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B1C1F;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.verticalPostCard .postContent {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.verticalPostCard .cardImage {
+  width: 100%;
+  aspect-ratio: 9/16;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.verticalPostCard .cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.verticalPostCard .interactionButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.verticalPostCard .actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: #f8f9fa;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.verticalPostCard .actionBtn:hover {
+  background: #e9ecef;
+}
+
+.verticalPostCard .actionBtn.liked {
+  background: #fff5f5;
+  color: #e53e3e;
+}
+
+.verticalPostCard .actionBtn.bookmarked {
+  background: #f0f8ff;
+  color: #3182ce;
+}
+
+.verticalPostCard .actionCount {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 /* 페이지 제목 */
@@ -99,8 +259,9 @@
 }
 
 .userLocation {
+  color: #999;
   font-size: 14px;
-  color: #666;
+  font-weight: 500;
 }
 
 .userInfoRow {
@@ -111,19 +272,15 @@
 }
 
 .userGender {
+  color: #999;
   font-size: 14px;
-  color: #666;
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 500;
 }
 
 .userAge {
+  color: #999;
   font-size: 14px;
-  color: #666;
-  background: #e8f4fd;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 500;
 }
 
 .postLocationRow {
@@ -344,6 +501,16 @@
 
 .sliderArrow.hidden {
   display: none;
+}
+
+/* 가게 정보 스타일 */
+.businessInfo,
+.menuInfo,
+.paymentInfo {
+  color: #1B1C1F;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 8px 0;
 }
 
 /* 위치 정보 */
@@ -587,15 +754,61 @@
 }
 
 @media (max-width: 768px) {
+  .body-content {
+    padding: 0 16px;
+  }
+  
   .mainContent {
-    margin-left: 0; /* 모바일에서는 사이드바 마진 제거 */
-    padding: 20px 16px;
+    margin: 0 auto;
+    padding: 20px 0;
     margin-top: 60px;
+    max-width: 100%;
   }
   
   .postDetailContainer {
     width: 100%;
     max-width: 100%;
+  }
+  
+  /* 모바일에서 두 컬럼을 세로로 배치 */
+  .twoColumnLayout {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .leftColumn {
+    flex: none;
+  }
+  
+  .rightColumn {
+    gap: 16px;
+  }
+  
+  .detailInfoSection {
+    padding: 0;
+  }
+  
+  .userInfoCard .userAvatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .userInfoCard .userName {
+    font-size: 14px;
+  }
+  
+  .verticalPostCard {
+    aspect-ratio: 9/16;
+    min-height: 500px;
+  }
+  
+  .verticalPostCard .cardImage {
+    height: 150px;
+  }
+  
+  .verticalPostCard .interactionButtons {
+    gap: 8px;
   }
   
   .interactionButtons {

@@ -23,7 +23,7 @@
   padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   background-color: white;
   color: #1B1C1F;
@@ -160,34 +160,34 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .country-city-selector {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
   }
   
   .dropdown-trigger {
     padding: 14px;
-    font-size: 16px;
+    font-size: 14px;
     min-height: 52px;
     height: 52px;
   }
   
   .dropdown-item {
     padding: 14px 16px;
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
 @media (max-width: 480px) {
   .dropdown-trigger {
     padding: 12px;
-    font-size: 16px;
+    font-size: 14px;
     min-height: 48px;
     height: 48px;
   }
   
   .dropdown-item {
     padding: 12px 16px;
-    font-size: 16px;
+    font-size: 14px;
   }
   
   .dropdown-menu {

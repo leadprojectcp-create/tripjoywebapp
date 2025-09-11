@@ -9,7 +9,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { useUnreadMessageCount } from '../../hooks/useUnreadMessageCount';
 
-import { PostCard } from '../../components/PostCard';
+import { PostDetailCard } from '../../components/PostDetailCard';
 import { getPostById, PostData } from '../../services/postService';
 import { getUserById } from '../../auth/services/authService';
 import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../../services/interactionService';
@@ -395,15 +395,22 @@ export default function PostDetailPage() {
     router.back();
   };
 
+  // 상호작용 변경 핸들러
+  const handleInteractionChange = useCallback((postId: string, type: 'like', isActive: boolean) => {
+    if (type === 'like') {
+      setIsLiked(isActive);
+    }
+  }, []);
+
   return (
     
       <ClientStyleProvider>
         <div className={styles.container}>
           {/* Top AppBar */}
           <AppBar 
+            title="게시물 상세"
             showBackButton={true}
             showLogo={false}
-            
           />
           
           {/* Body Content */}
@@ -428,255 +435,102 @@ export default function PostDetailPage() {
                 </div>
               ) : (
                 <div className={styles.postDetailContainer}>
-                  {/* 페이지 제목 */}
-                  <h1 className={styles.pageTitle}>게시물 상세</h1>
-
-                         {/* 작성자 정보 */}
-                         <div className={styles.formGroup}>
-                           <label className={styles.formLabel}>작성자</label>
-                           <div className={styles.userInfo}>
-                             <div className={styles.userAvatar}>
-                               {userInfo?.photoUrl || userInfo?.profileImage ? (
-                                 <img src={userInfo.photoUrl || userInfo.profileImage} alt={userInfo.name} />
-                               ) : (
-                                 <span>{userInfo?.name?.charAt(0) || 'U'}</span>
-                               )}
-                             </div>
-                             <div className={styles.userDetails}>
-                               <div className={styles.userName}>{userInfo?.name || '사용자'}</div>
-                               <div className={styles.userInfoRow}>
-                                 <span className={styles.userLocation}>
-                                   {translateCountry(userInfo?.location || '위치 미상')}
-                                 </span>
-                                 {userInfo?.gender && (
-                                   <span className={styles.userGender}>
-                                     {translateGender(userInfo.gender)}
-                                   </span>
-                                 )}
-                                 {userInfo?.birthDate && (
-                                   <span className={styles.userAge}>
-                                     {formatAge(calculateAge(userInfo.birthDate))}
-                                   </span>
-                                 )}
-                               </div>
-                             </div>
-                           </div>
-                         </div>
-
-                  {/* 위치 정보 */}
-                  {post?.location && (post.location.nationality || post.location.city) && (
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>위치</label>
-                      <div className={styles.postLocationRow}>
-                        {post.location.nationality && (
-                          <span className={styles.postNationality}>
-                            {post.location.countryName || post.location.nationality}
-                          </span>
-                        )}
-                        {post.location.city && (
-                          <span className={styles.postCity}>
-                            {post.location.cityName || post.location.city}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 게시물 내용 */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>게시물 내용</label>
-                    <div className={styles.postContent}>
-                      {post.content || '내용이 없습니다.'}
-                    </div>
-                  </div>
-
-                  {/* 이미지 */}
-                  {imageUrls.original.length > 0 && (
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>이미지</label>
-                      {imageUrls.original.length === 1 ? (
-                        // 단일 이미지
-                        <>
-                          <div className={`${styles.cardImage} ${styles.singleImage}`}>
-                            <img 
-                              src={imageUrls.original[0]} 
-                              alt="게시물 이미지"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className={styles.dotIndicator}>
-                            <div className={`${styles.dot} ${styles.active}`}></div>
-                          </div>
-                        </>
-                      ) : (
-                        // 다중 이미지 슬라이더
-                        <>
-                          <div className={styles.imageSliderContainer}>
-                            <button 
-                              className={`${styles.sliderArrow} ${styles.left} ${!sliderState.canScrollLeft ? styles.hidden : ''}`}
-                              onClick={() => scrollSlider('left')}
-                              aria-label="이전 이미지"
-                            >
-                              &lt;
-                            </button>
-                            <div 
-                              className={`${styles.cardImage} ${styles.imageSlider}`} 
-                              ref={sliderRef}
-                              onScroll={() => {
-                                checkScrollPosition();
-                                handleSliderScroll();
-                              }}
-                            >
-                              {imageUrls.original.map((imageUrl, index) => (
-                                <div key={index} className={styles.imageItem}>
-                                  <img 
-                                    src={imageUrl} 
-                                    alt={`게시물 이미지 ${index + 1}`}
-                                    loading="lazy"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                            <button 
-                              className={`${styles.sliderArrow} ${styles.right} ${!sliderState.canScrollRight ? styles.hidden : ''}`}
-                              onClick={() => scrollSlider('right')}
-                              aria-label="다음 이미지"
-                            >
-                              &gt;
-                            </button>
-                          </div>
-                          <div className={styles.dotIndicator}>
-                            {imageUrls.original.map((_, index) => (
-                              <div
-                                key={index}
-                                className={`${styles.dot} ${index === currentSlideIndex ? styles.active : ''}`}
-                                onClick={() => handleDotClick(index)}
-                              />
-                            ))}
-                          </div>
-                        </>
+                  <div className={styles.twoColumnLayout}>
+                    {/* 왼쪽: PostDetailCard - 9:16 비율 */}
+                    <div className={styles.leftColumn}>
+                      {userInfo && (
+                        <PostDetailCard 
+                          post={post}
+                          userInfo={userInfo}
+                          onInteractionChange={handleInteractionChange}
+                        />
                       )}
                     </div>
-                  )}
 
-                  {/* 위치 정보 */}
-                  {post.location && (
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>상세 주소</label>
-                      <div className={styles.locationInfo}>
-                        <div className={styles.locationName}>{post.location.name}</div>
-                        {post.location.address && (
-                          <div className={styles.locationAddress}>{post.location.address}</div>
-                        )}
-                        <div className={styles.mapContainer}>
-                          {!isGoogleMapsLoaded && (
-                            <div className={styles.mapLoading}>
-                              <div className={styles.loadingSpinner}></div>
-                              <p>지도를 불러오는 중...</p>
+                    {/* 오른쪽: 기존 상세 정보들 */}
+                    <div className={styles.rightColumn}>
+                      <div className={styles.detailInfoSection}>
+                        {/* 위치 정보 */}
+                        {post?.location && (post.location.nationality || post.location.city) && (
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>위치</label>
+                            <div className={styles.postLocationRow}>
+                              {post.location.nationality && (
+                                <span className={styles.postNationality}>
+                                  {post.location.countryName || post.location.nationality}
+                                </span>
+                              )}
+                              {post.location.city && (
+                                <span className={styles.postCity}>
+                                  {post.location.cityName || post.location.city}
+                                </span>
+                              )}
                             </div>
-                          )}
-                          <div 
-                            ref={mapRef}
-                            className={styles.googleMap}
-                            style={{ 
-                              height: '200px',
-                              width: '100%',
-                              borderRadius: '8px',
-                              overflow: 'hidden',
-                              display: isGoogleMapsLoaded ? 'block' : 'none'
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                          </div>
+                        )}
 
-                  {/* 해시태그 */}
-                  {post.hashtags && post.hashtags.length > 0 && (
-                    <div className={styles.formGroup}>
-                      <label className={styles.formLabel}>해시태그</label>
-                      <div className={styles.hashtags}>
-                        {post.hashtags.join(' ')}
-                      </div>
-                    </div>
-                  )}
+                        {/* 영업시간 */}
+                        {post.businessHours && (
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>영업시간</label>
+                            <div className={styles.businessInfo}>
+                              {post.businessHours}
+                            </div>
+                          </div>
+                        )}
 
-                  {/* 상호작용 버튼들 */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>상호작용</label>
-                    <div className={styles.interactionButtons}>
-                      <button 
-                        className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
-                        onClick={handleLikeToggle}
-                        disabled={isLoadingInteraction}
-                      >
-                        <span className={styles.actionIcon}>
-                          <img 
-                            src={isLiked ? "/icons/like_active.svg" : "/icons/like.svg"} 
-                            alt={isLiked ? "좋아요 취소" : "좋아요"}
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                        <span className={styles.actionCount}>{likesCount}</span>
-                      </button>
-                      
-                      <button 
-                        className={`${styles.actionBtn} ${isBookmarked ? styles.bookmarked : ''}`}
-                        onClick={handleBookmarkToggle}
-                        disabled={isLoadingInteraction}
-                      >
-                        <span className={styles.actionIcon}>
-                          <img 
-                            src={isBookmarked ? "/icons/scrap_active.svg" : "/icons/scrap.svg"} 
-                            alt={isBookmarked ? "스크랩 취소" : "스크랩"}
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                        <span className={styles.actionCount}>{bookmarksCount}</span>
-                      </button>
-                      
-                      <div className={styles.shareContainer}>
-                        <button 
-                          className={`${styles.actionBtn} ${styles.shareBtn} ${showShareMenu ? styles.active : ''}`}
-                          onClick={handleShareToggle}
-                        >
-                          <span className={styles.actionIcon}>
-                            <img 
-                              src={showShareMenu ? "/icons/share_active.svg" : "/icons/share.svg"} 
-                              alt="공유하기"
-                              width="20"
-                              height="20"
-                            />
-                          </span>
-                        </button>
-                        
-                        {showShareMenu && (
-                          <div className={styles.shareMenu}>
-                            <button onClick={() => handleShare('copy')} className={styles.shareOption}>
-                              📋 링크 복사
-                            </button>
-                            <button onClick={() => handleShare('facebook')} className={styles.shareOption}>
-                              📘 Facebook
-                            </button>
-                            <button onClick={() => handleShare('twitter')} className={styles.shareOption}>
-                              🐦 Twitter
-                            </button>
-                            <button onClick={() => handleShare('whatsapp')} className={styles.shareOption}>
-                              📱 WhatsApp
-                            </button>
+                        {/* 추천 메뉴 */}
+                        {post.recommendedMenu && (
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>추천 메뉴</label>
+                            <div className={styles.menuInfo}>
+                              {post.recommendedMenu}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 결제 방법 */}
+                        {post.paymentMethod && (
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>결제 방법</label>
+                            <div className={styles.paymentInfo}>
+                              {post.paymentMethod}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 상세 주소 및 지도 */}
+                        {post.location && (
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>상세 주소</label>
+                            <div className={styles.locationInfo}>
+                              <div className={styles.locationName}>{post.location.name}</div>
+                              {post.location.address && (
+                                <div className={styles.locationAddress}>{post.location.address}</div>
+                              )}
+                              <div className={styles.mapContainer}>
+                                {!isGoogleMapsLoaded && (
+                                  <div className={styles.mapLoading}>
+                                    <div className={styles.loadingSpinner}></div>
+                                    <p>지도를 불러오는 중...</p>
+                                  </div>
+                                )}
+                                <div 
+                                  ref={mapRef}
+                                  className={styles.googleMap}
+                                  style={{ 
+                                    height: '200px',
+                                    width: '100%',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    display: isGoogleMapsLoaded ? 'block' : 'none'
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* 작성일 */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>작성일</label>
-                    <div className={styles.dateInfo}>
-                      {post.createdAt ? new Date(post.createdAt.toDate ? post.createdAt.toDate() : post.createdAt).toLocaleString('ko-KR') : '날짜 정보 없음'}
                     </div>
                   </div>
                 </div>

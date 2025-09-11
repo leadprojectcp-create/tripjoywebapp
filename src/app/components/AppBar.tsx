@@ -212,6 +212,13 @@ export const AppBar = ({
               </div>
             )}
             
+            {/* Title 표시 (showLogo가 false일 때) */}
+            {!showLogo && title && (
+              <div className="app-bar-title">
+                {title}
+              </div>
+            )}
+            
             {/* PC에서 위치 선택기 표시 */}
             {pathname === '/' && (
               <div className="location-selector pc-location" onClick={handleLocationClick}>

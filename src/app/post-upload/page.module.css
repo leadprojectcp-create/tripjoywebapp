@@ -221,10 +221,9 @@
 
 /* 동영상 업로드 */
 .video-upload-hint {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
   margin-bottom: 12px;
-  line-height: 1.4;
 }
 
 .video-upload-container {
@@ -450,7 +449,7 @@
   padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   background: white;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -467,7 +466,7 @@
   padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  font-size: 16px;
+  font-size: 14px;
   background: white;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -664,10 +663,7 @@ input:checked + .toggle-slider:before {
 
 /* Tablet Responsive */
 @media (max-width: 1200px) and (min-width: 769px) {
-  .post-upload-main-content {
-    margin-left: 250px; /* 오른쪽 사이드바가 숨겨지므로 왼쪽 사이드바만 고려 */
-  }
-
+ 
   .post-upload-form {
     width: 100%;
     max-width: 800px;
@@ -679,7 +675,6 @@ input:checked + .toggle-slider:before {
   .post-upload-main-content {
     margin-left: 0; /* 모바일에서는 사이드바 없음 */
     padding: 16px;
-    margin-bottom: 80px; /* BottomNavigator 높이만큼 여백 추가 */
   }
   
   .button-section {
@@ -711,7 +706,7 @@ input:checked + .toggle-slider:before {
   }
 
   .form-input, .form-textarea {
-    font-size: 16px;
+    font-size: 14px;
     padding: 14px;
   }
 
@@ -734,7 +729,6 @@ input:checked + .toggle-slider:before {
     max-width: 450px; /* 모바일에서는 최대 450px */
     width: 100%; /* 사이드바가 숨겨지므로 전체 너비 */
     padding: 15px 16px; /* 좌우 패딩 16px 추가 */
-    margin: 60px auto 80px auto; /* 상단 60px, 하단 80px, 좌우 auto로 가운데 정렬 */
     align-items: center; /* 카드들을 가운데 정렬 */
     box-sizing: border-box; /* 패딩 포함한 너비 계산 */
   }
@@ -747,7 +741,7 @@ input:checked + .toggle-slider:before {
   }
 
   .form-input, .form-textarea {
-    font-size: 16px;
+    font-size: 14px;
     padding: 12px;
   }
 
@@ -876,6 +870,25 @@ input:checked + .toggle-slider:before {
   margin-top: 5px;
 }
 
+.label-with-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.label-with-count .form-label-secondary {
+  margin-bottom: 0;
+}
+
+.label-with-count .media-count-info {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 12px;
+  color: #707070;
+  font-weight: 500;
+}
+
 /* 모바일 반응형 - 미디어 업로드 */
 @media (max-width: 768px) {
   .media-upload-container,
@@ -921,10 +934,18 @@ input:checked + .toggle-slider:before {
   flex: 1;
 }
 
+/* Payment hint */
+.payment-hint {
+  color: #999;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
 /* Radio group */
 .radio-group {
   display: flex;
-  gap: 24px;
+  gap: 100px;
   flex-wrap: wrap;
 }
 
@@ -937,9 +958,33 @@ input:checked + .toggle-slider:before {
 
 .radio-option input[type="radio"] {
   margin-right: 8px;
-  width: 16px;
-  height: 16px;
-  accent-color: #007bff;
+  width: 22px;
+  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #d0d0d0;
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-option input[type="radio"]:checked {
+  border-color: #007bff;
+  background-color: #007bff;
+}
+
+.radio-option input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
 }
 
 .radio-label {
@@ -955,7 +1000,7 @@ input:checked + .toggle-slider:before {
   }
   
   .radio-group {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    gap: 50px;
   }
 }

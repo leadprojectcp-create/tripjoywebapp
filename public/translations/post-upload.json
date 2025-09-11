@@ -197,6 +197,15 @@
     "th": "บัตรหรือเงินสด",
     "fil": "Card o Cash"
   },
+  "paymentMethodHint": {
+    "ko": "가능한 결제 방법을 선택해주세요",
+    "en": "Please select available payment methods",
+    "vi": "Vui lòng chọn phương thức thanh toán có sẵn",
+    "zh": "请选择可用的支付方式",
+    "ja": "利用可能な支払い方法を選択してください",
+    "th": "กรุณาเลือกวิธีการชำระเงินที่มีอยู่",
+    "fil": "Mangyaring piliin ang mga available na paraan ng pagbabayad"
+  },
   "locationPlaceholder": {
     "ko": "장소를 검색하세요 (예: 스타벅스, 명동역)",
     "en": "Search for a place (e.g., Starbucks, Myeongdong Station)",

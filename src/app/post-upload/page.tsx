@@ -599,7 +599,12 @@ const PostUploadContent: React.FC = () => {
 
             {/* 이미지 업로드 */}
             <div className={styles['form-group']}>
-              <label className={styles['form-label-secondary']}>{t('uploadImages')}</label>
+              <div className={styles['label-with-count']}>
+                <label className={styles['form-label-secondary']}>{t('uploadImages')}</label>
+                <div className={styles['media-count-info']}>
+                  사진 {postData.images.length + previewImages.filter(img => img.isExisting).length}/10
+                </div>
+              </div>
               
               {/* 숨겨진 파일 입력들 */}
               <input
@@ -650,10 +655,6 @@ const PostUploadContent: React.FC = () => {
                 )}
               </div>
               
-              {/* 이미지 카운트 정보 */}
-              <div className={styles['media-count-info']}>
-                사진 {postData.images.length + previewImages.filter(img => img.isExisting).length}/10
-              </div>
             </div>
 
             {/* 동영상 업로드 */}
@@ -739,6 +740,9 @@ const PostUploadContent: React.FC = () => {
             {/* 결제 방법 */}
             <div className={styles['form-group']}>
               <label className={styles['form-label-secondary']}>{t('paymentMethod')}</label>
+              <div className={styles['payment-hint']}>
+                {t('paymentMethodHint')}
+              </div>
               <div className={styles['radio-group']}>
                 <label className={styles['radio-option']}>
                   <input
