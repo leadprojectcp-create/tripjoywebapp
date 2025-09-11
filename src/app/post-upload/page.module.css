@@ -22,8 +22,8 @@
 .post-upload-main-content {
   flex: 1; /* 남은 공간 모두 사용 */
   padding: 30px 24px; /* 좌우 패딩 추가 */
-  margin-top: 60px; /* AppBar 높이만큼 아래로 */
-  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  margin-top: 75px; /* AppBar 높이만큼 아래로 */
+  min-height: calc(100vh - 75px); /* AppBar 높이만큼 빼기 */
   display: flex;
   flex-direction: column;
   box-sizing: border-box; /* 패딩 포함한 너비 계산 */
@@ -58,11 +58,26 @@
 }
 
 .form-label {
-  display: block;
+  display: flex;
+  align-items: center;
   font-weight: 600;
-  color: #333;
+  color: #1B1C1F;
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.form-label img {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.form-label-secondary {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #707070;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
 
 .form-textarea,
@@ -70,7 +85,7 @@
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   background-color: white;
   box-sizing: border-box;
@@ -145,12 +160,12 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 120px;
-  height: 120px;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  background: white;
-  color: #666;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #EBEBEB;
+  border-radius: 10px;
+  background: transparent;
+  color: #737373;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -265,12 +280,12 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 120px;
-  height: 90px;
-  border: 2px dashed #ddd;
-  border-radius: 12px;
-  background: #fafafa;
-  color: #666;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #EBEBEB;
+  border-radius: 10px;
+  background: transparent;
+  color: #737373;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
@@ -302,26 +317,61 @@
 
 
 /* 제출 버튼 */
-.submit-section {
+.button-section {
   margin-top: 30px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
-.submit-btn {
-  background: #007bff;
-  color: white;
+
+.save-draft-btn {
+  background: #F0F2F5;
+  color: #1B1C1F;
   border: none;
-  padding: 12px 30px;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 10px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  width: 180px;
+  height: 48px;
   min-width: 180px;
-  transition: all 0.3s ease;
+  max-width: 180px;
+  min-height: 48px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-.submit-btn:hover:not(:disabled) {
-  background: #0056b3;
+.save-draft-btn:disabled {
+  background: #E9ECEF;
+  color: #6C757D;
+  cursor: not-allowed;
+}
+
+.submit-btn {
+  background: #237AF2;
+  color: #FFF;
+  border: none;
+  padding: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 180px;
+  height: 48px;
+  min-width: 180px;
+  max-width: 180px;
+  min-height: 48px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .submit-btn:disabled {
@@ -394,13 +444,6 @@
   margin-bottom: 20px;
 }
 
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-}
 
 .form-input {
   width: 100%;
@@ -499,16 +542,16 @@
 
 .add-image-btn {
   aspect-ratio: 1;
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  background: #f8f9fa;
+  border: 1px solid #EBEBEB;
+  border-radius: 10px;
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #666;
+  color: #737373;
 }
 
 .add-image-btn:hover {
@@ -618,28 +661,6 @@ input:checked + .toggle-slider:before {
   text-align: center;
 }
 
-.submit-btn {
-  padding: 16px 48px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 200px;
-}
-
-.submit-btn:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
-}
 
 /* Tablet Responsive */
 @media (max-width: 1200px) and (min-width: 769px) {
@@ -660,6 +681,19 @@ input:checked + .toggle-slider:before {
     padding: 16px;
     margin-bottom: 80px; /* BottomNavigator 높이만큼 여백 추가 */
   }
+  
+  .button-section {
+    flex-direction: row;
+    gap: 12px;
+  }
+  
+  .save-draft-btn,
+  .submit-btn {
+    width: calc(50% - 6px);
+    min-width: calc(50% - 6px);
+    max-width: calc(50% - 6px);
+  }
+  
 
   .post-upload-form {
     width: 100%;
@@ -686,11 +720,6 @@ input:checked + .toggle-slider:before {
     gap: 12px;
   }
 
-  .submit-btn {
-    width: 100%;
-    padding: 16px;
-    font-size: 16px;
-  }
 }
 
 /* Small Mobile Responsive */
@@ -728,8 +757,8 @@ input:checked + .toggle-slider:before {
 
   .image-preview-wrapper,
   .add-image-btn {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
   }
 }
 
@@ -788,12 +817,12 @@ input:checked + .toggle-slider:before {
 }
 
 .add-video-btn {
-  width: 200px;
+  width: 150px;
   height: 150px;
-  border: 2px dashed #1da1f2;
-  border-radius: 8px;
-  background: #f8f9fa;
-  color: #1da1f2;
+  border: 1px solid #EBEBEB;
+  border-radius: 10px;
+  background: transparent;
+  color: #737373;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -818,12 +847,12 @@ input:checked + .toggle-slider:before {
 }
 
 .add-media-btn {
-  width: 200px;
+  width: 150px;
   height: 150px;
-  border: 2px dashed #1da1f2;
-  border-radius: 8px;
-  background: #f8f9fa;
-  color: #1da1f2;
+  border: 1px solid #EBEBEB;
+  border-radius: 10px;
+  background: transparent;
+  color: #737373;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -857,8 +886,8 @@ input:checked + .toggle-slider:before {
   .video-preview-wrapper,
   .add-video-btn,
   .add-media-btn {
-    width: 150px;
-    height: 112px;
+    width: 130px;
+    height: 130px;
   }
 }
 
@@ -866,11 +895,67 @@ input:checked + .toggle-slider:before {
   .video-preview-wrapper,
   .add-video-btn,
   .add-media-btn {
-    width: 120px;
-    height: 90px;
+    width: 110px;
+    height: 110px;
   }
   
   .video-preview {
     max-height: 200px;
+  }
+}
+
+/* Required field indicator */
+.required {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+/* Two column inputs */
+.two-column-inputs {
+  display: flex;
+  gap: 16px;
+}
+
+.input-column {
+  flex: 1;
+}
+
+/* Radio group */
+.radio-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.radio-option input[type="radio"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  accent-color: #007bff;
+}
+
+.radio-label {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Responsive design for radio group */
+@media (max-width: 768px) {
+  .two-column-inputs {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .radio-group {
+    flex-direction: column;
+    gap: 12px;
   }
 }

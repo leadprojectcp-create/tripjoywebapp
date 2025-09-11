@@ -700,10 +700,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
   return (
     <div className={`${styles['google-maps-location-picker']} ${className}`}>
       <div className={styles['location-input-group']}>
-        <label className={styles['form-label']}>
-          📍 {t('location')} (선택사항)
-        </label>
-        
         <div className={styles['search-input-wrapper']}>
           {/* 게시물 업로드 페이지가 아닐 때만 토글 버튼 표시 */}
           {!isPostUploadPage && (
@@ -738,19 +734,10 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
             </div>
           )}
           
-          {locationDetails && (
-            <button
-              type="button"
-              className={styles['remove-location-btn']}
-              onClick={handleRemoveLocation}
-            >
-              ✕
-            </button>
-          )}
         </div>
         
         <div className={styles['search-input-wrapper']}>
-          <span className={styles['search-icon']}>🔍</span>
+          <img src="/icons/search.svg" alt="검색" width="16" height="16" className={styles['search-icon']} />
           <input
             ref={locationInputRef}
             type="text"
@@ -760,17 +747,6 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           />
         </div>
       </div>
-
-      {/* 선택된 위치 정보 */}
-      {locationDetails && (
-        <div className={styles['selected-location-info']}>
-          <div className={styles['location-icon']}>📍</div>
-          <div className={styles['location-text']}>
-            <div className={styles['location-name']}>{locationDetails.name}</div>
-            <div className={styles['location-address']}>{locationDetails.address}</div>
-          </div>
-        </div>
-      )}
 
       {/* 지도 */}
       {isMapVisible && (
@@ -805,8 +781,44 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
           )}
         </div>
       )}
+
+      {/* 선택된 위치 정보 - 지도 밑에 표시 */}
+      {locationDetails && (
+        <>
+          <div className={styles['location-name-group']}>
+            <label className={styles['location-name-label']}>가게명</label>
+            <input
+              type="text"
+              value={locationDetails.name}
+              onChange={(e) => {
+                const updatedLocationDetails = {
+                  ...locationDetails,
+                  name: e.target.value
+                };
+                onLocationSelect(locationDetails.address, updatedLocationDetails);
+              }}
+              className={styles['location-name-input']}
+            />
+          </div>
+          <div className={styles['location-address-group']}>
+            <div className={styles['location-address-content']}>
+              <div className={styles['location-address-icon']}>
+                <img src="/icons/location_on.svg" alt="위치" width="16" height="16" />
+              </div>
+              <span className={styles['location-address-text']}>{locationDetails.address}</span>
+            </div>
+            <button
+              type="button"
+              className={styles['remove-location-btn']}
+              onClick={handleRemoveLocation}
+            >
+              <img src="/icons/close_md.svg" alt="닫기" width="16" height="16" />
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-export default GoogleMapsLocationPicker;
+export default React.memo(GoogleMapsLocationPicker);

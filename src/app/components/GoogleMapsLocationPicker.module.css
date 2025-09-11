@@ -9,12 +9,12 @@
   margin-bottom: 16px;
 }
 
-.form-label {
+.location-picker-label {
   display: block;
   font-weight: 600;
-  color: #333;
+  color: #1B1C1F;
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* 검색 입력 필드 */
@@ -29,16 +29,18 @@
 .search-icon {
   position: absolute;
   left: 12px;
-  color: #666;
   z-index: 2;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .location-input {
   width: 100%;
-  padding: 12px 12px 12px 40px;
+  padding: 16px 16px 16px 40px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   background-color: white;
   box-sizing: border-box;
@@ -93,18 +95,19 @@
 }
 
 .remove-location-btn {
-  padding: 6px 12px;
-  background: #dc3545;
-  color: white;
+  padding: 4px;
+  background: none;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
   cursor: pointer;
   transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .remove-location-btn:hover {
-  background: #c82333;
+  background: #f8f9fa;
 }
 
 .current-location-btn {
@@ -171,17 +174,17 @@
 /* 지도 컨테이너 */
 .map-container {
   margin-top: 16px;
-  border-radius: 5px;
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 200px;
 }
 
 
 .google-map {
   width: 100%;
-  height: 300px;
+  height: 200px;
   border: none;
 }
 
@@ -190,7 +193,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 300px;
+  height: 200px;
   background: #f8f9fa;
   color: #666;
   font-size: 14px;
@@ -281,7 +284,7 @@
 @media (max-width: 768px) {
   .google-map,
   .map-loading {
-    height: 250px;
+    height: 200px;
   }
   
   .map-header h3 {
@@ -300,6 +303,77 @@
   
   .google-map,
   .map-loading {
-    height: 200px;
+    height: 180px;
+  }
+}
+
+/* 선택된 위치 정보 스타일 */
+.location-name-group {
+  margin-top: 16px;
+}
+
+.location-name-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #707070;
+  margin-bottom: 6px;
+}
+
+.location-name-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+  color: #333;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.location-name-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.location-address-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.location-address-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.location-address-icon {
+  display: flex;
+  align-items: center;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.location-address-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .location-name-group {
+    margin-top: 12px;
+  }
+  
+  .location-name-input,
+  .location-address-group {
+    padding: 8px 10px;
   }
 }

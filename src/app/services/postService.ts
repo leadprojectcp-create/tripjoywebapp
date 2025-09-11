@@ -41,6 +41,11 @@ export interface PostData {
     cityName?: string;    // 전체 도시명 (예: "Hanoi", "Seoul")
     countryName?: string; // 전체 국가명 (예: "Vietnam", "South Korea")
   };
+  countryCode?: string;
+  cityCode?: string;
+  businessHours?: string;
+  recommendedMenu?: string;
+  paymentMethod?: string;
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
@@ -69,6 +74,9 @@ export const createPost = async (
   locationDetails: LocationDetails | null,
   countryCityInfo?: CountryCityInfo,
   videoFile?: File | null,
+  businessHours?: string,
+  recommendedMenu?: string,
+  paymentMethod?: string,
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   try {
@@ -168,6 +176,9 @@ export const createPost = async (
       images: uploadedImages, // 🎯 이미지 저장
       video: uploadedVideo, // 🎥 동영상 저장
       location: locationData,
+      businessHours: businessHours || '',
+      recommendedMenu: recommendedMenu || '',
+      paymentMethod: paymentMethod || '',
       createdAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       updatedAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       likeCount: 0, // 좋아요 카운트
@@ -625,6 +636,9 @@ export const updatePost = async (
   remainingExistingImages?: UploadedImage[], // 남은 기존 이미지들
   newVideo?: File | null, // 새 동영상 파일
   existingVideo?: UploadedImage | null, // 기존 동영상
+  businessHours?: string,
+  recommendedMenu?: string,
+  paymentMethod?: string,
 ): Promise<boolean> => {
   try {
     console.log('📝 게시물 업데이트 시작:', postId);
@@ -687,6 +701,9 @@ export const updatePost = async (
       cityCode,
       images: finalImages,
       video: finalVideo, // 동영상 추가
+      businessHours: businessHours || '',
+      recommendedMenu: recommendedMenu || '',
+      paymentMethod: paymentMethod || '',
       updatedAt: serverTimestamp() // Firestore 서버 타임스탬프 사용
     };
 
@@ -696,6 +713,90 @@ export const updatePost = async (
     return true;
   } catch (error) {
     console.error('❌ 게시물 업데이트 실패:', error);
+    return false;
+  }
+};
+
+/**
+ * DB에 먼저 게시물 생성 (미디어 없이)
+ * 백그라운드 업로드를 위한 빠른 DB 저장
+ */
+export const createPostQuick = async (
+  userId: string,
+  content: string,
+  locationDetails: LocationDetails | null,
+  location: { countryCode: string; cityCode: string },
+  businessHours?: string,
+  recommendedMenu?: string,
+  paymentMethod?: string
+): Promise<string> => {
+  try {
+    console.log('🚀 빠른 게시물 생성 시작 (미디어 제외)');
+
+    const postData = {
+      userId,
+      content,
+      location: locationDetails?.address || '',
+      locationDetails: locationDetails ? {
+        name: locationDetails.name,
+        address: locationDetails.address,
+        placeId: locationDetails.placeId,
+        lat: locationDetails.lat,
+        lng: locationDetails.lng
+      } : null,
+      countryCode: location.countryCode,
+      cityCode: location.cityCode,
+      businessHours: businessHours || '',
+      recommendedMenu: recommendedMenu || '',
+      paymentMethod: paymentMethod || '',
+      images: [], // 빈 배열로 시작
+      video: null, // null로 시작
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      likeCount: 0,
+      bookmarkCount: 0,
+      isVisible: true,
+      comments: 0
+    };
+
+    const docRef = await addDoc(collection(db, 'posts'), postData);
+    console.log(`✅ 빠른 게시물 생성 완료: ${docRef.id}`);
+    
+    return docRef.id;
+  } catch (error) {
+    console.error('❌ 빠른 게시물 생성 실패:', error);
+    throw error;
+  }
+};
+
+/**
+ * 게시물의 미디어 정보만 업데이트
+ * 백그라운드 업로드 완료 후 호출
+ */
+export const updatePostMedia = async (
+  postId: string,
+  images: UploadedImage[],
+  video?: UploadedImage | null
+): Promise<boolean> => {
+  try {
+    console.log(`📤 게시물 미디어 업데이트 시작: ${postId}`);
+
+    const postRef = doc(db, 'posts', postId);
+    const updateData: any = {
+      images: images || [],
+      updatedAt: new Date().toISOString()
+    };
+
+    if (video !== undefined) {
+      updateData.video = video;
+    }
+
+    await updateDoc(postRef, updateData);
+    console.log(`✅ 게시물 미디어 업데이트 완료: ${postId}`);
+    
+    return true;
+  } catch (error) {
+    console.error(`❌ 게시물 미디어 업데이트 실패: ${postId}`, error);
     return false;
   }
 };

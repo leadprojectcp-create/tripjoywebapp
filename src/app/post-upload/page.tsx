@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, Suspense } from 'react';
+import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
@@ -23,6 +23,9 @@ interface PostData {
   cityCode: string;
   images: File[];
   video: File | null;
+  businessHours: string;
+  recommendedMenu: string;
+  paymentMethod: string;
 }
 
 interface PreviewImage {
@@ -59,6 +62,9 @@ const PostUploadContent: React.FC = () => {
     cityCode: '',
     images: [],
     video: null,
+    businessHours: '',
+    recommendedMenu: '',
+    paymentMethod: '',
   });
 
   const [previewImages, setPreviewImages] = useState<PreviewImage[]>([]);
@@ -68,6 +74,7 @@ const PostUploadContent: React.FC = () => {
   const [deletedExistingImages, setDeletedExistingImages] = useState<string[]>([]); // 삭제된 기존 이미지 URL들
   const [deletedExistingVideo, setDeletedExistingVideo] = useState<string | null>(null); // 삭제된 기존 동영상 URL
   const [existingPost, setExistingPost] = useState<PostServiceData | null>(null); // 기존 게시물 데이터
+  const [draftCount, setDraftCount] = useState(0); // 임시저장 카운트
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,10 +114,13 @@ const PostUploadContent: React.FC = () => {
           content: existingPostData.content || '',
           location: existingPostData.location?.name || '',
           locationDetails: existingPostData.location as unknown as LocationDetails || null,
-          countryCode: '',
-          cityCode: '',
+          countryCode: existingPostData.countryCode || '',
+          cityCode: existingPostData.cityCode || '',
           images: [], // 기존 이미지는 File 객체가 아니므로 빈 배열
           video: null, // 기존 동영상은 File 객체가 아니므로 null
+          businessHours: existingPostData.businessHours || '',
+          recommendedMenu: existingPostData.recommendedMenu || '',
+          paymentMethod: existingPostData.paymentMethod || '',
         });
 
         // 기존 이미지들을 미리보기로 표시 (URL만)
@@ -147,12 +157,12 @@ const PostUploadContent: React.FC = () => {
   }, [isEditMode, editPostId, user?.uid, router]);
 
   // 입력 필드 변경 핸들러
-  const handleInputChange = (field: keyof PostData, value: string) => {
+  const handleInputChange = useCallback((field: keyof PostData, value: string) => {
     setPostData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
+  }, []);
 
 
   // 이미지 제거 핸들러
@@ -312,24 +322,89 @@ const PostUploadContent: React.FC = () => {
 
 
   // 위치 선택 핸들러
-  const handleLocationSelect = (location: string, locationDetails: LocationDetails | null) => {
+  const handleLocationSelect = useCallback((location: string, locationDetails: LocationDetails | null) => {
     console.log('📍 Location selected:', { location, locationDetails });
     setPostData(prev => ({
       ...prev,
       location,
       locationDetails
     }));
-  };
+  }, []);
 
   // 국가/도시 선택 핸들러
-  const handleCountryCitySelect = (countryCode: string, cityCode: string) => {
+  const handleCountryCitySelect = useCallback((countryCode: string, cityCode: string) => {
     console.log('🌍 Country/City selected:', { countryCode, cityCode });
     setPostData(prev => ({
       ...prev,
       countryCode,
       cityCode
     }));
+  }, []);
+
+  // 임시 저장 데이터 로드
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('postDraft');
+      if (savedDraft && !isEditMode) {
+        const draftData = JSON.parse(savedDraft);
+        setPostData(prev => ({
+          ...prev,
+          content: draftData.content || '',
+          businessHours: draftData.businessHours || '',
+          recommendedMenu: draftData.recommendedMenu || '',
+          paymentMethod: draftData.paymentMethod || '',
+        }));
+        setDraftCount(1);
+      }
+    } catch (error) {
+      console.error('임시 저장 데이터 로드 실패:', error);
+    }
+  }, [isEditMode]);
+
+  // 임시 저장 데이터 삭제
+  const clearDraft = () => {
+    localStorage.removeItem('postDraft');
+    setDraftCount(0);
   };
+
+  // 임시 저장
+  const handleSaveDraft = useCallback(() => {
+    try {
+      const draftData = {
+        content: postData.content,
+        location: postData.location,
+        locationDetails: postData.locationDetails,
+        countryCode: postData.countryCode,
+        cityCode: postData.cityCode,
+        businessHours: postData.businessHours,
+        recommendedMenu: postData.recommendedMenu,
+        paymentMethod: postData.paymentMethod,
+        savedAt: new Date().toISOString(),
+        isEditMode: isEditMode,
+        editPostId: editPostId
+      };
+
+      localStorage.setItem('postDraft', JSON.stringify(draftData));
+      setDraftCount(prev => prev + 1);
+      alert('임시 저장되었습니다.');
+    } catch (error) {
+      console.error('임시 저장 실패:', error);
+      alert('임시 저장에 실패했습니다.');
+    }
+  }, [postData, isEditMode, editPostId]);
+
+  // 뒤로가기 시 취소 확인
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (postData.content || previewImages.length > 0 || previewVideo) {
+        e.preventDefault();
+        e.returnValue = '게시물 작성을 취소하시겠어요? 작성된 내용은 삭제됩니다.';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [postData.content, previewImages.length, previewVideo]);
 
   // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
@@ -397,11 +472,15 @@ const PostUploadContent: React.FC = () => {
           newImages,
           remainingExistingImages,
           postData.video, // 새 동영상 파일
-          existingPost?.video // 기존 동영상
+          existingPost?.video, // 기존 동영상
+          postData.businessHours,
+          postData.recommendedMenu,
+          postData.paymentMethod
         );
 
         if (success) {
           console.log('✅ 게시물 수정 완료');
+          clearDraft(); // 임시 저장 데이터 삭제
           alert('게시물이 수정되었습니다.');
           router.push('/profile');
         } else {
@@ -435,12 +514,16 @@ const PostUploadContent: React.FC = () => {
             cityCode: postData.cityCode
           },
           postData.video, // 동영상 파일 전달
+          postData.businessHours,
+          postData.recommendedMenu,
+          postData.paymentMethod,
           (progress: number) => {
             setUploadProgress(progress);
           }
         );
 
         console.log('✅ 게시물 업로드 완료! Post ID:', postId);
+        clearDraft(); // 임시 저장 데이터 삭제
         alert(t('uploadSuccess'));
         
         // 홈으로 이동
@@ -488,7 +571,10 @@ const PostUploadContent: React.FC = () => {
 
             {/* 국가/도시 선택 */}
             <div className={styles['form-group']}>
-              <label className={styles['form-label']}>{t('countryAndCitySelection')}</label>
+              <label className={styles['form-label']}>
+                <img src="/icons/compass.svg" alt="나침반" width="16" height="16" style={{ marginRight: '8px' }} />
+                {t('countryAndCitySelection')}
+              </label>
               <PostUploadCountryCitySelector
                 selectedCountry={postData.countryCode}
                 selectedCity={postData.cityCode}
@@ -497,9 +583,23 @@ const PostUploadContent: React.FC = () => {
               />
             </div>
 
+            {/* 위치 선택 */}
+            <div className={styles['form-group']}>
+              <label className={styles['form-label']}>
+                <img src="/icons/map.svg" alt="지도" width="16" height="16" style={{ marginRight: '8px' }} />
+                {t('addLocation')}
+              </label>
+              <GoogleMapsLocationPicker
+                initialLocation={postData.location}
+                locationDetails={postData.locationDetails}
+                onLocationSelect={handleLocationSelect}
+                className={styles['location-picker']}
+              />
+            </div>
+
             {/* 이미지 업로드 */}
             <div className={styles['form-group']}>
-              <label className={styles['form-label']}>{t('uploadImages')}</label>
+              <label className={styles['form-label-secondary']}>{t('uploadImages')}</label>
               
               {/* 숨겨진 파일 입력들 */}
               <input
@@ -558,7 +658,7 @@ const PostUploadContent: React.FC = () => {
 
             {/* 동영상 업로드 */}
             <div className={styles['form-group']}>
-              <label className={styles['form-label']}>{t('uploadVideo')}</label>
+              <label className={styles['form-label-secondary']}>{t('uploadVideo')}</label>
               <div className={styles['video-upload-hint']}>
                 {t('videoUploadHint')}
               </div>
@@ -610,9 +710,72 @@ const PostUploadContent: React.FC = () => {
               </div>
             </div>
 
+            {/* 영업시간과 추천 메뉴 (한 줄) */}
+            <div className={styles['form-group']}>
+              <div className={styles['two-column-inputs']}>
+                <div className={styles['input-column']}>
+                  <label className={styles['form-label-secondary']}>{t('businessHours')}</label>
+                  <input
+                    type="text"
+                    value={postData.businessHours}
+                    onChange={(e) => handleInputChange('businessHours', e.target.value)}
+                    placeholder={t('businessHoursPlaceholder')}
+                    className={styles['form-input']}
+                  />
+                </div>
+                <div className={styles['input-column']}>
+                  <label className={styles['form-label-secondary']}>{t('recommendedMenu')}</label>
+                  <input
+                    type="text"
+                    value={postData.recommendedMenu}
+                    onChange={(e) => handleInputChange('recommendedMenu', e.target.value)}
+                    placeholder={t('recommendedMenuPlaceholder')}
+                    className={styles['form-input']}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 결제 방법 */}
+            <div className={styles['form-group']}>
+              <label className={styles['form-label-secondary']}>{t('paymentMethod')}</label>
+              <div className={styles['radio-group']}>
+                <label className={styles['radio-option']}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="card"
+                    checked={postData.paymentMethod === 'card'}
+                    onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  />
+                  <span className={styles['radio-label']}>{t('paymentCard')}</span>
+                </label>
+                <label className={styles['radio-option']}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cash"
+                    checked={postData.paymentMethod === 'cash'}
+                    onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  />
+                  <span className={styles['radio-label']}>{t('paymentCash')}</span>
+                </label>
+                <label className={styles['radio-option']}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="both"
+                    checked={postData.paymentMethod === 'both'}
+                    onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  />
+                  <span className={styles['radio-label']}>{t('paymentBoth')}</span>
+                </label>
+              </div>
+            </div>
+
             {/* 게시글 내용 */}
             <div className={styles['form-group']}>
-              <label className={styles['form-label']}>{t('postContent')}</label>
+              <label className={styles['form-label-secondary']}>{t('postContent')}</label>
               <textarea
                 value={postData.content}
                 onChange={(e) => handleInputChange('content', e.target.value)}
@@ -626,22 +789,23 @@ const PostUploadContent: React.FC = () => {
               </div>
             </div>
 
-            {/* 위치 선택 */}
-            <GoogleMapsLocationPicker
-              initialLocation={postData.location}
-              locationDetails={postData.locationDetails}
-              onLocationSelect={handleLocationSelect}
-              className={styles['location-picker']}
-            />
-
             {/* 선택된 위치 표시는 GoogleMapsLocationPicker 내부에서 처리 */}
 
 
 
 
 
-            {/* 제출 버튼 */}
-            <div className={styles['submit-section']}>
+            {/* 버튼 섹션 */}
+            <div className={styles['button-section']}>
+              <button
+                type="button"
+                className={styles['save-draft-btn']}
+                onClick={handleSaveDraft}
+                disabled={isUploading}
+              >
+                임시 저장 {draftCount > 0 && `(${draftCount})`}
+              </button>
+              
               <button
                 type="submit"
                 className={styles['submit-btn']}
@@ -649,7 +813,7 @@ const PostUploadContent: React.FC = () => {
               >
                 {isUploading 
                   ? `${isEditMode ? '수정' : '업로드'} 중... ${uploadProgress.toFixed(0)}%` 
-                  : isEditMode ? '게시물 수정' : t('uploadPost')
+                  : isEditMode ? '게시물 수정' : t('createPost')
                 }
               </button>
               

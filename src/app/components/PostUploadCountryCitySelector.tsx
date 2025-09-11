@@ -279,4 +279,4 @@ const PostUploadCountryCitySelector: React.FC<PostUploadCountryCitySelectorProps
   );
 };
 
-export default PostUploadCountryCitySelector;
+export default React.memo(PostUploadCountryCitySelector);

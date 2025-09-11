@@ -1,12 +1,12 @@
 {
   "createPost": {
-    "ko": "게시물 업로드",
-    "en": "Upload Post",
-    "vi": "Tải lên bài viết",
-    "zh": "上传帖子",
-    "ja": "投稿アップロード",
-    "th": "อัปโหลดโพสต์",
-    "fil": "Mag-upload ng Post"
+    "ko": "게시물 등록",
+    "en": "Register Post",
+    "vi": "Đăng ký bài viết",
+    "zh": "注册帖子",
+    "ja": "投稿登録",
+    "th": "ลงทะเบียนโพสต์",
+    "fil": "Magparehistro ng Post"
   },
   "uploadImages": {
     "ko": "이미지 업로드",
@@ -54,13 +54,13 @@
     "fil": "Magdagdag ng Larawan"
   },
   "postContent": {
-    "ko": "게시물 작성",
-    "en": "Post Content",
-    "vi": "Nội dung bài viết",
-    "zh": "帖子内容",
-    "ja": "投稿内容",
-    "th": "เนื้อหาโพสต์",
-    "fil": "Nilalaman ng Post"
+    "ko": "가게 상세 정보",
+    "en": "Store Details",
+    "vi": "Chi tiết cửa hàng",
+    "zh": "店铺详细信息",
+    "ja": "店舗詳細情報",
+    "th": "รายละเอียดร้านค้า",
+    "fil": "Mga Detalye ng Tindahan"
   },
   "postTitle": {
     "ko": "제목",
@@ -90,13 +90,13 @@
     "fil": "Paglalarawan"
   },
   "contentPlaceholder": {
-    "ko": "게시물 내용을 작성하세요",
-    "en": "Write post content",
-    "vi": "Viết nội dung bài viết",
-    "zh": "编写帖子内容",
-    "ja": "投稿の内容を書いてください",
-    "th": "เขียนเนื้อหาโพสต์",
-    "fil": "Isulat ang nilalaman ng post"
+    "ko": "가게의 분위기, 음식 맛, 서비스 등 상세한 후기를 작성해주세요",
+    "en": "Please write detailed reviews about the store's atmosphere, food taste, service, etc.",
+    "vi": "Vui lòng viết đánh giá chi tiết về không khí cửa hàng, hương vị món ăn, dịch vụ, v.v.",
+    "zh": "请详细描述店铺的氛围、食物味道、服务等",
+    "ja": "お店の雰囲気、料理の味、サービスなどの詳細なレビューを書いてください",
+    "th": "กรุณาเขียนรีวิวโดยละเอียดเกี่ยวกับบรรยากาศของร้าน รสชาติอาหาร บริการ ฯลฯ",
+    "fil": "Mangyaring magsulat ng detalyadong mga review tungkol sa kapaligiran ng tindahan, lasa ng pagkain, serbisyo, atbp."
   },
   "locationInfo": {
     "ko": "위치 정보",
@@ -115,6 +115,87 @@
     "ja": "場所",
     "th": "ตำแหน่ง",
     "fil": "Lokasyon"
+  },
+  "addLocation": {
+    "ko": "위치를 추가해주세요",
+    "en": "Please add a location",
+    "vi": "Vui lòng thêm vị trí",
+    "zh": "请添加位置",
+    "ja": "位置を追加してください",
+    "th": "กรุณาเพิ่มตำแหน่ง",
+    "fil": "Mangyaring magdagdag ng lokasyon"
+  },
+  "businessHours": {
+    "ko": "영업시간",
+    "en": "Business Hours",
+    "vi": "Giờ hoạt động",
+    "zh": "营业时间",
+    "ja": "営業時間",
+    "th": "เวลาทำการ",
+    "fil": "Oras ng Negosyo"
+  },
+  "businessHoursPlaceholder": {
+    "ko": "예: 09:00 - 22:00",
+    "en": "e.g. 09:00 - 22:00",
+    "vi": "ví dụ: 09:00 - 22:00",
+    "zh": "例如：09:00 - 22:00",
+    "ja": "例：09:00 - 22:00",
+    "th": "เช่น 09:00 - 22:00",
+    "fil": "hal: 09:00 - 22:00"
+  },
+  "recommendedMenu": {
+    "ko": "추천 메뉴",
+    "en": "Recommended Menu",
+    "vi": "Thực đơn gợi ý",
+    "zh": "推荐菜单",
+    "ja": "おすすめメニュー",
+    "th": "เมนูแนะนำ",
+    "fil": "Inirerekomendang Menu"
+  },
+  "recommendedMenuPlaceholder": {
+    "ko": "예: 김치찌개, 불고기",
+    "en": "e.g. Kimchi stew, Bulgogi",
+    "vi": "ví dụ: Canh kimchi, Bulgogi",
+    "zh": "例如：泡菜汤、烤肉",
+    "ja": "例：キムチチゲ、プルコギ",
+    "th": "เช่น สตูว์กิมจิ บุลโกกิ",
+    "fil": "hal: Kimchi stew, Bulgogi"
+  },
+  "paymentMethod": {
+    "ko": "결제 방법",
+    "en": "Payment Method",
+    "vi": "Phương thức thanh toán",
+    "zh": "支付方式",
+    "ja": "支払い方法",
+    "th": "วิธีการชำระเงิน",
+    "fil": "Paraan ng Pagbabayad"
+  },
+  "paymentCard": {
+    "ko": "카드",
+    "en": "Card",
+    "vi": "Thẻ",
+    "zh": "卡",
+    "ja": "カード",
+    "th": "บัตร",
+    "fil": "Card"
+  },
+  "paymentCash": {
+    "ko": "현금",
+    "en": "Cash",
+    "vi": "Tiền mặt",
+    "zh": "现金",
+    "ja": "現金",
+    "th": "เงินสด",
+    "fil": "Cash"
+  },
+  "paymentBoth": {
+    "ko": "카드 or 현금",
+    "en": "Card or Cash",
+    "vi": "Thẻ hoặc tiền mặt",
+    "zh": "卡或现金",
+    "ja": "カードまたは現金",
+    "th": "บัตรหรือเงินสด",
+    "fil": "Card o Cash"
   },
   "locationPlaceholder": {
     "ko": "장소를 검색하세요 (예: 스타벅스, 명동역)",
