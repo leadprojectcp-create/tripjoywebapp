@@ -12,6 +12,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from "../services/firebase";
 import CountryAndCitySelector, { CountryAndCitySelectorRef } from "../components/CountryAndCitySelector";
 import { PostCard } from "../components/PostCard";
+import { VideoSection } from "../components/VideoSection";
 import styles from "./style.module.css";
 
 export default function Dashboard() {
@@ -188,7 +189,7 @@ export default function Dashboard() {
                 ) : (
                   <div className={styles['content-grid']}>
                     {posts.length > 0 ? (
-                      posts.map((post) => (
+                      posts.slice(0, 8).map((post) => ( // 최대 8개 (4개씩 2줄)
                         <PostCard
                           key={post.id}
                           post={post}
@@ -205,6 +206,12 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
+
+              {/* Video Section */}
+              <VideoSection 
+                posts={posts}
+                userInfoCache={userInfoCache}
+              />
             </div>
           </div>
         

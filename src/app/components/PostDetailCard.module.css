@@ -1,8 +1,7 @@
-/* PostDetailCard - 상세 페이지용 3:4 비율 카드 */
+/* PostDetailCard - 상세 페이지용 카드 */
 .postDetailCard {
   background: white;
   border-radius: 12px;
-  aspect-ratio: 3/4;
   display: flex;
   flex-direction: column;
   overflow: visible;
@@ -10,88 +9,6 @@
   max-width: 400px;
 }
 
-/* 카드 헤더 */
-.cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 0 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.userAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #e9ecef;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #6c757d;
-  flex-shrink: 0;
-}
-
-.userAvatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.userDetails {
-  flex: 1;
-  min-width: 0;
-}
-
-.userName {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1B1C1F;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.userLocation {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #999;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.locationIcon {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-}
-
-.locationText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dateBadge {
-  font-size: 12px;
-  color: #999;
-  background: #f8f9fa;
-  padding: 4px 8px;
-  border-radius: 12px;
-  white-space: nowrap;
-}
 
 /* 이미지 컨테이너 */
 .imageContainer {
@@ -282,7 +199,7 @@
 
 /* 카드 푸터 */
 .cardFooter {
-  padding: 12px 16px;
+  padding: 12px 0;
   border-top: 1px solid #f0f0f0;
   flex: 1;
   display: flex;
@@ -292,96 +209,178 @@
 
 .engagementActions {
   display: flex;
+  gap: 12px;
+  margin-bottom: 8px 0;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
 }
 
 .leftActions {
   display: flex;
+  gap: 4px;
   align-items: center;
-  gap: 16px;
 }
 
 .actionBtn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border: none;
-  background: #f8f9fa;
+  padding: 4px 8px 4px 0 !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  background: none !important;
+  border: none !important;
   border-radius: 20px;
+  font-size: 16px;
+  color: #666;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
+  line-height: 1;
+  transition: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-decoration: none;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn:active,
+.actionBtn:focus,
+.actionBtn:hover,
+.actionBtn:visited {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.actionBtn:active {
+  background: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background: none !important;
 }
 
 .actionBtn:hover {
-  background: #e9ecef;
+  background: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionBtn.active,
+.actionBtn.liked {
+  color: #1976d2;
 }
 
 .actionBtn.liked {
-  background: #fff5f5;
-  color: #e53e3e;
+  color: #d32f2f;
 }
 
 .actionIcon {
-  display: flex;
-  align-items: center;
+  font-size: 20px;
+  line-height: 1;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.actionIcon img {
+  width: 20px;
+  height: 20px;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .actionCount {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+  color: #1B1C1F;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .shareBtn {
-  background: #f8f9fa;
-}
-
-.shareBtn.active {
-  background: #e3f2fd;
-  color: #1976d2;
+  /* justify-content: space-between으로 자동으로 오른쪽 끝에 배치됨 */
 }
 
 /* 공유 메뉴 */
 .shareMenu {
   position: absolute;
-  bottom: 60px;
-  right: 16px;
+  top: -8px;
+  right: 0;
   background: white;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 8px 0;
+  z-index: 1000;
   min-width: 160px;
-  z-index: 10;
+  overflow: hidden;
+  margin-bottom: 8px;
 }
 
 .shareOption {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.15s;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  padding: 8px 16px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s ease;
 }
 
 .shareOption:hover {
-  background: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 /* 위치 정보 및 게시물 내용 */
 .locationInfo {
   flex: 1;
-}
-
-.postContent {
-  margin-top: 8px;
 }
 
 .postText {
@@ -391,60 +390,65 @@
   word-break: break-word;
 }
 
+/* 게시물 액션 (번역 버튼 + 날짜) */
+.postActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* 번역 버튼 */
+.translateBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.translateBtn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.translateBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 글작성 날짜 */
+.postDate {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .postDetailCard {
-    aspect-ratio: 3/4;
     min-height: 400px;
   }
   
-  .cardHeader {
-    padding: 0 0 8px 0;
-  }
-  
-  .userAvatar {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-  
-  .userName {
-    font-size: 13px;
-  }
-  
-  .userLocation {
-    font-size: 11px;
-  }
-  
-  .locationIcon {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .dateBadge {
-    font-size: 11px;
-    padding: 3px 6px;
-  }
   
   .cardFooter {
-    padding: 8px 12px;
+    padding: 8px 0;
   }
   
   .engagementActions {
-    margin-bottom: 8px;
-  }
-  
-  .leftActions {
-    gap: 12px;
+    gap: 8px;
   }
   
   .actionBtn {
-    padding: 4px 8px;
+    padding: 6px 10px 6px 0;
     font-size: 13px;
   }
   
-  .actionCount {
-    font-size: 13px;
+  .actionIcon {
+    font-size: 14px;
   }
   
   .postText {

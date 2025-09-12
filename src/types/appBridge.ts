@@ -41,6 +41,9 @@ export interface GeolocationError {
 // 나중에 확장될 수 있는 메시지 타입들
 export type MessageType = 
   | 'LOCATION_UPDATE'
+  | 'LOCATION_REQUEST'    // 위치 정보 요청
+  | 'LOCATION_RESPONSE'   // 위치 정보 응답
+  | 'OPEN_DEEP_LINK'      // 딥링크 열기
   | 'CAMERA_REQUEST'      // 나중에 추가
   | 'FILE_UPLOAD'         // 나중에 추가
   | 'PUSH_NOTIFICATION'   // 나중에 추가

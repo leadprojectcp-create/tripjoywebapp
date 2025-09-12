@@ -13,16 +13,13 @@ import { PostDetailCard } from '../../components/PostDetailCard';
 import { getPostById, PostData } from '../../services/postService';
 import { getUserById } from '../../auth/services/authService';
 import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../../services/interactionService';
-import { GOOGLE_MAPS_API_KEY } from '../../utils/googleMaps';
+import { PostDetailHeader } from './PostDetailHeader';
+import { LocationInfoSection } from './LocationInfoSection';
+import { usePostTranslation } from './usePostTranslation';
+import { useLocationTranslation } from './useLocationTranslation';
 import ClientStyleProvider from '../../components/ClientStyleProvider';
 import styles from './page.module.css';
 
-// Google Maps 타입 선언
-declare global {
-  interface Window {
-    google: any;
-  }
-}
 
 interface UserInfo {
   name: string;
@@ -37,7 +34,7 @@ export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuthContext();
-  const { t } = useTranslationContext();
+  const { t, currentLanguage } = useTranslationContext();
   const unreadMessageCount = useUnreadMessageCount();
   
   const [post, setPost] = useState<PostData | null>(null);
@@ -48,6 +45,19 @@ export default function PostDetailPage() {
   // 상호작용 상태
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  
+  // 커스텀 훅 사용
+  const { 
+    translatedBusinessHours, 
+    translatedRecommendedMenu, 
+    translatedAddress, 
+    isTranslating 
+  } = usePostTranslation(post);
+  
+  const { 
+    translatePostLocation, 
+    translatePaymentMethod 
+  } = useLocationTranslation(post);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarksCount, setBookmarksCount] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -58,94 +68,10 @@ export default function PostDetailPage() {
   const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
   const sliderRef = useRef<HTMLDivElement | null>(null);
   
-  // 지도 상태
-  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-  const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
+
 
   const postId = params.id as string;
 
-  // 국가코드를 현재 언어의 국가명으로 변환하는 함수
-  const translateCountry = (countryCode: string): string => {
-    if (!countryCode) return '';
-    
-    // 기본값들은 그대로 반환 (번역하지 않음)
-    if (countryCode === '위치 미상' || countryCode === '사용자') {
-      return countryCode;
-    }
-    
-    try {
-      return t(`countries.${countryCode}`);
-    } catch (error) {
-      return countryCode; // 번역이 없으면 원본 반환
-    }
-  };
-
-  // 성별을 현재 언어로 번역하는 함수
-  const translateGender = (gender: string): string => {
-    if (!gender) return '';
-    const lowerGender = gender.toLowerCase();
-    if (lowerGender === 'male' || lowerGender === 'man' || lowerGender === '남성') {
-      return t('male');
-    } else if (lowerGender === 'female' || lowerGender === 'woman' || lowerGender === '여성') {
-      return t('female');
-    }
-    return gender; // 번역이 없으면 원본 반환
-  };
-
-  // 나이에 언어별 단위를 붙이는 함수
-  const formatAge = (age: number): string => {
-    if (!age || age === 0) return '';
-    return `${age}${t('ageUnit')}`;
-  };
-
-  // 생년월일로부터 나이 계산하는 함수
-  const calculateAge = (birthDateString: string): number => {
-    if (!birthDateString) return 0;
-    
-    try {
-      // "2020년 6월 7일 오전 12시 0분 0초 UTC+9" 형식 파싱
-      const koreanDateRegex = /(\d{4})년 (\d{1,2})월 (\d{1,2})일/;
-      const match = birthDateString.match(koreanDateRegex);
-      
-      if (match) {
-        const year = parseInt(match[1]);
-        const month = parseInt(match[2]) - 1; // JavaScript Date는 월이 0부터 시작
-        const day = parseInt(match[3]);
-        
-        const birthDate = new Date(year, month, day);
-        const today = new Date();
-        
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        
-        // 생일이 아직 지나지 않았다면 나이에서 1을 뺌
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
-        }
-        
-        return age;
-      }
-      
-      // 일반적인 날짜 형식도 시도
-      const birthDate = new Date(birthDateString);
-      if (!isNaN(birthDate.getTime())) {
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
-        }
-        
-        return age;
-      }
-    } catch (error) {
-      console.error('생년월일 파싱 오류:', error);
-    }
-    
-    return 0;
-  };
 
   useEffect(() => {
     const loadPostDetail = async () => {
@@ -344,52 +270,6 @@ export default function PostDetailPage() {
     }
   }, []);
 
-  // 지도 초기화
-  useEffect(() => {
-    if (!post?.location?.coordinates) return;
-
-    const initMap = () => {
-      if (mapRef.current && window.google && window.google.maps && post?.location?.coordinates) {
-        const { lat, lng } = post.location.coordinates;
-        
-        mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-          center: { lat, lng },
-          zoom: 15,
-          mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-          disableDefaultUI: false,
-          zoomControl: true,
-          streetViewControl: false,
-          fullscreenControl: false,
-          mapTypeControl: false,
-        });
-        
-        // 마커 추가
-        new window.google.maps.Marker({
-          position: { lat, lng },
-          map: mapInstanceRef.current,
-          title: post.location.name,
-        });
-        
-        setIsGoogleMapsLoaded(true);
-      }
-    };
-
-    // Google Maps API가 이미 로드되어 있는지 확인
-    if (window.google && window.google.maps) {
-      // 이미 로드되어 있으면 바로 지도 생성
-      setTimeout(initMap, 100);
-    } else {
-      // 로드되지 않았으면 스크립트 로드 후 지도 생성
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&language=ko`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        setTimeout(initMap, 100);
-      };
-      document.head.appendChild(script);
-    }
-  }, [post?.location?.coordinates, post?.location?.name]);
 
   const handleBackClick = () => {
     router.back();
@@ -435,102 +315,53 @@ export default function PostDetailPage() {
                 </div>
               ) : (
                 <div className={styles.postDetailContainer}>
+                  {/* 카드 헤더 - 전체 넓이 사용 */}
+                  <PostDetailHeader userInfo={userInfo ? {
+                    id: userInfo.name || '',
+                    email: '',
+                    name: userInfo.name || '',
+                    photoUrl: userInfo.photoUrl || userInfo.profileImage || '',
+                    phoneNumber: '',
+                    signupMethod: 'email',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    birthDate: userInfo.birthDate || '',
+                    gender: userInfo.gender || '',
+                    location: userInfo.location || '',
+                    loginType: 'email',
+                    lastLoginAt: new Date().toISOString(),
+                    points: 0,
+                    usage_count: 0,
+                    language: 'ko',
+                    consents: {
+                      termsOfService: false,
+                      personalInfo: false,
+                      locationInfo: false,
+                      marketing: false,
+                      thirdParty: false
+                    },
+                    lastUpdated: new Date().toISOString()
+                  } : null} />
+
                   <div className={styles.twoColumnLayout}>
                     {/* 왼쪽: PostDetailCard - 9:16 비율 */}
                     <div className={styles.leftColumn}>
-                      {userInfo && (
-                        <PostDetailCard 
-                          post={post}
-                          userInfo={userInfo}
-                          onInteractionChange={handleInteractionChange}
-                        />
-                      )}
+                      <PostDetailCard 
+                        post={post}
+                        onInteractionChange={handleInteractionChange}
+                      />
                     </div>
 
                     {/* 오른쪽: 기존 상세 정보들 */}
                     <div className={styles.rightColumn}>
-                      <div className={styles.detailInfoSection}>
-                        {/* 위치 정보 */}
-                        {post?.location && (post.location.nationality || post.location.city) && (
-                          <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>위치</label>
-                            <div className={styles.postLocationRow}>
-                              {post.location.nationality && (
-                                <span className={styles.postNationality}>
-                                  {post.location.countryName || post.location.nationality}
-                                </span>
-                              )}
-                              {post.location.city && (
-                                <span className={styles.postCity}>
-                                  {post.location.cityName || post.location.city}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 영업시간 */}
-                        {post.businessHours && (
-                          <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>영업시간</label>
-                            <div className={styles.businessInfo}>
-                              {post.businessHours}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 추천 메뉴 */}
-                        {post.recommendedMenu && (
-                          <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>추천 메뉴</label>
-                            <div className={styles.menuInfo}>
-                              {post.recommendedMenu}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 결제 방법 */}
-                        {post.paymentMethod && (
-                          <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>결제 방법</label>
-                            <div className={styles.paymentInfo}>
-                              {post.paymentMethod}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* 상세 주소 및 지도 */}
-                        {post.location && (
-                          <div className={styles.formGroup}>
-                            <label className={styles.formLabel}>상세 주소</label>
-                            <div className={styles.locationInfo}>
-                              <div className={styles.locationName}>{post.location.name}</div>
-                              {post.location.address && (
-                                <div className={styles.locationAddress}>{post.location.address}</div>
-                              )}
-                              <div className={styles.mapContainer}>
-                                {!isGoogleMapsLoaded && (
-                                  <div className={styles.mapLoading}>
-                                    <div className={styles.loadingSpinner}></div>
-                                    <p>지도를 불러오는 중...</p>
-                                  </div>
-                                )}
-                                <div 
-                                  ref={mapRef}
-                                  className={styles.googleMap}
-                                  style={{ 
-                                    height: '200px',
-                                    width: '100%',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    display: isGoogleMapsLoaded ? 'block' : 'none'
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <LocationInfoSection 
+                        post={post}
+                        translatedBusinessHours={translatedBusinessHours}
+                        translatedRecommendedMenu={translatedRecommendedMenu}
+                        translatedAddress={translatedAddress}
+                        translatePaymentMethod={translatePaymentMethod}
+                        translatePostLocation={translatePostLocation}
+                      />
                     </div>
                   </div>
                 </div>

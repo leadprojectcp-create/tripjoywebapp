@@ -233,6 +233,25 @@ export const requestLocationFromApp = (): void => {
 };
 
 /**
+ * 딥링크 열기 메시지 생성
+ */
+export const createOpenDeepLinkMessage = (url: string): BridgeMessage => {
+  return {
+    type: 'OPEN_DEEP_LINK',
+    data: { url },
+    timestamp: Date.now()
+  };
+};
+
+/**
+ * 앱에서 딥링크 열기 요청
+ */
+export const requestOpenDeepLink = (url: string): void => {
+  const message = createOpenDeepLinkMessage(url);
+  sendMessageToApp(message);
+};
+
+/**
  * 앱 환경 정보 가져오기
  */
 export const getAppEnvironment = (): AppEnvironment => {

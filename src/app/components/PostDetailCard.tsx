@@ -5,26 +5,16 @@ import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
 import { toggleLike, checkLikeStatus } from '../services/interactionService';
+import { translateText, LANGUAGE_CODES, LanguageCode } from '../services/translateService';
 import styles from './PostDetailCard.module.css';
 
 interface PostDetailCardProps {
   post: PostData;
-  userInfo?: {
-    name: string;
-    location: string;
-    profileImage?: string;
-    photoUrl?: string;
-    gender?: string;
-    birthDate?: string;
-    nationality?: string;
-    city?: string;
-  };
   onInteractionChange?: (postId: string, type: 'like', isActive: boolean) => void;
 }
 
 export const PostDetailCard: React.FC<PostDetailCardProps> = ({ 
   post, 
-  userInfo = { name: '사용자', location: '위치 미상' },
   onInteractionChange
 }) => {
   const { t, currentLanguage } = useTranslationContext();
@@ -37,103 +27,12 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [playingVideoIndex, setPlayingVideoIndex] = useState<number | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+  const [showTranslated, setShowTranslated] = useState(false);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const isMountedRef = useRef(true);
   
-  // 국가/도시 데이터 상태
-  const [countries, setCountries] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
-
-  // 국가 데이터 로드
-  useEffect(() => {
-    const loadCountries = async () => {
-      try {
-        const response = await fetch('/data/countries.json');
-        const data = await response.json();
-        setCountries(data.countries || []);
-      } catch (error) {
-        console.error('❌ 국가 데이터 로드 실패:', error);
-      }
-    };
-
-    loadCountries();
-  }, []);
-
-  // 도시 데이터 로드 (게시물 위치의 국가가 변경될 때)
-  useEffect(() => {
-    const loadCities = async (countryCode: string) => {
-      if (!countryCode) {
-        setCities([]);
-        return;
-      }
-
-      try {
-        const selectedCountryData = countries.find(c => c.code === countryCode);
-        if (!selectedCountryData) return;
-
-        const countryFileMap: Record<string, string> = {
-          'ko': 'kr', 'en': 'us', 'vi': 'vn', 'zh': 'cn',
-          'ja': 'jp', 'th': 'th', 'fil': 'ph'
-        };
-
-        const fileName = countryFileMap[selectedCountryData.name];
-        if (!fileName) return;
-
-        const response = await fetch(`/data/cities-${fileName}.json`);
-        const data = await response.json();
-        setCities(data.cities || []);
-      } catch (error) {
-        console.error('❌ 도시 데이터 로드 실패:', error);
-        setCities([]);
-      }
-    };
-
-    // 게시물 위치의 국가 코드로 도시 데이터 로드
-    if (post.location?.nationality) {
-      loadCities(post.location.nationality);
-    }
-  }, [post.location?.nationality, countries]);
-
-  // 국가코드를 현재 언어의 국가명으로 변환하는 함수
-  const translateCountry = (countryCode: string): string => {
-    if (!countryCode) return '';
-    
-    // 기본값들은 그대로 반환 (번역하지 않음)
-    if (countryCode === '위치 미상' || countryCode === '사용자') {
-      return countryCode;
-    }
-    
-    const country = countries.find(c => c.code === countryCode);
-    return country?.names[currentLanguage] || country?.names['en'] || countryCode;
-  };
-
-  // 도시코드를 현재 언어의 도시명으로 변환하는 함수
-  const translateCity = (cityCode: string): string => {
-    if (!cityCode) return '';
-    
-    const city = cities.find(c => c.code === cityCode);
-    return city?.names[currentLanguage] || city?.names['en'] || cityCode;
-  };
-
-  // 게시물 위치 정보를 번역하는 함수
-  const translatePostLocation = (postLocation: any): string => {
-    if (!postLocation) return '';
-    
-    // 국가/도시 코드가 있으면 번역하여 표시
-    if (postLocation.nationality && postLocation.city) {
-      const countryName = translateCountry(postLocation.nationality);
-      const cityName = translateCity(postLocation.city);
-      return `${countryName} · ${cityName}`;
-    }
-    
-    // 장소명이 있으면 그대로 표시
-    if (postLocation.name) {
-      return postLocation.name;
-    }
-    
-    // 기본값 없음
-    return '';
-  };
 
   // 🚀 미디어 URL 추출 (이미지 + 비디오, useMemo로 최적화 - 무한 렌더링 방지)
   const mediaUrls = useMemo(() => {
@@ -340,6 +239,32 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
     setShowShareMenu(false);
   }, [post.id, post.content, t]);
 
+  // 번역 핸들러
+  const handleTranslate = useCallback(async () => {
+    if (!post.content || isTranslating) return;
+
+    try {
+      setIsTranslating(true);
+      
+      // 현재 선택된 언어로 번역 (브라우저에서 선택된 언어)
+      const targetLanguage = currentLanguage;
+      
+      const translated = await translateText(post.content, LANGUAGE_CODES[targetLanguage as LanguageCode]);
+      setTranslatedText(translated);
+      setShowTranslated(true);
+    } catch (error) {
+      console.error('번역 실패:', error);
+      alert('번역 중 오류가 발생했습니다.');
+    } finally {
+      setIsTranslating(false);
+    }
+  }, [post.content, currentLanguage, isTranslating]);
+
+  // 원문 보기 핸들러
+  const handleShowOriginal = useCallback(() => {
+    setShowTranslated(false);
+  }, []);
+
   // dot indicator 클릭 핸들러
   const handleDotClick = useCallback((index: number) => {
     try {
@@ -545,32 +470,6 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
 
   return (
     <div className={styles.postDetailCard}>
-      {/* 카드 헤더 */}
-      <div className={styles.cardHeader}>
-        <div className={styles.userInfo}>
-          <div className={styles.userAvatar}>
-            {userInfo.photoUrl || userInfo.profileImage ? (
-              <img src={userInfo.photoUrl || userInfo.profileImage} alt={userInfo.name} />
-            ) : (
-              <span>{userInfo.name.charAt(0)}</span>
-            )}
-          </div>
-          <div className={styles.userDetails}>
-            <div className={styles.userName}>{userInfo.name}</div>
-            {translatePostLocation(post.location) && (
-              <div className={styles.userLocation}>
-                <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
-                <span className={styles.locationText}>
-                  {translatePostLocation(post.location)}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* 날짜 표시 */}
-        <span className={styles.dateBadge}>{formatDate(post.createdAt)}</span>
-      </div>
 
       {/* 미디어 영역 - 9:16 비율 (이미지 + 비디오) */}
       {(() => {
@@ -654,9 +553,28 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
           <div className={styles.postContent}>
             {post.content && (
               <span className={styles.postText}>
-                {post.content}
+                {showTranslated && translatedText ? translatedText : post.content}
               </span>
             )}
+          </div>
+          
+          {/* 번역 버튼과 날짜 */}
+          <div className={styles.postActions}>
+            {/* 번역 버튼 */}
+            {post.content && (
+              <button 
+                className={styles.translateBtn}
+                onClick={showTranslated ? handleShowOriginal : handleTranslate}
+                disabled={isTranslating}
+              >
+                {isTranslating ? '번역 중...' : (showTranslated ? '원문 보기' : '번역하기')}
+              </button>
+            )}
+            
+            {/* 글작성 날짜 - 오른쪽 정렬 */}
+            <div className={styles.postDate}>
+              {formatDate(post.createdAt)}
+            </div>
           </div>
         </div>
       </div>

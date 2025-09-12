@@ -11,15 +11,16 @@ export const Footer: React.FC = () => {
   const pathname = usePathname();
   const [isApp, setIsApp] = useState(false);
   
-  // 채팅 페이지에서는 footer 숨기기
+  // 채팅 페이지와 쇼츠 페이지에서는 footer 숨기기
   const isChatPage = pathname?.startsWith('/chat');
+  const isShortsPage = pathname?.startsWith('/shorts');
   
   // 클라이언트에서만 앱 환경 감지
   useEffect(() => {
     setIsApp(typeof window !== 'undefined' && !!(window as any).ReactNativeWebView);
   }, []);
   
-  if (isChatPage) {
+  if (isChatPage || isShortsPage) {
     return null;
   }
 

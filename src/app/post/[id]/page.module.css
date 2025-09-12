@@ -31,12 +31,13 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding-bottom: 80px; /* 푸터 공간 확보 */
 }
 
 /* 게시물 상세 컨테이너 */
 .postDetailContainer {
   width: 100%;
-  max-width: 840px;
+  max-width: 820px;
   margin: 0 auto;
   text-align: left;
   box-sizing: border-box;
@@ -56,6 +57,92 @@
   gap: 20px;
 }
 
+/* 카드 헤더 - 전체 넓이 사용 */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 20px;
+}
+
+.cardHeader .userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.cardHeader .userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.cardHeader .userAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardHeader .userDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardHeader .userName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B1C1F;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardHeader .userLocation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardHeader .locationIcon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.cardHeader .locationText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardHeader .dateBadge {
+  font-size: 12px;
+  color: #999;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
 .rightColumn {
   flex: 1;
   display: flex;
@@ -63,12 +150,116 @@
   gap: 20px;
 }
 
+/* 위치 헤더 (아이콘 + 이름) */
+.locationHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 0;
+}
+
+.locationIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.locationHeader .locationName {
+  color: #1B1C1F;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .detailInfoSection {
   background: white;
-  border-radius: 12px;
-  padding: 0;
+  border-radius: 10px;
+  padding: 15px;
   box-shadow: none;
+  border: 1px solid #EBEBEB;
+}
+
+/* 정보 행 스타일 */
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.infoLabel {
+  color: #BCC4CC;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.infoValue {
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* 지도 행 - detailInfoSection 안에서 꽉차게 */
+.mapRow {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.mapRow .mapContainer {
+  width: 100%;
+}
+
+/* 액션 버튼들 */
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.directionsBtn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #EBEBEB;
+  background: #FFF;
+  color: #237AF2;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.taxiBtn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
   border: none;
+  background: #237AF2;
+  color: #FFF;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 안내 텍스트 섹션 */
+.disclaimerSection {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #F5F7F9;
+  border-radius: 10px;
+}
+
+.disclaimerText {
+  color: #999;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.disclaimerText:last-child {
+  margin-bottom: 0;
 }
 
 /* 사용자 정보 카드 - 기존 스타일 유지 (가로 배치) */
@@ -119,7 +310,6 @@
   color: #999;
   font-size: 14px;
   font-weight: 500;
-  line-height: 1.4;
 }
 
 /* 세로 긴 PostCard 스타일 */
@@ -144,7 +334,6 @@
 
 .verticalPostCard .postContent {
   font-size: 14px;
-  line-height: 1.5;
   color: #333;
 }
 
@@ -290,28 +479,10 @@
   flex-wrap: wrap;
 }
 
-.postNationality {
-  font-size: 12px;
-  color: #666;
-  background: #f0f8ff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #d0e7ff;
-}
-
-.postCity {
-  font-size: 12px;
-  color: #666;
-  background: #f0fff0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #d0f0d0;
-}
 
 /* 게시물 내용 */
 .postContent {
   font-size: 16px;
-  line-height: 1.6;
   color: #333;
   white-space: pre-wrap;
 }
@@ -517,17 +688,17 @@
 .locationInfo {
 }
 
+
 .locationName {
   font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 4px;
 }
 
 .locationAddress {
+  color: #1B1C1F;
   font-size: 14px;
-  color: #666;
-  margin-bottom: 15px;
+  font-weight: 500;
 }
 
 .mapContainer {
@@ -778,14 +949,52 @@
   
   .leftColumn {
     flex: none;
+    width: 100%;
+  }
+  
+  .cardHeader {
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  
+  .cardHeader .userAvatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .cardHeader .userName {
+    font-size: 13px;
+  }
+  
+  .cardHeader .userLocation {
+    font-size: 11px;
+  }
+  
+  .cardHeader .locationIcon {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .cardHeader .dateBadge {
+    font-size: 11px;
+    padding: 3px 6px;
   }
   
   .rightColumn {
+    flex: none;
     gap: 16px;
   }
   
   .detailInfoSection {
-    padding: 0;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* 모바일에서 푸터 공간 확보 */
+  .mainContent {
+    padding-bottom: 100px;
   }
   
   .userInfoCard .userAvatar {

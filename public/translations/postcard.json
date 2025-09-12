@@ -7,5 +7,239 @@
     "ja": "詳細を見る",
     "th": "ดูรายละเอียด",
     "fil": "Tingnan ang Detalye"
+  },
+  "businessHours": {
+    "ko": "영업시간",
+    "en": "Business Hours",
+    "vi": "Giờ mở cửa",
+    "zh": "营业时间",
+    "ja": "営業時間",
+    "th": "เวลาทำการ",
+    "fil": "Oras ng Negosyo"
+  },
+  "paymentMethod": {
+    "ko": "결제방법",
+    "en": "Payment Method",
+    "vi": "Phương thức thanh toán",
+    "zh": "支付方式",
+    "ja": "支払い方法",
+    "th": "วิธีการชำระเงิน",
+    "fil": "Paraan ng Pagbabayad"
+  },
+  "recommendedMenu": {
+    "ko": "추천메뉴",
+    "en": "Recommended Menu",
+    "vi": "Thực đơn gợi ý",
+    "zh": "推荐菜单",
+    "ja": "おすすめメニュー",
+    "th": "เมนูแนะนำ",
+    "fil": "Inirerekomendang Menu"
+  },
+  "location": {
+    "ko": "위치",
+    "en": "Location",
+    "vi": "Vị trí",
+    "zh": "位置",
+    "ja": "場所",
+    "th": "ตำแหน่ง",
+    "fil": "Lokasyon"
+  },
+  "address": {
+    "ko": "주소",
+    "en": "Address",
+    "vi": "Địa chỉ",
+    "zh": "地址",
+    "ja": "住所",
+    "th": "ที่อยู่",
+    "fil": "Address"
+  },
+  "paymentCard": {
+    "ko": "카드",
+    "en": "Card",
+    "vi": "Thẻ",
+    "zh": "卡片",
+    "ja": "カード",
+    "th": "บัตร",
+    "fil": "Card"
+  },
+  "paymentCash": {
+    "ko": "현금",
+    "en": "Cash",
+    "vi": "Tiền mặt",
+    "zh": "现金",
+    "ja": "現金",
+    "th": "เงินสด",
+    "fil": "Cash"
+  },
+  "paymentCardOrCash": {
+    "ko": "카드 또는 현금",
+    "en": "Card or Cash",
+    "vi": "Thẻ hoặc tiền mặt",
+    "zh": "卡片或现金",
+    "ja": "カードまたは現金",
+    "th": "บัตรหรือเงินสด",
+    "fil": "Card o Cash"
+  },
+  "disclaimer1": {
+    "ko": "영업시간·메뉴는 변동될 수 있습니다.",
+    "en": "Business hours and menus may vary.",
+    "vi": "Giờ mở cửa và thực đơn có thể thay đổi.",
+    "zh": "营业时间和菜单可能会变动。",
+    "ja": "営業時間・メニューは変動する場合があります。",
+    "th": "เวลาทำการและเมนูอาจเปลี่ยนแปลงได้",
+    "fil": "Ang oras ng negosyo at menu ay maaaring magbago."
+  },
+  "disclaimer2": {
+    "ko": "실제 정보와 차이가 있을 수 있습니다.",
+    "en": "There may be differences from actual information.",
+    "vi": "Có thể có sự khác biệt với thông tin thực tế.",
+    "zh": "可能与实际信息存在差异。",
+    "ja": "実際の情報と異なる場合があります。",
+    "th": "อาจมีความแตกต่างจากข้อมูลจริง",
+    "fil": "Maaaring may pagkakaiba sa aktwal na impormasyon."
+  },
+  "disclaimer3": {
+    "ko": "방문 전 최신 정보를 확인하세요.",
+    "en": "Please check the latest information before visiting.",
+    "vi": "Vui lòng kiểm tra thông tin mới nhất trước khi đến thăm.",
+    "zh": "请在访问前确认最新信息。",
+    "ja": "訪問前に最新情報をご確認ください。",
+    "th": "กรุณาตรวจสอบข้อมูลล่าสุดก่อนเยี่ยมชม",
+    "fil": "Pakitignan ang pinakabagong impormasyon bago bumisita."
+  },
+  "directions": {
+    "ko": "길찾기",
+    "en": "Directions",
+    "vi": "Chỉ đường",
+    "zh": "导航",
+    "ja": "道順",
+    "th": "เส้นทาง",
+    "fil": "Direksyon"
+  },
+  "callTaxi": {
+    "ko": "택시 호출",
+    "en": "Call Taxi",
+    "vi": "Gọi taxi",
+    "zh": "叫出租车",
+    "ja": "タクシーを呼ぶ",
+    "th": "เรียกแท็กซี่",
+    "fil": "Tawag ng Taxi"
+  },
+  "appOnlyMessage": {
+    "ko": "앱에서 사용 가능합니다.",
+    "en": "Available in the app only.",
+    "vi": "Chỉ có sẵn trong ứng dụng.",
+    "zh": "仅在应用程序中可用。",
+    "ja": "アプリでのみ利用可能です。",
+    "th": "ใช้ได้เฉพาะในแอปเท่านั้น",
+    "fil": "Available sa app lang."
+  },
+  "appleMapsNavigation": {
+    "ko": "애플 지도로 찾기",
+    "en": "Find with Apple Maps",
+    "vi": "Tìm bằng Apple Maps",
+    "zh": "使用苹果地图查找",
+    "ja": "Apple Mapsで検索",
+    "th": "ค้นหาด้วย Apple Maps",
+    "fil": "Hanapin gamit ang Apple Maps"
+  },
+  "googleMapsNavigation": {
+    "ko": "구글 지도로 길찾기",
+    "en": "Get directions with Google Maps",
+    "vi": "Tìm đường bằng Google Maps",
+    "zh": "使用谷歌地图导航",
+    "ja": "Google Mapsで道順",
+    "th": "เส้นทางด้วย Google Maps",
+    "fil": "Direksyon gamit ang Google Maps"
+  },
+  "selectOption": {
+    "ko": "선택하기",
+    "en": "Select",
+    "vi": "Chọn",
+    "zh": "选择",
+    "ja": "選択",
+    "th": "เลือก",
+    "fil": "Piliin"
+  },
+  "grabCall": {
+    "ko": "Grab으로 호출하기",
+    "en": "Call with Grab",
+    "vi": "Gọi bằng Grab",
+    "zh": "使用Grab叫车",
+    "ja": "Grabで呼ぶ",
+    "th": "เรียกด้วย Grab",
+    "fil": "Tawag gamit ang Grab"
+  },
+  "indriveCall": {
+    "ko": "indrive로 호출하기",
+    "en": "Call with indrive",
+    "vi": "Gọi bằng indrive",
+    "zh": "使用indrive叫车",
+    "ja": "indriveで呼ぶ",
+    "th": "เรียกด้วย indrive",
+    "fil": "Tawag gamit ang indrive"
+  },
+  "kakaoTCall": {
+    "ko": "카카오T로 호출하기",
+    "en": "Call with KakaoT",
+    "vi": "Gọi bằng KakaoT",
+    "zh": "使用KakaoT叫车",
+    "ja": "KakaoTで呼ぶ",
+    "th": "เรียกด้วย KakaoT",
+    "fil": "Tawag gamit ang KakaoT"
+  },
+  "didiCall": {
+    "ko": "DiDi로 호출하기",
+    "en": "Call with DiDi",
+    "vi": "Gọi bằng DiDi",
+    "zh": "使用DiDi叫车",
+    "ja": "DiDiで呼ぶ",
+    "th": "เรียกด้วย DiDi",
+    "fil": "Tawag gamit ang DiDi"
+  },
+  "goCall": {
+    "ko": "GO로 호출하기",
+    "en": "Call with GO",
+    "vi": "Gọi bằng GO",
+    "zh": "使用GO叫车",
+    "ja": "GOで呼ぶ",
+    "th": "เรียกด้วย GO",
+    "fil": "Tawag gamit ang GO"
+  },
+  "southeastAsiaRecommended": {
+    "ko": "동남아 추천",
+    "en": "Southeast Asia Recommended",
+    "vi": "Được khuyến nghị cho Đông Nam Á",
+    "zh": "东南亚推荐",
+    "ja": "東南アジア推奨",
+    "th": "แนะนำสำหรับเอเชียตะวันออกเฉียงใต้",
+    "fil": "Inirerekomenda para sa Timog Silangang Asya"
+  },
+  "koreaRecommended": {
+    "ko": "한국 추천",
+    "en": "Korea Recommended",
+    "vi": "Được khuyến nghị cho Hàn Quốc",
+    "zh": "韩国推荐",
+    "ja": "韓国推奨",
+    "th": "แนะนำสำหรับเกาหลี",
+    "fil": "Inirerekomenda para sa Korea"
+  },
+  "chinaRecommended": {
+    "ko": "중국 추천",
+    "en": "China Recommended",
+    "vi": "Được khuyến nghị cho Trung Quốc",
+    "zh": "中国推荐",
+    "ja": "中国推奨",
+    "th": "แนะนำสำหรับจีน",
+    "fil": "Inirerekomenda para sa China"
+  },
+  "japanRecommended": {
+    "ko": "일본 추천",
+    "en": "Japan Recommended",
+    "vi": "Được khuyến nghị cho Nhật Bản",
+    "zh": "日本推荐",
+    "ja": "日本推奨",
+    "th": "แนะนำสำหรับญี่ปุ่น",
+    "fil": "Inirerekomenda para sa Japan"
   }
 }
