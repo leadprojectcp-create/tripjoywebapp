@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PostData, getUsersBatch } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
@@ -8,7 +8,7 @@ import { AppBar } from '../components/AppBar';
 import { BottomNavigator } from '../components/BottomNavigator';
 import styles from './shorts.module.css';
 
-export default function ShortsPage() {
+function ShortsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslationContext();
@@ -377,5 +377,24 @@ export default function ShortsPage() {
       </div>
       <BottomNavigator />
     </>
+  );
+}
+
+export default function ShortsPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: '#000',
+        color: 'white'
+      }}>
+        <div>Loading...</div>
+      </div>
+    }>
+      <ShortsContent />
+    </Suspense>
   );
 }
