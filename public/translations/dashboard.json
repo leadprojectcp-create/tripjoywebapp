@@ -17,6 +17,15 @@
     "th": "พื้นที่ยอดนิยมแบบเรียลไทม์",
     "fil": "Real-time na Mga Sikat na Lugar"
   },
+  "localRecommendedTripPlay": {
+    "ko": "현지인 추천 트립 PLAY",
+    "en": "Local Recommended Trip PLAY",
+    "vi": "Chuyến đi được đề xuất bởi người địa phương PLAY",
+    "zh": "当地人推荐旅行 PLAY",
+    "ja": "現地人おすすめトリップ PLAY",
+    "th": "ทริปแนะนำโดยคนท้องถิ่น PLAY",
+    "fil": "Inirerekomendang Trip ng mga Lokal PLAY"
+  },
   "createFirstPost": {
     "ko": "첫 번째 게시물을 작성해보세요!",
     "en": "Create your first post!",

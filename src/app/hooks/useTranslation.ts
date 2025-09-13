@@ -97,7 +97,7 @@ export const useTranslation = () => {
           fetch('/translations/profile-edit.json'),
           fetch('/translations/post-upload.json'),
           fetch('/translations/dashboard.json'),
-          fetch('/translations/my-activity.json'),
+          fetch('/translations/wishlist.json'),
           fetch('/translations/alert.json'),
           fetch('/translations/notice.json'),
           fetch('/translations/faq.json'),

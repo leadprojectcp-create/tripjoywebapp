@@ -39,7 +39,7 @@ export const AppBar = ({
 
   // 로그인이 필요한 페이지들
   const requiresAuth = (path: string) => {
-    const authRequiredPaths = ['/my-activity', '/profile', '/chat', '/post-upload'];
+    const authRequiredPaths = ['/wishlist', '/profile', '/chat', '/post-upload'];
     return authRequiredPaths.includes(path);
   };
 
@@ -247,15 +247,6 @@ export const AppBar = ({
               />
               {t('uploadPost')}
             </button>
-            <button className={`desktop-menu-item ${isActive('/my-activity') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/my-activity')}>
-              <Image 
-                src={isActive('/my-activity') ? "/icons/activity_active.svg" : "/icons/activity.svg"} 
-                alt="Activity" 
-                width={24} 
-                height={24}
-              />
-              {t('myActivity')}
-            </button>
             <button className={`desktop-menu-item ${isActive('/trip-tour') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/trip-tour')}>
               <Image 
                 src={isActive('/trip-tour') ? "/icons/triptour_active.svg" : "/icons/triptour.svg"} 
@@ -298,6 +289,15 @@ export const AppBar = ({
             {!isMobile && isMenuOpen && (
               <div className="menu-dropdown">
                 <div className="menu-dropdown-content">
+                  <button onClick={() => handleAuthRequiredMenuClick('/wishlist')}>
+                    <Image 
+                      src={isActive('/wishlist') ? "/icons/activity_active.svg" : "/icons/activity.svg"} 
+                      alt="Wishlist" 
+                      width={20} 
+                      height={20}
+                    />
+                    {t('wishlist')}
+                  </button>
                   <button onClick={() => handleSettingsItemClick('notifications')}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
@@ -380,6 +380,17 @@ export const AppBar = ({
               </button>
             </div>
             <div className="mobile-menu-items">
+              {/* 찜목록 항목 */}
+              <button onClick={() => handleAuthRequiredMenuClick('/wishlist')}>
+                <Image 
+                  src={isActive('/wishlist') ? "/icons/activity_active.svg" : "/icons/activity.svg"} 
+                  alt="Wishlist" 
+                  width={20} 
+                  height={20}
+                />
+                {t('wishlist')}
+              </button>
+              
               {/* 설정 항목들 */}
               <div className="mobile-settings-section">
                 <button onClick={() => handleSettingsItemClick('notifications')}>

@@ -44,14 +44,14 @@
     "th": "โปรไฟล์",
     "fil": "Profile"
   },
-  "myActivity": {
-    "ko": "내활동",
-    "en": "My Activity",
-    "vi": "Hoạt động của tôi",
-    "zh": "我的活动",
-    "ja": "マイアクティビティ",
-    "th": "กิจกรรมของฉัน",
-    "fil": "Aking Aktibidad"
+  "wishlist": {
+    "ko": "찜목록",
+    "en": "Wishlist",
+    "vi": "Danh sách yêu thích",
+    "zh": "心愿单",
+    "ja": "ウィッシュリスト",
+    "th": "รายการที่ต้องการ",
+    "fil": "Listahan ng Gusto"
   },
   "chat": {
     "ko": "채팅",

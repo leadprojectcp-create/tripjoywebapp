@@ -285,3 +285,45 @@ export const getUserBookmarkedPostIds = async (userId: string): Promise<string[]
     return [];
   }
 };
+
+/**
+ * 사용자가 좋아요한 게시물 전체 데이터 가져오기
+ */
+export const getUserLikedPosts = async (userId: string): Promise<any[]> => {
+  try {
+    // 1. 사용자가 좋아요한 게시물 ID 목록 가져오기
+    const likedPostIds = await getUserLikedPostIds(userId);
+    
+    if (likedPostIds.length === 0) {
+      return [];
+    }
+    
+    // 2. 각 게시물의 전체 데이터 가져오기
+    const posts = await Promise.all(
+      likedPostIds.map(async (postId) => {
+        const postDocRef = doc(db, 'posts', postId);
+        const postDoc = await getDoc(postDocRef);
+        
+        if (postDoc.exists()) {
+          return {
+            id: postDoc.id,
+            ...postDoc.data()
+          };
+        }
+        return null;
+      })
+    );
+    
+    // 3. null 값 제거하고 최신순으로 정렬
+    return posts
+      .filter(post => post !== null)
+      .sort((a, b) => {
+        const aTime = (a as any).createdAt?.toDate?.() || new Date(0);
+        const bTime = (b as any).createdAt?.toDate?.() || new Date(0);
+        return bTime.getTime() - aTime.getTime();
+      });
+  } catch (error) {
+    console.error('사용자 좋아요 게시물 데이터 가져오기 실패:', error);
+    return [];
+  }
+};

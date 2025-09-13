@@ -550,18 +550,17 @@ const PostUploadContent: React.FC = () => {
   return (
     <AuthGuard>
       <div className={styles['post-upload-container']}>
-        <AppBar />
+        <AppBar 
+          title={t('createPost')}
+          showBackButton={true}
+          showLogo={false}
+        />
         
         <div className={styles['post-upload-body-content']}>
           
           
           <div className={styles['post-upload-main-content']}>
             <form onSubmit={handleSubmit} className={styles['post-upload-form']}>
-            
-            {/* 페이지 제목 */}
-            <h1 className={styles['page-title']}>
-              {isEditMode ? '게시물 수정' : t('createPost')}
-            </h1>
 
             {/* 안내 사항 */}
             <div className={styles['guidelines-notice']}>

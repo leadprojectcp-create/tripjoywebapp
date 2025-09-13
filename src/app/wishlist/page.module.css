@@ -1,0 +1,146 @@
+.container {
+  min-height: 100vh;
+}
+
+.mainContent {
+  width: 1280px;
+  max-width: 1280px;
+  padding: 30px 24px;
+  margin: 75px auto 0;
+  min-height: calc(100vh - 75px);
+}
+
+.tabContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tabButton {
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid #F0F0F3;
+  background-color: white;
+  color: #4E5968;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.tabButton.active {
+  border: 1px solid #237AF2;
+  color: #237AF2;
+}
+
+.tabButton:hover {
+  background-color: #f8f9fa;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e1e8ed;
+  margin-bottom: 24px;
+}
+
+.countryFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.countryTag {
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1px solid #F0F0F3;
+  background-color: white;
+  color: #4E5968;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.countryTag.active {
+  border: 1px solid #237AF2;
+  color: #237AF2;
+}
+
+.countryTag:hover {
+  background-color: #f8f9fa;
+}
+
+.contentArea {
+  min-height: 400px;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  justify-items: center;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.emptyState h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.emptyState p {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+@media (max-width: 1200px) {
+  .mainContent {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 16px;
+  }
+  
+  .postsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 16px 12px;
+    margin-top: 60px;
+  }
+  
+  .postsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .tabButton,
+  .countryTag {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+  
+  .emptyState {
+    padding: 40px 16px;
+  }
+  
+  .emptyState h3 {
+    font-size: 16px;
+  }
+  
+  .emptyState p {
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "wishlist": {
+    "ko": "찜목록",
+    "en": "Wishlist",
+    "vi": "Danh sách yêu thích",
+    "zh": "收藏夹",
+    "ja": "ウィッシュリスト",
+    "th": "รายการโปรด",
+    "fil": "Wishlist"
+  },
+  "wishedPosts": {
+    "ko": "찜한 게시물",
+    "en": "Wished Posts",
+    "vi": "Bài viết đã thích",
+    "zh": "收藏的帖子",
+    "ja": "お気に入り投稿",
+    "th": "โพสต์ที่โปรด",
+    "fil": "Mga Post na Nagustuhan"
+  },
+  "wishedTours": {
+    "ko": "찜한 투어",
+    "en": "Wished Tours",
+    "vi": "Tour đã thích",
+    "zh": "收藏的旅行团",
+    "ja": "お気に入りツアー",
+    "th": "ทัวร์ที่โปรด",
+    "fil": "Mga Tour na Nagustuhan"
+  },
+  "wishedCountries": {
+    "ko": "찜한 국가",
+    "en": "Wished Countries",
+    "vi": "Quốc gia đã thích",
+    "zh": "收藏的国家",
+    "ja": "お気に入り国",
+    "th": "ประเทศที่โปรด",
+    "fil": "Mga Bansa na Nagustuhan"
+  },
+  "toursComingSoon": {
+    "ko": "찜한 투어 기능이 곧 출시됩니다!",
+    "en": "Wished Tours feature coming soon!",
+    "vi": "Tính năng tour yêu thích sắp ra mắt!",
+    "zh": "收藏旅行团功能即将推出！",
+    "ja": "お気に入りツアー機能が近日公開！",
+    "th": "ฟีเจอร์ทัวร์โปรดจะเปิดตัวเร็วๆ นี้!",
+    "fil": "Ang feature ng mga tour na nagustuhan ay malapit nang ilabas!"
+  },
+  "toursHint": {
+    "ko": "투어 기능이 개발되면 여기서 확인할 수 있습니다.",
+    "en": "You can check here when the tour feature is developed.",
+    "vi": "Bạn có thể kiểm tra ở đây khi tính năng tour được phát triển.",
+    "zh": "当旅行团功能开发完成后，您可以在这里查看。",
+    "ja": "ツアー機能が開発されたら、ここで確認できます。",
+    "th": "คุณสามารถตรวจสอบที่นี่เมื่อฟีเจอร์ทัวร์ได้รับการพัฒนา",
+    "fil": "Maaari mong tingnan dito kapag na-develop na ang feature ng tour."
+  },
+  "noWishlistPosts": {
+    "ko": "찜목록이 비어있습니다",
+    "en": "Your wishlist is empty",
+    "vi": "Danh sách yêu thích của bạn trống",
+    "zh": "您的收藏夹是空的",
+    "ja": "ウィッシュリストが空です",
+    "th": "รายการโปรดของคุณว่างเปล่า",
+    "fil": "Walang laman ang inyong wishlist"
+  },
+  "wishlistHint": {
+    "ko": "마음에 드는 게시물에 좋아요를 눌러보세요!",
+    "en": "Like posts that you enjoy!",
+    "vi": "Hãy thích những bài viết bạn yêu thích!",
+    "zh": "为你喜欢的帖子点赞吧！",
+    "ja": "気に入った投稿にいいねしてみましょう！",
+    "th": "ไลค์โพสต์ที่คุณชอบ!",
+    "fil": "Mag-like sa mga post na nagustuhan mo!"
+  },
+  "loading": {
+    "ko": "로딩 중...",
+    "en": "Loading...",
+    "vi": "Đang tải...",
+    "zh": "加载中...",
+    "ja": "読み込み中...",
+    "th": "กำลังโหลด...",
+    "fil": "Naglo-load..."
+  },
+  "all": {
+    "ko": "전체",
+    "en": "All",
+    "vi": "Tất cả",
+    "zh": "全部",
+    "ja": "すべて",
+    "th": "ทั้งหมด",
+    "fil": "Lahat"
+  }
+}

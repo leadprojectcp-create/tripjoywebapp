@@ -6,9 +6,9 @@ import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
 import { toggleLike, checkLikeStatus } from '../services/interactionService';
-import styles from './PostCard.module.css';
+import styles from './ProfilePostCard.module.css';
 
-interface PostCardProps {
+interface ProfilePostCardProps {
   post: PostData;
   userInfo?: {
     name: string;
@@ -28,7 +28,7 @@ interface PostCardProps {
   onDelete?: (postId: string) => void; // 삭제 콜백
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ 
+export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ 
   post, 
   userInfo = { name: '사용자', location: '위치 미상' },
   showUserInfo = true,
@@ -719,3 +719,5 @@ export const PostCard: React.FC<PostCardProps> = ({
     </div>
   );
 };
+
+export default ProfilePostCard;

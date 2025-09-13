@@ -106,8 +106,8 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
   return (
     <div className={styles.videoSection}>
       <h2 className={styles.sectionTitle}>
-        <img src="/icons/upload_active.svg" alt="동영상" width="24" height="24" />
-        동영상 게시물
+        <img src="/icons/play.svg" alt="동영상" width="24" height="24" />
+        {t('localRecommendedTripPlay')}
       </h2>
       
       <div className={styles.videoContainer}>

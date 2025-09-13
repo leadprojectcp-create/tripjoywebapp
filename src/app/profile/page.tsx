@@ -11,7 +11,7 @@ import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { db } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { PostCard } from "../components/PostCard";
+import ProfilePostCard from "../components/ProfilePostCard";
 import { getPosts, PostData, deletePost } from "../services/postService";
 import { followUser, unfollowUser, isFollowing, getFollowStats, getFollowersList, getFollowingList, UserInfo } from "../services/followService";
 import ClientStyleProvider from "../components/ClientStyleProvider";
@@ -149,9 +149,6 @@ function ProfileContent() {
 
 
 
-  const handleEdit = () => {
-    router.push('/profile/profile-edit');
-  };
 
   // 이미지 클릭 핸들러 (팝업 열기)
   const handleImageClick = () => {
@@ -400,16 +397,22 @@ function ProfileContent() {
         const success = await unfollowUser(user.uid, targetUserId);
         if (success) {
           setIsFollowingUser(false);
-          // 실제 데이터를 다시 로드해서 정확한 카운트 반영
-          window.location.reload();
+          // 팔로워 수 감소
+          setProfileData(prev => ({
+            ...prev,
+            followerCount: Math.max(0, prev.followerCount - 1)
+          }));
         }
       } else {
         // 팔로우
         const success = await followUser(user.uid, targetUserId);
         if (success) {
           setIsFollowingUser(true);
-          // 실제 데이터를 다시 로드해서 정확한 카운트 반영
-          window.location.reload();
+          // 팔로워 수 증가
+          setProfileData(prev => ({
+            ...prev,
+            followerCount: prev.followerCount + 1
+          }));
         }
       }
     } catch (error) {
@@ -540,7 +543,23 @@ function ProfileContent() {
                           </span>
                         </div>
                         
-                        {isEditing ? (
+                        {/* Stats Section - 위치/성별/나이와 한줄 소개 사이에 배치 */}
+                        <div className={styles.profileStats}>
+                          <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowersClick}>
+                            <span className={styles.statNumber}>{profileData.followerCount}</span>
+                            <span className={styles.statLabel}>{t('followers')}</span>
+                          </div>
+                          <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowingClick}>
+                            <span className={styles.statNumber}>{profileData.followingCount}</span>
+                            <span className={styles.statLabel}>{t('following')}</span>
+                          </div>
+                          <div className={styles.statItem}>
+                            <span className={styles.statNumber}>{profileData.postCount}</span>
+                            <span className={styles.statLabel}>{t('posts')}</span>
+                          </div>
+                        </div>
+                        
+                        {isEditing && (
                           <div className={styles.profileIntroductionEdit}>
                             <textarea
                               className={styles.profileIntroductionInput}
@@ -550,59 +569,14 @@ function ProfileContent() {
                               rows={3}
                             />
                           </div>
-                        ) : (
-                          <div className={styles.profileIntroduction}>
-                            {profileData.introduction || (isOwnProfile ? t('addIntroPlaceholder') : "")}
-                          </div>
                         )}
                       </div>
+                      
                     </div>
-                    <div className={styles.profileActions}>
-                      {isOwnProfile ? (
-                        !isEditing ? (
-                          <button className={styles.editProfileBtn} onClick={handleEdit}>
-                            {t('editProfile')}
-                          </button>
-                        ) : (
-                          <div className={styles.editActions}>
-                            <button className={styles.saveBtn} onClick={handleSave}>
-                              {t('save')}
-                            </button>
-                            <button className={styles.cancelBtn} onClick={handleCancel}>
-                              {t('cancel')}
-                            </button>
-                          </div>
-                        )
-                      ) : (
-                        <button 
-                          className={`${styles.followBtn} ${isFollowingUser ? styles.following : ''}`} 
-                          onClick={handleFollow}
-                          disabled={isFollowLoading}
-                        >
-                          {isFollowLoading 
-                            ? '...' 
-                            : isFollowingUser 
-                              ? (t('following') || '팔로잉') 
-                              : (t('follow') || '팔로우')
-                          }
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Stats Section - 로그인한 사용자의 프로필인 경우만 표시 */}
-                  <div className={styles.profileStats}>
-                    <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowersClick}>
-                      <span className={styles.statNumber}>{profileData.followerCount}</span>
-                      <span className={styles.statLabel}>{t('followers')}</span>
-                    </div>
-                    <div className={`${styles.statItem} ${styles.clickable}`} onClick={handleFollowingClick}>
-                      <span className={styles.statNumber}>{profileData.followingCount}</span>
-                      <span className={styles.statLabel}>{t('following')}</span>
-                    </div>
-                    <div className={styles.statItem}>
-                      <span className={styles.statNumber}>{profileData.postCount}</span>
-                      <span className={styles.statLabel}>{t('posts')}</span>
+                    
+                    {/* 한줄 소개 - profileHeader 안에 배치 */}
+                    <div className={styles.profileOneLineIntro}>
+                      {profileData.introduction || (isOwnProfile ? t('addIntroPlaceholder') : "")}
                     </div>
                   </div>
 
@@ -610,20 +584,54 @@ function ProfileContent() {
                   <div className={styles.profileActionButtons}>
                     {isOwnProfile ? (
                       <>
-                        {/* 모바일에서만 보이는 게시물 업로드 버튼 */}
-                        <button className={`${styles.actionBtn} ${styles.uploadBtn} ${styles.mobileOnly}`} onClick={handleUploadPost}>
+                        <button 
+                          className={`${styles.actionBtn} ${styles.editBtn}`} 
+                          onClick={() => router.push('/profile/profile-edit')}
+                        >
+                          {t('editProfile')}
+                        </button>
+                        <button 
+                          className={`${styles.actionBtn} ${styles.wishlistBtn}`} 
+                          onClick={() => router.push('/wishlist')}
+                        >
+                          {t('wishlist')}
+                        </button>
+                        {/* 내 프로필에서만 보이는 게시물 업로드 버튼 */}
+                        <button className={styles.uploadBtn} onClick={handleUploadPost}>
                           <span className={styles.uploadIcon}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <img
+                              src="/icons/upload.svg"
+                              alt="업로드"
+                              width="27"
+                              height="27"
+                            />
                           </span>
-                          <span className={styles.uploadText}>{t('uploadPost')}</span>
                         </button>
                       </>
                     ) : (
                       <>
-                        <button className={`${styles.actionBtn} ${styles.primary}`} onClick={handleChat}>
+                        <button className={`${styles.actionBtn} ${styles.editBtn}`} onClick={handleChat}>
                           {t('chat')}
+                        </button>
+                        <button 
+                          className={`${styles.actionBtn} ${isFollowingUser ? styles.followBtnFollowing : styles.followBtn}`} 
+                          onClick={handleFollow}
+                          disabled={isFollowLoading}
+                        >
+                          {isFollowLoading ? '...' : (
+                            isFollowingUser ? (
+                              <>
+                                {t('following')}
+                                <img
+                                  src="/icons/check.svg"
+                                  alt="체크"
+                                  width="16"
+                                  height="16"
+                                  style={{ filter: 'brightness(0) saturate(100%) invert(11%) sepia(8%) saturate(1018%) hue-rotate(169deg) brightness(95%) contrast(88%)' }}
+                                />
+                              </>
+                            ) : t('follow')
+                          )}
                         </button>
                       </>
                     )}
@@ -632,11 +640,10 @@ function ProfileContent() {
               )}
 
 
-
               {/* Posts Section - 로딩 완료 후에만 표시 */}
               {!isLoading && (
                 <div className={styles.profilePostsSection}>
-                  <h2>{isOwnProfile ? t('myPosts') : `${profileData.name}${t('userPosts')}`}</h2>
+                  
                   <div className={styles.profileContentGrid}>
                     {postsLoading ? (
                       <div className={styles.profileLoading}>
@@ -650,7 +657,7 @@ function ProfileContent() {
                       </div>
                     ) : (
                       userPosts.map((post) => (
-                        <PostCard 
+                        <ProfilePostCard 
                           key={post.id} 
                           post={post}
                           userInfo={{
@@ -665,7 +672,6 @@ function ProfileContent() {
                           showSettings={isOwnProfile}
                           onEdit={handleEditPost}
                           onDelete={handleDeletePost}
-
                         />
                       ))
                     )}

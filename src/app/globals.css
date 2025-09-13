@@ -40,6 +40,7 @@ html, body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -49,6 +50,9 @@ body {
   /* CSS 하이드레이션 안정성 확보 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 스크롤 동작 개선 */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 * {

@@ -13,16 +13,15 @@
 
 /* Profile Main Content */
 .profileMainContent {
-  width: calc(100% - 650px); /* 전체 너비에서 좌측(250px) + 우측(400px) 마진 제외 */
-  padding: 30px;
-  margin-top: 60px; /* AppBar 높이만큼 아래로 (사이드바는 fixed라서 별도 처리) */
-  margin-left: 250px; /* 왼쪽 사이드바 너비만큼 마진 */
-  margin-right: 0; /* calc로 너비를 조정했으므로 마진 제거 */
-  min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
+  width: 100%;
+  max-width: 1280px;
+  padding: 20px 16px 0 16px; /* PC에서만 위쪽 20px 여백 */
+  margin: 75px auto 0;
+  min-height: calc(100vh - 75px);
   display: flex;
   flex-direction: column;
-  align-items: center; /* 내부 요소들을 가운데 정렬 */
-  box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+  align-items: center;
+  box-sizing: border-box;
 }
 
 /* Profile Loading Spinner - 고유 클래스명 */
@@ -41,13 +40,12 @@
 
 /* Profile Header */
 .profileHeader {
-  width: 740px;
+  width: 600px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-start;
-  padding: 20px 0;
-  border-bottom: 1px solid #e1e8ed;
-  margin-bottom: 20px;
+  padding: 0 0 20px 0;
+  gap: 20px;
 }
 
 .profileInfo {
@@ -61,8 +59,8 @@
 }
 
 .avatarCircle {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   background-color: #f1f3f4;
   display: flex;
@@ -73,8 +71,8 @@
 }
 
 .avatarImage {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -85,27 +83,34 @@
   transition: transform 0.2s ease;
 }
 
-.clickable:hover {
-  transform: scale(1.05);
-}
 
 .profileBasicInfo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  flex: 1; /* 남은 공간을 모두 차지 */
+}
+
+.profileOneLineIntro {
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
 .profileName {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
+  color: #1B1C1F;
+  font-size: 20px;
+  font-weight: 700;
   margin: 0;
 }
 
 .profileDetails {
+  color: #999;
   font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
+  font-weight: 500;
+  margin-bottom: 15px;
 }
 
 .profileIntroduction {
@@ -189,9 +194,6 @@
   transition: all 0.2s ease;
 }
 
-.editProfileBtn:hover {
-  background-color: #e55a2e;
-}
 
 
 
@@ -212,9 +214,6 @@
   transition: all 0.2s ease;
 }
 
-.saveBtn:hover {
-  background-color: #45a049;
-}
 
 .cancelBtn {
   background-color: #f44336;
@@ -228,38 +227,83 @@
   transition: all 0.2s ease;
 }
 
-.cancelBtn:hover {
-  background-color: #da190b;
-}
 
 .followBtn {
-  background-color: #007bff;
+  border-radius: 10px;
+  background: #237AF2;
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
+  border: none;
+  padding: 14px 20px;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
 }
 
-.followBtn:hover {
-  background-color: #0056b3;
+
+/* 프로필 액션 버튼들 */
+.profileActionButtons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: flex-start;
 }
+
+.editBtn {
+  border-radius: 10px;
+  background: #F5F7F9;
+  color: #1B1C1F;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+}
+
+
+.wishlistBtn {
+  border-radius: 10px;
+  background: #F5F7F9;
+  color: #1B1C1F;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+}
+
 
 .followBtn.following {
   background-color: #28a745;
   color: white;
 }
 
-.followBtn.following:hover {
-  background-color: #dc3545;
+.followBtnFollowing {
+  border-radius: 10px;
+  background: #F5F7F9;
+  color: #1B1C1F;
+  border: none;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.followBtn.following:hover::after {
-  content: "언팔로우";
-}
 
 .followBtn:disabled {
   opacity: 0.6;
@@ -268,12 +312,9 @@
 
 /* Profile Stats */
 .profileStats {
-  width: 740px;
   display: flex;
-  justify-content: center;
-  gap: 60px;
-  padding: 20px 0;
-  border-bottom: 1px solid #e1e8ed;
+  justify-content: start;
+  gap: min(80px, 15vw); /* 최대 80px, 화면 넓이의 15%까지 */
   margin-bottom: 20px;
 }
 
@@ -285,22 +326,24 @@
 }
 
 .statNumber {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .statLabel {
+  color: #4E5968;
   font-size: 14px;
-  color: #666;
+  font-weight: 500;
 }
 
 /* Profile Action Buttons */
 .profileActionButtons {
-  width: 740px;
+  width: 100%;
+  max-width: 600px;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 10px;
   margin-bottom: 30px;
 }
 
@@ -312,7 +355,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 120px;
 }
 
 .primary {
@@ -320,9 +362,6 @@
   color: white;
 }
 
-.primary:hover {
-  background-color: #e55a2e;
-}
 
 .secondary {
   background-color: #f8f9fa;
@@ -330,10 +369,6 @@
   border: 2px solid #e1e8ed;
 }
 
-.secondary:hover {
-  background-color: #e9ecef;
-  border-color: #d1d7dd;
-}
 
 /* Profile Content */
 .profileContent {
@@ -410,10 +445,11 @@
 
 /* Posts Section */
 .profilePostsSection {
-  width: 740px;
+  width: 1280px;
+  max-width: 1280px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .profilePostsSection h2 {
@@ -421,16 +457,15 @@
   font-weight: bold;
   color: #333;
   margin-bottom: 20px;
-  width: 740px;
-  text-align: left;
+  width: 1280px;
 }
 
 /* Profile Content Grid - 고유 클래스명 */
 .profileContentGrid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 /* PostCard는 components/PostCard.css를 사용 */
@@ -450,40 +485,37 @@
   margin: 0;
 }
 
-/* Upload Post Button - 모바일 전용 */
+/* Upload Post Button - 오른쪽 끝 */
 .uploadBtn {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-  background: #007bff;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #FE4651;
   color: white;
   border: none;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.uploadBtn:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
-}
 
 .uploadIcon {
   display: flex;
   align-items: center;
+  color: white;
+}
+
+.uploadIcon img {
+  filter: brightness(0) invert(1);
 }
 
 .uploadText {
   white-space: nowrap;
 }
 
-/* 기본적으로 숨김 (데스크톱에서는 보이지 않음) */
-.mobileOnly {
-  display: none !important;
-}
 
 /* 태블릿에서 오른쪽 사이드바가 숨겨질 때 */
 @media (max-width: 1200px) {
@@ -493,14 +525,21 @@
   }
 }
 
+/* 태블릿 반응형 */
+@media (max-width: 1024px) {
+  .profileContentGrid {
+    grid-template-columns: repeat(3, 1fr); /* 태블릿에서는 3개씩 */
+    gap: 20px;
+  }
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .profileMainContent {
-    width: 100%; /* 모바일에서는 전체 너비 사용 */
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    padding: 20px;
+    width: 100%;
+    max-width: 600px; /* 모바일에서 최대 600px */
+    margin: 60px auto 0;
+    padding: 0 16px; /* 모바일에서는 위쪽 패딩 제거 */
     padding-bottom: 80px; /* BottomNavigator 공간 확보 */
   }
 
@@ -510,10 +549,11 @@
 
   .profileHeader {
     width: 100%;
+    max-width: 600px; /* 모바일에서 최대 600px로 제한 */
     flex-direction: column;
     align-items: flex-start;
+    padding: 0 0 20px 0;
     gap: 20px;
-    padding: 20px 0;
   }
 
   .profileInfo {
@@ -526,13 +566,29 @@
   }
 
   .profileStats {
-    width: 100%;
-    gap: 40px;
+    margin-bottom: 0; /* 모바일에서 하단 여백 제거 */
+  }
+
+  .profileDetails {
+    margin-bottom: 15px; /* 모바일에서 하단 여백 조정 */
+  }
+
+  .profileName {
+    font-size: 16px;
+  }
+
+  .avatarCircle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .avatarImage {
+    width: 80px;
+    height: 80px;
   }
 
   .profileActionButtons {
     width: 100%;
-    gap: 15px;
   }
 
   .actionBtn {
@@ -541,7 +597,6 @@
   }
 
   .profileNameInput {
-    font-size: 24px;
     max-width: 100%;
   }
 
@@ -568,17 +623,7 @@
     width: 100%;
   }
 
-  /* 모바일에서만 업로드 버튼 표시 */
-  .mobileOnly {
-    display: flex !important;
-  }
 
-  /* 모바일에서 액션 버튼들을 세로로 배치 */
-  .profileActionButtons {
-    flex-direction: column !important;
-    gap: 12px !important;
-    align-items: center !important;
-  }
 
   .actionBtn {
     width: 100% !important;
@@ -588,43 +633,40 @@
 
 @media (max-width: 480px) {
   .profileMainContent {
-    width: 100% !important; /* 소형 모바일에서는 강제로 전체 너비 사용 */
-    padding: 15px 16px; /* 좌우 패딩 16px 추가 */
-    margin-top: 60px;
+    width: 100%;
+    max-width: 600px; /* 소형 모바일에서도 최대 600px */
+    padding: 0 16px; /* 모바일에서는 위쪽 패딩 제거 */
+    margin: 60px auto 0;
     padding-bottom: 80px;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    align-items: center; /* 카드들을 가운데 정렬 */
-    box-sizing: border-box; /* 패딩 포함한 너비 계산 */
+    align-items: center;
+    box-sizing: border-box;
   }
 
   .profileLoading {
-    width: 100% !important;
+    width: 100%;
   }
 
   .profileHeader {
-    width: 100% !important;
+    width: 100%;
+    max-width: 600px; /* 소형 모바일에서도 최대 600px로 제한 */
+    padding: 0 0 20px 0;
+  }
+
+  .avatarCircle {
+    width: 80px;
+    height: 80px;
   }
 
   .profileStats {
-    width: 100% !important;
-    gap: 30px;
-    padding: 15px 0;
+    margin-bottom: 0; /* 모바일에서 하단 여백 제거 */
   }
 
-  .statNumber {
-    font-size: 20px;
+  .profileDetails {
+    margin-bottom: 15px; /* 모바일에서 하단 여백 조정 */
   }
 
   .profileActionButtons {
     width: 100% !important;
-    gap: 10px;
-    padding: 0 10px;
-  }
-
-  .actionBtn {
-    padding: 10px 20px;
-    font-size: 13px;
   }
 
   .profileContent {
@@ -640,40 +682,13 @@
   }
 
   .profileContentGrid {
-    align-items: stretch; /* 카드들이 전체 너비 사용 */
+    grid-template-columns: repeat(2, 1fr); /* 모바일에서는 2개씩 */
+    gap: 16px; /* 모바일에서는 간격 줄임 */
     width: 100%; /* 전체 너비 */
   }
   
-  .profileName {
-    font-size: 24px;
-  }
 
-  .avatarCircle {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-  }
 
-  .profileSection h3 {
-    font-size: 16px;
-  }
-
-  .memoSection h4 {
-    font-size: 14px;
-  }
-
-  .profilePostsSection h2 {
-    font-size: 20px;
-  }
-
-  .profileNameInput {
-    font-size: 20px;
-  }
-
-  .profileIntroductionInput {
-    font-size: 14px;
-    min-height: 50px;
-  }
 }
 
 /* 이미지 모달 스타일 */
@@ -720,9 +735,6 @@
   backdrop-filter: blur(10px);
 }
 
-.modalCloseBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
 
 .modalImageContainer {
   position: relative;
@@ -850,9 +862,6 @@
   transition: background-color 0.2s ease;
 }
 
-.followItem:hover {
-  background-color: #f7f9fa;
-}
 
 .followItem:last-child {
   border-bottom: none;
@@ -908,9 +917,6 @@
   transition: background-color 0.2s ease;
 }
 
-.unfollowBtn:hover {
-  background-color: #ff5252;
-}
 
 /* 클릭 가능한 통계 아이템 */
 .statItem.clickable {
@@ -921,10 +927,6 @@
   margin: -8px;
 }
 
-.statItem.clickable:hover {
-  transform: translateY(-2px);
-  background-color: rgba(29, 161, 242, 0.1);
-}
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
