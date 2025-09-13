@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
 import { createPost, updatePost, PostData as PostServiceData } from '../services/postService';
-import { deleteImageFromImageKit, UploadedImage } from '../services/imageKitService';
+import { UploadedImage } from '../services/postService';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { AuthGuard } from '../components/AuthGuard';
@@ -170,19 +170,9 @@ const PostUploadContent: React.FC = () => {
     const imageToRemove = previewImages[index];
     
     if (imageToRemove.isExisting && imageToRemove.originalUrl) {
-      // 기존 이미지인 경우 ImageKit에서 삭제하고 삭제 목록에 추가
-      try {
-        console.log('🗑️ 기존 이미지 삭제 시작:', imageToRemove.originalUrl);
-        await deleteImageFromImageKit(imageToRemove.originalUrl);
-        console.log('✅ ImageKit에서 이미지 삭제 완료:', imageToRemove.originalUrl);
-        
-        // 삭제된 기존 이미지 목록에 추가
-        setDeletedExistingImages(prev => [...prev, imageToRemove.originalUrl!]);
-      } catch (error) {
-        console.warn('⚠️ ImageKit 이미지 삭제 실패 (계속 진행):', error);
-        // 삭제 실패해도 UI에서는 제거 (나중에 정리)
-        setDeletedExistingImages(prev => [...prev, imageToRemove.originalUrl!]);
-      }
+      // 기존 이미지인 경우 삭제 목록에 추가
+      console.log('🗑️ 기존 이미지 삭제 예정:', imageToRemove.originalUrl);
+      setDeletedExistingImages(prev => [...prev, imageToRemove.originalUrl!]);
     } else {
       // 새 이미지인 경우 URL 해제
       URL.revokeObjectURL(imageToRemove.url);
@@ -221,9 +211,23 @@ const PostUploadContent: React.FC = () => {
         alert(`${file.name}의 파일 크기는 10MB 이하여야 합니다.`);
         return;
       }
-      
-      const url = URL.createObjectURL(file);
-      setPreviewImages(prev => [...prev, { url, file, isExisting: false }]);
+
+      // 이미지 크기 검증 (가로 300px 이상)
+      const img = new Image();
+      img.onload = () => {
+        if (img.width < 300) {
+          alert(`${file.name}의 가로 크기는 300px 이상이어야 합니다. (현재: ${img.width}px)`);
+          return;
+        }
+        
+        const url = URL.createObjectURL(file);
+        setPreviewImages(prev => [...prev, { url, file, isExisting: false }]);
+      };
+      img.onerror = () => {
+        alert(`${file.name}은(는) 유효하지 않은 이미지 파일입니다.`);
+        return;
+      };
+      img.src = URL.createObjectURL(file);
     });
     
     event.target.value = '';
@@ -240,14 +244,14 @@ const PostUploadContent: React.FC = () => {
       return;
     }
 
-    // 파일 크기 제한 (5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // 파일 크기 제한 (50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
       alert(t('videoSizeLimit'));
       return;
     }
 
-    // 동영상 길이 확인 (10초 이내)
+    // 동영상 길이 확인 (15초 이내)
     const video = document.createElement('video');
     video.preload = 'metadata';
     
@@ -255,7 +259,7 @@ const PostUploadContent: React.FC = () => {
       window.URL.revokeObjectURL(video.src);
       const duration = video.duration;
       
-      if (duration > 10) {
+      if (duration > 15) {
         alert(t('videoDurationLimit'));
         return;
       }
@@ -292,19 +296,9 @@ const PostUploadContent: React.FC = () => {
     if (!previewVideo) return;
 
     if (previewVideo.isExisting && previewVideo.originalUrl) {
-      // 기존 동영상인 경우 ImageKit에서 삭제하고 삭제 목록에 추가
-      try {
-        console.log('🗑️ 기존 동영상 삭제 시작:', previewVideo.originalUrl);
-        await deleteImageFromImageKit(previewVideo.originalUrl);
-        console.log('✅ ImageKit에서 동영상 삭제 완료:', previewVideo.originalUrl);
-        
-        // 삭제된 기존 동영상 목록에 추가
-        setDeletedExistingVideo(previewVideo.originalUrl);
-      } catch (error) {
-        console.warn('⚠️ ImageKit 동영상 삭제 실패 (계속 진행):', error);
-        // 삭제 실패해도 UI에서는 제거 (나중에 정리)
-        setDeletedExistingVideo(previewVideo.originalUrl);
-      }
+      // 기존 동영상인 경우 삭제 목록에 추가
+      console.log('🗑️ 기존 동영상 삭제 예정:', previewVideo.originalUrl);
+      setDeletedExistingVideo(previewVideo.originalUrl);
     } else {
       // 새 동영상인 경우 URL 해제
       URL.revokeObjectURL(previewVideo.url);
@@ -603,6 +597,9 @@ const PostUploadContent: React.FC = () => {
                 <div className={styles['media-count-info']}>
                   사진 {postData.images.length + previewImages.filter(img => img.isExisting).length}/10
                 </div>
+              </div>
+              <div className={styles['image-upload-hint']}>
+                {t('imageUploadHint')}
               </div>
               
               {/* 숨겨진 파일 입력들 */}

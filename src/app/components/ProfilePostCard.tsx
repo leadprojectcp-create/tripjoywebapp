@@ -6,6 +6,7 @@ import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
 import { toggleLike, checkLikeStatus } from '../services/interactionService';
+import { bunnyService } from '../services/bunnyService';
 import styles from './ProfilePostCard.module.css';
 
 interface ProfilePostCardProps {
@@ -216,21 +217,9 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   // 🚀 이미지 URL 추출 (useMemo로 최적화 - 무한 렌더링 방지)
   const imageUrls = useMemo(() => {
     if (post.images && post.images.length > 0) {
-      return {
-        original: post.images.map(img => img.urls?.original || img.url),
-        thumbnails: post.images.map(img => img.urls?.thumbnail || img.url),
-        medium: post.images.map(img => img.urls?.medium || img.url),
-        large: post.images.map(img => img.urls?.large || img.url),
-      };
+      return post.images.map(img => img.url);
     }
-    
-    // 기본값
-    return {
-      original: [],
-      thumbnails: [],
-      medium: [],
-      large: [],
-    };
+    return [];
   }, [post.images]); // post.images가 변경될 때만 재계산
 
 
@@ -288,7 +277,20 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   // 🚀 컴포넌트 마운트 시 스크롤 상태 초기화 (최적화된 의존성)
   useEffect(() => {
     checkScrollPosition();
-  }, [checkScrollPosition, imageUrls.thumbnails.length]); // 배열 길이만 체크하여 안정성 확보
+  }, [checkScrollPosition, imageUrls.length]); // 배열 길이만 체크하여 안정성 확보
+
+  // 🚀 이미지 프리로딩 (빠른 로딩을 위해)
+  useEffect(() => {
+    if (imageUrls.length > 0) {
+      // 썸네일 이미지들을 미리 로드 (200x200 크기로)
+      const thumbnailUrls = imageUrls.map(url => 
+        `${url}?width=200&height=200&fit=cover&quality=100`
+      );
+      bunnyService.preloadImages(thumbnailUrls).catch(error => {
+        console.warn('이미지 프리로딩 실패:', error);
+      });
+    }
+  }, [imageUrls]);
 
   // 🚀 컴포넌트 언마운트 시 정리
   useEffect(() => {
@@ -473,7 +475,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
     <>
       <div className={`${styles.cardImage} ${styles.singleImage}`}>
         <img 
-          src={imageUrls.original[0]} 
+          src={`${imageUrls[0]}?width=400&height=400&fit=cover&quality=100`} 
           alt="게시물 이미지"
           loading="lazy"
           onClick={handleImageClick}
@@ -525,10 +527,10 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
             handleSliderScroll();
           }}
         >
-          {imageUrls.original.map((imageUrl, index) => (
+          {imageUrls.map((imageUrl, index) => (
             <div key={index} className={styles.imageItem}>
               <img 
-                src={imageUrl} 
+                src={`${imageUrl}?width=400&height=400&fit=cover&quality=100`} 
                 alt={`게시물 이미지 ${index + 1}`}
                 loading="lazy"
                 onClick={handleImageClick}
@@ -565,7 +567,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
       </div>
       {/* Dot Indicator - 이미지 슬라이더 컨테이너 밖에 표시 */}
       <div className={styles.dotIndicator}>
-        {imageUrls.original.map((_, index) => (
+        {imageUrls.map((_, index) => (
           <div
             key={index}
             className={`${styles.dot} ${index === currentSlideIndex ? styles.active : ''}`}
@@ -641,7 +643,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
 
       {/* 이미지 영역 */}
       {(() => {
-        if (imageUrls.thumbnails.length === 0) {
+        if (imageUrls.length === 0) {
           return (
             <div className={`${styles.cardImage} ${styles.singleImage}`}>
               <div className={styles.imagePlaceholder}>
@@ -649,7 +651,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
               </div>
             </div>
           );
-        } else if (imageUrls.thumbnails.length === 1) {
+        } else if (imageUrls.length === 1) {
           return renderSingleImage();
         } else {
           return renderImageSlider();

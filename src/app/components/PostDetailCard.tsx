@@ -348,16 +348,16 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
                 </video>
               ) : (
                 <>
-                  <img 
-                    src={media.original} 
-                    alt="비디오 썸네일"
-                    loading="lazy"
-                    onError={(e) => {
-                      console.error('썸네일 로드 실패:', media.original);
-                      // fallback으로 비디오 URL 사용
-                      e.currentTarget.src = media.videoUrl || '';
-                    }}
-                  />
+                      <img 
+                        src={media.thumbnail || media.videoUrl || media.original} 
+                        alt="비디오 썸네일"
+                        loading="lazy"
+                        onError={(e) => {
+                          console.error('비디오 썸네일 로드 실패:', media.thumbnail || media.videoUrl || media.original);
+                          // 비디오 썸네일이 없으면 비디오 자체를 표시
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
                   <button 
                     className={styles.playButton}
                     onClick={() => handleVideoPlay(0)}
@@ -419,13 +419,13 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
                   ) : (
                     <>
                       <img 
-                        src={media.original} 
+                        src={media.thumbnail ? `${media.thumbnail.split('?')[0]}?width=400&height=533&fit=cover&quality=100` : (media.videoUrl || media.original)} 
                         alt={`비디오 썸네일 ${index + 1}`}
                         loading="lazy"
                         onError={(e) => {
-                          console.error('썸네일 로드 실패:', media.original);
-                          // fallback으로 비디오 URL 사용
-                          e.currentTarget.src = media.videoUrl || '';
+                          console.error('비디오 썸네일 로드 실패:', media.thumbnail || media.videoUrl || media.original);
+                          // 비디오 썸네일이 없으면 비디오 자체를 표시
+                          e.currentTarget.style.display = 'none';
                         }}
                       />
                       <button 

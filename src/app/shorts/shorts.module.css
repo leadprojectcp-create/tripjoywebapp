@@ -9,6 +9,9 @@
   align-items: center; /* 수직 가운데 정렬 */
   background: #000;
   z-index: 1;
+  /* 휠 스크롤 방지 */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .shortsContainer {
@@ -80,12 +83,24 @@
   overflow: hidden;
   width: 100%;
   height: 100%;
+  /* 휠 스크롤 방지 */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.videoStack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .videoWrapper {
   width: 100%;
-  height: auto; /* 높이 자동 */
+  height: 100%; /* 전체 높이 사용 */
   position: relative;
+  flex-shrink: 0; /* 축소 방지 */
   aspect-ratio: 9/16; /* 9:16 비율 */
 }
 

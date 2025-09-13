@@ -44,6 +44,24 @@
     "th": "กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูป",
     "fil": "Mangyaring mag-upload ng hindi bababa sa 1 larawan"
   },
+  "imageSizeLimit": {
+    "ko": "이미지의 가로 크기는 300px 이상이어야 합니다",
+    "en": "Image width must be at least 300px",
+    "vi": "Chiều rộng hình ảnh phải ít nhất 300px",
+    "zh": "图像宽度必须至少为300px",
+    "ja": "画像の幅は300px以上である必要があります",
+    "th": "ความกว้างของรูปภาพต้องอย่างน้อย 300px",
+    "fil": "Ang lapad ng larawan ay dapat na hindi bababa sa 300px"
+  },
+  "imageUploadHint": {
+    "ko": "이미지는 가로 300px 이상, 최대 10장까지 업로드 가능합니다.",
+    "en": "Images must be at least 300px wide, up to 10 images can be uploaded.",
+    "vi": "Hình ảnh phải có chiều rộng ít nhất 300px, có thể tải lên tối đa 10 hình.",
+    "zh": "图像宽度必须至少为300px，最多可上传10张图像。",
+    "ja": "画像の幅は300px以上である必要があり、最大10枚までアップロード可能です。",
+    "th": "รูปภาพต้องมีความกว้างอย่างน้อย 300px สามารถอัปโหลดได้สูงสุด 10 รูป",
+    "fil": "Ang mga larawan ay dapat na hindi bababa sa 300px ang lapad, maaaring mag-upload ng hanggang 10 larawan."
+  },
   "addImage": {
     "ko": "사진 추가",
     "en": "Add Image",
@@ -442,22 +460,22 @@
     "fil": "Mga file ng video lang ang maaaring i-upload"
   },
   "videoSizeLimit": {
-    "ko": "동영상 파일 크기는 5MB를 초과할 수 없습니다",
-    "en": "Video file size cannot exceed 5MB",
-    "vi": "Kích thước file video không được vượt quá 5MB",
-    "zh": "视频文件大小不能超过5MB",
-    "ja": "動画ファイルサイズは5MBを超えることはできません",
-    "th": "ขนาดไฟล์วิดีโอไม่สามารถเกิน 5MB",
-    "fil": "Ang laki ng file ng video ay hindi maaaring lumampas sa 5MB"
+    "ko": "동영상 파일 크기는 50MB를 초과할 수 없습니다",
+    "en": "Video file size cannot exceed 50MB",
+    "vi": "Kích thước file video không được vượt quá 50MB",
+    "zh": "视频文件大小不能超过50MB",
+    "ja": "動画ファイルサイズは50MBを超えることはできません",
+    "th": "ขนาดไฟล์วิดีโอไม่สามารถเกิน 50MB",
+    "fil": "Ang laki ng file ng video ay hindi maaaring lumampas sa 50MB"
   },
   "videoDurationLimit": {
-    "ko": "동영상 길이는 10초 이내여야 합니다",
-    "en": "Video duration must be within 10 seconds",
-    "vi": "Thời lượng video phải trong vòng 10 giây",
-    "zh": "视频长度必须在10秒以内",
-    "ja": "動画の長さは10秒以内である必要があります",
-    "th": "ความยาววิดีโอต้องไม่เกิน 10 วินาที",
-    "fil": "Ang haba ng video ay dapat na hindi hihigit sa 10 segundo"
+    "ko": "동영상 길이는 15초 이내여야 합니다",
+    "en": "Video duration must be within 15 seconds",
+    "vi": "Thời lượng video phải trong vòng 15 giây",
+    "zh": "视频长度必须在15秒以内",
+    "ja": "動画の長さは15秒以内である必要があります",
+    "th": "ความยาววิดีโอต้องไม่เกิน 15 วินาที",
+    "fil": "Ang haba ng video ay dapat na hindi hihigit sa 15 segundo"
   },
   "videoReadError": {
     "ko": "동영상 파일을 읽을 수 없습니다",
@@ -469,13 +487,13 @@
     "fil": "Hindi mababasa ang file ng video"
   },
   "videoUploadHint": {
-    "ko": "동영상은 1개만 업로드 가능하며, 10초 이내, 5MB 이하의 파일만 지원됩니다.",
-    "en": "Only 1 video can be uploaded, and only files within 10 seconds and 5MB or less are supported.",
-    "vi": "Chỉ có thể tải lên 1 video và chỉ hỗ trợ các file trong vòng 10 giây và 5MB trở xuống.",
-    "zh": "只能上传1个视频，仅支持10秒以内、5MB以下的文件。",
-    "ja": "動画は1つのみアップロード可能で、10秒以内、5MB以下のファイルのみサポートされています。",
-    "th": "สามารถอัปโหลดวิดีโอได้เพียง 1 ไฟล์ และรองรับเฉพาะไฟล์ที่ยาวไม่เกิน 10 วินาที และขนาดไม่เกิน 5MB",
-    "fil": "Maaari lamang mag-upload ng 1 video, at sinusuportahan lamang ang mga file na hindi hihigit sa 10 segundo at 5MB o mas mababa."
+    "ko": "동영상은 1개만 업로드 가능하며, 15초 이내, 50MB 이하의 파일만 지원됩니다.",
+    "en": "Only 1 video can be uploaded, and only files within 15 seconds and 50MB or less are supported.",
+    "vi": "Chỉ có thể tải lên 1 video và chỉ hỗ trợ các file trong vòng 15 giây và 50MB trở xuống.",
+    "zh": "只能上传1个视频，仅支持15秒以内、50MB以下的文件。",
+    "ja": "動画は1つのみアップロード可能で、15秒以内、50MB以下のファイルのみサポートされています。",
+    "th": "สามารถอัปโหลดวิดีโอได้เพียง 1 ไฟล์ และรองรับเฉพาะไฟล์ที่ยาวไม่เกิน 15 วินาที และขนาดไม่เกิน 50MB",
+    "fil": "Maaari lamang mag-upload ng 1 video, at sinusuportahan lamang ang mga file na hindi hihigit sa 15 segundo at 50MB o mas mababa."
   },
   "reviewGuidelines": {
     "ko": "솔직한 후기를 작성해주세요✨",

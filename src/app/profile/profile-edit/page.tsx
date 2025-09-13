@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import { getUserData, updateUserProfile } from '../../auth/services/authService';
-import { uploadImage } from '../../services/imageKitService';
+import { bunnyService } from '../../services/bunnyService';
 
 import { AppBar } from '../../components/AppBar';
 import { BottomNavigator } from '../../components/BottomNavigator';
@@ -136,12 +136,19 @@ function ProfileEditContent() {
         console.warn('⚠️ 사용자 데이터 조회 실패, 현재 이미지 사용:', error);
       }
       
-      // tripjoy/profile/userId/ 폴더에 업로드 (진행률 콜백 + 기존 이미지 삭제)
-      const imageUrl = await uploadImage(file, user.uid, (progress, stage) => {
-        setUploadProgress(progress);
-        setUploadStage(stage);
-        console.log(`📊 업로드 진행률: ${progress}% - ${stage}`);
-      }, oldImageUrl);
+      // Bunny.net에 프로필 이미지 업로드
+      setUploadStage('업로드 중...');
+      setUploadProgress(50);
+      
+      const result = await bunnyService.uploadImage(file, `tripjoy/profile/${user.uid}`);
+      
+      if (!result.success || !result.url) {
+        throw new Error(result.error || 'Upload failed');
+      }
+      
+      const imageUrl = result.url;
+      setUploadProgress(100);
+      setUploadStage('완료!');
       
       console.log('✅ 업로드된 이미지 URL:', imageUrl);
       

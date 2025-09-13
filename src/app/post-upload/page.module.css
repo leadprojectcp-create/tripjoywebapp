@@ -219,6 +219,13 @@
   line-height: 1.6;
 }
 
+/* 이미지 업로드 */
+.image-upload-hint {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
 /* 동영상 업로드 */
 .video-upload-hint {
   font-size: 11px;

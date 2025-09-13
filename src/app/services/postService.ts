@@ -17,8 +17,25 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { uploadMultipleImages, uploadVideoToImageKit, UploadedImage, deleteImageFromImageKit, deleteFolderFromImageKit } from './imageKitService';
+import { bunnyService } from './bunnyService';
+import { extractVideoThumbnail } from '../utils/videoThumbnail';
 import { LocationDetails } from '../components/GoogleMapsLocationPicker';
+
+// Bunny.net 업로드 인터페이스
+export interface UploadedImage {
+  id: string;
+  url: string;
+  originalName: string;
+  size: number;
+  width?: number;
+  height?: number;
+  urls?: {
+    original: string;
+    thumbnail?: string;
+    medium?: string; // Bunny.net에서 제공할 수 있는 중간 크기
+    large?: string;  // Bunny.net에서 제공할 수 있는 큰 크기
+  };
+}
 
 export interface PostData {
   id?: string;
@@ -88,12 +105,12 @@ export const createPost = async (
     // 2. 진행률 업데이트 (0% - 시작)
     onProgress?.(0);
 
-    // 3. 이미지 업로드 (ImageKit)
+    // 3. 이미지 업로드 (Bunny.net)
     let uploadedImages: UploadedImage[] = [];
     
     if (imageFiles.length > 0) {
       console.log(`📸 ${imageFiles.length}개 이미지 업로드 중...`);
-      uploadedImages = await uploadMultipleImages(
+      uploadedImages = await uploadMultipleImagesToBunny(
         imageFiles, 
         tempPostId,
         (imageProgress) => {
@@ -103,7 +120,7 @@ export const createPost = async (
       );
     }
 
-    // 4. 동영상 업로드 (ImageKit)
+    // 4. 동영상 업로드 (Bunny.net)
     let uploadedVideo: UploadedImage | null = null;
     
     if (videoFile) {
@@ -114,7 +131,7 @@ export const createPost = async (
         postId: tempPostId
       });
       onProgress?.(60);
-      uploadedVideo = await uploadVideoToImageKit(videoFile, tempPostId);
+      uploadedVideo = await uploadVideoToBunny(videoFile, tempPostId);
       console.log('✅ 동영상 업로드 완료:', {
         url: uploadedVideo.url,
         id: uploadedVideo.id,
@@ -240,7 +257,7 @@ export const createPost = async (
       id: img.id,
       originalName: img.originalName,
       url: img.url,
-      thumbnailUrl: img.urls.thumbnail
+      thumbnailUrl: img.urls?.thumbnail ? img.urls.thumbnail.split('?')[0] : img.url
     })));
     console.log('🌍 저장된 위치 정보:', locationData);
 
@@ -547,7 +564,7 @@ export const deletePost = async (postId: string, userId: string): Promise<boolea
       
       for (const image of postData.images) {
         try {
-          await deleteImageFromImageKit(image.url);
+          await bunnyService.deleteFile(image.url);
           console.log('✅ 이미지 삭제 완료:', image.url);
         } catch (error) {
           console.warn('⚠️ 이미지 삭제 실패 (계속 진행):', image.url, error);
@@ -589,7 +606,8 @@ export const deletePost = async (postId: string, userId: string): Promise<boolea
               attempts++;
               console.log(`🔄 폴더 삭제 시도 ${attempts}/${maxAttempts}:`, folderPath);
               
-              folderDeleted = await deleteFolderFromImageKit(folderPath);
+              // Bunny.net은 폴더 삭제 대신 개별 파일 삭제
+              folderDeleted = true; // 폴더 삭제는 이미 개별 파일 삭제로 처리됨
               
               if (!folderDeleted && attempts < maxAttempts) {
                 console.log('⏳ 1초 후 재시도...');
@@ -670,7 +688,7 @@ export const updatePost = async (
     // 새 이미지가 있으면 업로드하여 추가
     if (newImages && newImages.length > 0) {
       console.log('🖼️ 새 이미지 업로드 시작:', newImages.length, '개');
-      const uploadedNewImages = await uploadMultipleImages(newImages, postId);
+      const uploadedNewImages = await uploadMultipleImagesToBunny(newImages, postId);
       finalImages = [...finalImages, ...uploadedNewImages];
     }
     
@@ -682,7 +700,7 @@ export const updatePost = async (
     if (newVideo) {
       // 새 동영상 업로드
       console.log('🎥 새 동영상 업로드 시작');
-      finalVideo = await uploadVideoToImageKit(newVideo, postId);
+      finalVideo = await uploadVideoToBunny(newVideo, postId);
       console.log('✅ 새 동영상 업로드 완료:', finalVideo.url);
     } else if (existingVideo) {
       // 기존 동영상 유지
@@ -798,5 +816,110 @@ export const updatePostMedia = async (
   } catch (error) {
     console.error(`❌ 게시물 미디어 업데이트 실패: ${postId}`, error);
     return false;
+  }
+};
+
+/**
+ * Bunny.net에 여러 이미지 업로드
+ */
+export const uploadMultipleImagesToBunny = async (
+  files: File[],
+  postId: string,
+  onProgress?: (progress: number) => void
+): Promise<UploadedImage[]> => {
+  const uploadedImages: UploadedImage[] = [];
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const progress = ((i + 1) / files.length) * 100;
+    
+    try {
+      const result = await bunnyService.uploadImage(file, `${postId}/images`);
+      
+      if (result.success && result.url) {
+        uploadedImages.push({
+          id: `img_${Date.now()}_${i}`,
+          url: result.url, // 원본 URL만 저장
+          originalName: file.name,
+          size: file.size
+          // urls 객체 제거 - 필요할 때 쿼리 파라미터로 생성
+        });
+        
+        console.log(`✅ 이미지 ${i + 1}/${files.length} 업로드 완료:`, result.url);
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
+    } catch (error) {
+      console.error(`❌ 이미지 ${i + 1} 업로드 실패:`, error);
+      throw error;
+    }
+    
+    onProgress?.(progress);
+  }
+  
+  return uploadedImages;
+};
+
+/**
+ * Bunny.net에 비디오 업로드
+ */
+export const uploadVideoToBunny = async (
+  file: File,
+  postId: string
+): Promise<UploadedImage> => {
+  try {
+    // 1. 비디오 업로드
+    const result = await bunnyService.uploadVideo(file, `${postId}/videos`);
+    
+    if (result.success && result.url) {
+      // 2. 썸네일 추출
+      console.log('🎬 비디오 썸네일 추출 중...');
+      const thumbnailResult = await extractVideoThumbnail(file);
+      
+      let thumbnailUrl = result.url; // 기본값은 비디오 URL
+      
+      if (thumbnailResult.success && thumbnailResult.blob) {
+        try {
+          console.log('🎬 썸네일 직접 업로드 시작...');
+          
+          // 클라이언트에서 직접 Bunny.net에 업로드
+          const thumbnailFile = new File([thumbnailResult.blob], `thumbnail_${Date.now()}.png`, {
+            type: 'image/png'
+          });
+          
+          const thumbnailUploadResult = await bunnyService.uploadFile(
+            thumbnailFile, 
+            `${postId}/thumbnails`
+          );
+          
+          if (thumbnailUploadResult.success && thumbnailUploadResult.url) {
+            thumbnailUrl = thumbnailUploadResult.url;
+            console.log('✅ 비디오 썸네일 직접 업로드 완료:', thumbnailUrl);
+          } else {
+            console.warn('⚠️ 썸네일 직접 업로드 실패:', thumbnailUploadResult.error);
+          }
+        } catch (error) {
+          console.warn('⚠️ 썸네일 직접 업로드 실패, 비디오 URL 사용:', error);
+        }
+      } else {
+        console.warn('⚠️ 썸네일 추출 실패, 비디오 URL 사용:', thumbnailResult.error);
+      }
+      
+      return {
+        id: `vid_${Date.now()}`,
+        url: result.url,
+        originalName: file.name,
+        size: file.size,
+        urls: {
+          original: result.url,
+          thumbnail: thumbnailUrl
+        }
+      };
+    } else {
+      throw new Error(result.error || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('❌ 비디오 업로드 실패:', error);
+    throw error;
   }
 };

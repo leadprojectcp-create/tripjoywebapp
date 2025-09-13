@@ -6,6 +6,7 @@ import { PostData, getUsersBatch } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { AppBar } from '../components/AppBar';
 import { BottomNavigator } from '../components/BottomNavigator';
+import { filterPostsByLocation, filterVideoPosts } from './shortsLogic';
 import styles from './shorts.module.css';
 
 function ShortsContent() {
@@ -13,6 +14,7 @@ function ShortsContent() {
   const searchParams = useSearchParams();
   const { t } = useTranslationContext();
   
+  const [allPosts, setAllPosts] = useState<PostData[]>([]);
   const [posts, setPosts] = useState<PostData[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +27,7 @@ function ShortsContent() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 비디오 게시물만 필터링
-  const videoPosts = posts.filter(post => post.video && post.video.url && post.video.url.trim() !== '');
+  const videoPosts = filterVideoPosts(posts);
 
   // 앱바와 바텀 높이 계산
   useEffect(() => {
@@ -109,24 +111,34 @@ function ShortsContent() {
         setIsLoading(true);
         const { getPosts } = await import('../services/postService');
         
-        const allPosts = await getPosts();
-        const videoOnlyPosts = allPosts.filter((post: PostData) => post.video && post.video.url && post.video.url.trim() !== '');
+        const allPostsData = await getPosts();
+        const videoOnlyPosts = filterVideoPosts(allPostsData);
         
-        setPosts(videoOnlyPosts);
+        // 전체 비디오 게시물 저장
+        setAllPosts(videoOnlyPosts);
         
-        // 사용자 정보 캐시
-        const userIds = [...new Set(videoOnlyPosts.map((post: PostData) => post.userId))];
-        const users = await getUsersBatch(userIds);
-        setUserInfoCache(users); // getUsersBatch는 이미 Record<string, any>를 반환
-        
-        // URL에서 초기 인덱스 설정
+        // URL에서 초기 인덱스가 있으면 해당 게시물 기준으로 필터링
         const initialIndex = searchParams.get('index');
+        let filteredPosts = videoOnlyPosts;
+        
         if (initialIndex) {
           const index = parseInt(initialIndex, 10);
           if (index >= 0 && index < videoOnlyPosts.length) {
-            setCurrentIndex(index);
+            const referencePost = videoOnlyPosts[index];
+            filteredPosts = filterPostsByLocation(videoOnlyPosts, referencePost);
+            setCurrentIndex(0); // 필터링된 결과에서 첫 번째로 설정
           }
+        } else {
+          // 초기 인덱스가 없으면 첫 번째 게시물 기준으로 필터링
+          filteredPosts = filterPostsByLocation(videoOnlyPosts);
         }
+        
+        setPosts(filteredPosts);
+        
+        // 사용자 정보 캐시
+        const userIds = [...new Set(filteredPosts.map((post: PostData) => post.userId))];
+        const users = await getUsersBatch(userIds);
+        setUserInfoCache(users); // getUsersBatch는 이미 Record<string, any>를 반환
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -139,23 +151,20 @@ function ShortsContent() {
 
   // 현재 비디오 재생/일시정지
   useEffect(() => {
-    const currentVideo = videoRefs.current[videoPosts[currentIndex]?.id || ''];
-    if (currentVideo) {
-      if (isPaused) {
-        currentVideo.pause();
-      } else {
-        currentVideo.play().catch(console.error);
-      }
-    }
-    
-    // 다른 비디오들 일시정지
+    // 모든 비디오 일시정지
     Object.keys(videoRefs.current).forEach(postId => {
       const video = videoRefs.current[postId];
-      if (video && postId !== videoPosts[currentIndex]?.id) {
+      if (video) {
         video.pause();
         video.currentTime = 0;
       }
     });
+    
+    // 현재 비디오만 재생
+    const currentVideo = videoRefs.current[videoPosts[currentIndex]?.id || ''];
+    if (currentVideo && !isPaused) {
+      currentVideo.play().catch(console.error);
+    }
   }, [currentIndex, videoPosts, isPaused]);
 
   const handleScroll = (direction: 'up' | 'down') => {
@@ -163,6 +172,20 @@ function ShortsContent() {
       setCurrentIndex(currentIndex - 1);
     } else if (direction === 'down' && currentIndex < videoPosts.length - 1) {
       setCurrentIndex(currentIndex + 1);
+    } else if (direction === 'down' && currentIndex === videoPosts.length - 1) {
+      // 마지막 영상에 도달했을 때, 같은 위치의 다른 영상이 있는지 확인
+      const currentPost = videoPosts[currentIndex];
+      if (currentPost) {
+        const sameLocationPosts = filterPostsByLocation(allPosts, currentPost);
+        const remainingPosts = sameLocationPosts.filter(post => 
+          !videoPosts.some(videoPost => videoPost.id === post.id)
+        );
+        
+        if (remainingPosts.length > 0) {
+          console.log(`🔄 같은 위치의 추가 영상 ${remainingPosts.length}개 발견, 목록에 추가`);
+          setPosts(prev => [...prev, ...remainingPosts]);
+        }
+      }
     }
   };
 
@@ -203,6 +226,19 @@ function ShortsContent() {
     };
     
     document.addEventListener('touchend', handleTouchEnd);
+  };
+
+  // PC에서 마우스 휠 이벤트 처리
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    // 휠을 위로 올리면 다음 영상 (down)
+    // 휠을 아래로 내리면 이전 영상 (up)
+    if (e.deltaY < 0) {
+      handleScroll('down');
+    } else if (e.deltaY > 0) {
+      handleScroll('up');
+    }
   };
 
   const getVideoThumbnail = (post: PostData) => {
@@ -272,44 +308,55 @@ function ShortsContent() {
           <div 
             className={styles.videoContainer}
             onTouchStart={handleTouchStart}
+            onWheel={handleWheel}
             onClick={handleVideoClick}
             ref={containerRef}
           >
-        <div className={styles.videoWrapper}>
-          <video
-            ref={(el) => {
-              if (currentPost?.id) {
-                videoRefs.current[currentPost.id] = el;
-              }
-            }}
-            className={styles.video}
-            poster={getVideoThumbnail(currentPost)}
-            preload="metadata"
-            muted
-            loop
-            playsInline
-            autoPlay
-          >
-            <source src={getVideoUrl(currentPost)} type="video/mp4" />
-            <source src={getVideoUrl(currentPost)} type="video/webm" />
-            <source src={getVideoUrl(currentPost)} type="video/ogg" />
-            브라우저가 동영상을 지원하지 않습니다.
-          </video>
-          {/* 터치 피드백 버튼 */}
-          {showPlayButton && (
-            <div className={styles.playButton}>
-              {isPaused ? (
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                  <path d="M8 5v14l11-7z" fill="white"/>
-                </svg>
-              ) : (
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="white"/>
-                </svg>
-              )}
+            <div 
+              className={styles.videoStack}
+              style={{ 
+                transform: `translateY(-${currentIndex * 100}%)`,
+                transition: 'transform 0.3s ease-out'
+              }}
+            >
+              {videoPosts.map((post, index) => (
+                <div key={post.id} className={styles.videoWrapper}>
+                  <video
+                    ref={(el) => {
+                      if (post.id) {
+                        videoRefs.current[post.id] = el;
+                      }
+                    }}
+                    className={styles.video}
+                    poster={getVideoThumbnail(post)}
+                    preload="metadata"
+                    muted
+                    loop
+                    playsInline
+                    autoPlay={index === currentIndex}
+                  >
+                    <source src={getVideoUrl(post)} type="video/mp4" />
+                    <source src={getVideoUrl(post)} type="video/webm" />
+                    <source src={getVideoUrl(post)} type="video/ogg" />
+                    브라우저가 동영상을 지원하지 않습니다.
+                  </video>
+                  {/* 터치 피드백 버튼 */}
+                  {showPlayButton && index === currentIndex && (
+                    <div className={styles.playButton}>
+                      {isPaused ? (
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                          <path d="M8 5v14l11-7z" fill="white"/>
+                        </svg>
+                      ) : (
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                          <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="white"/>
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
         
         <div className={styles.contentOverlay}>
           <div className={styles.postInfo}>

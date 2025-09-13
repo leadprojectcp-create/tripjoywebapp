@@ -1,5 +1,19 @@
 /* PostCard 전용 스타일 */
 
+/* 이미지 로딩 최적화 */
+.imageLoadingOptimized {
+  image-rendering: -webkit-optimize-contrast; /* WebKit 최적화 */
+  image-rendering: crisp-edges; /* 선명한 렌더링 */
+  will-change: transform; /* GPU 가속 */
+  backface-visibility: hidden; /* 3D 변환 최적화 */
+  transition: opacity 0.2s ease-in-out; /* 부드러운 페이드인 */
+  opacity: 0; /* 초기 투명도 */
+}
+
+.imageLoadingOptimized.loaded {
+  opacity: 1; /* 로딩 완료 시 불투명 */
+}
+
 /* 메인 카드 컨테이너 */
 .contentCard {
   padding: 0;
