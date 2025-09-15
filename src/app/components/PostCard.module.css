@@ -441,8 +441,8 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 4px;
-  margin-top: 8px;
+  gap: 2px;
+  margin-top: 10px;
 }
 
 /* 액션 버튼들 행 - 찜(왼쪽)과 공유하기(오른쪽) */

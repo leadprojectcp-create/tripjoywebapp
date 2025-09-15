@@ -191,12 +191,17 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
     }
 
     try {
+      const options: any = {
+        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'address_components', 'types']
+      };
+      // 게시물 업로드 페이지에서는 전세계 검색 가능 (국가 제한 제거)
+      if (!isPostUploadPage) {
+        options.componentRestrictions = getCountryRestrictions(currentLanguage as Language);
+      }
+
       const autocompleteInstance = new window.google.maps.places.Autocomplete(
         locationInputRef.current,
-        {
-          fields: ['place_id', 'name', 'formatted_address', 'geometry', 'address_components', 'types'],
-          componentRestrictions: getCountryRestrictions(currentLanguage as Language),
-        }
+        options
       );
 
       autocompleteInstance.addListener('place_changed', () => {
@@ -283,7 +288,7 @@ const GoogleMapsLocationPicker: React.FC<GoogleMapsLocationPickerProps> = ({
       
       const mapInstance = new window.google.maps.Map(mapRef.current, {
         center: center,
-        zoom: 15,
+        zoom: 3,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
