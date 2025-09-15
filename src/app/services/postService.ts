@@ -74,6 +74,9 @@ export interface PostData {
   bookmarkedBy?: { [userId: string]: any }; // serverTimestamp
   comments: number;
   isVisible: boolean;
+  // 🚀 현재 사용자 상태 (서버에서 미리 계산)
+  isLikedByCurrentUser?: boolean;
+  isBookmarkedByCurrentUser?: boolean;
 }
 
 interface CountryCityInfo {
@@ -295,7 +298,8 @@ export const getPostById = async (postId: string): Promise<PostData | null> => {
  */
 export const getPosts = async (
   limitCount: number = 20,
-  userId?: string
+  userId?: string,
+  currentUserId?: string
 ): Promise<PostData[]> => {
   try {
     // 🚀 성능 최적화: 인덱스 최적화된 쿼리
@@ -346,8 +350,14 @@ export const getPosts = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
+        // 🚀 좋아요/북마크 정보 포함!
+        likedBy: data.likedBy || {},
+        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
-        isVisible: data.isVisible
+        isVisible: data.isVisible,
+        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
+        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
+        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
       } as PostData);
     });
 
@@ -359,41 +369,6 @@ export const getPosts = async (
   }
 };
 
-/**
- * 배치로 사용자 정보 조회 (성능 최적화)
- */
-export const getUsersBatch = async (userIds: string[]): Promise<Record<string, any>> => {
-  try {
-    if (userIds.length === 0) return {};
-
-    // 중복 제거
-    const uniqueUserIds = [...new Set(userIds)];
-    
-    // Firestore의 'in' 쿼리는 최대 10개까지만 지원
-    const batchSize = 10;
-    const userInfoMap: Record<string, any> = {};
-
-    for (let i = 0; i < uniqueUserIds.length; i += batchSize) {
-      const batch = uniqueUserIds.slice(i, i + batchSize);
-      
-      const q = query(
-        collection(db, 'users'),
-        where('__name__', 'in', batch.map(id => doc(db, 'users', id)))
-      );
-
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        userInfoMap[doc.id] = doc.data();
-      });
-    }
-
-    console.log(`✅ ${uniqueUserIds.length}명의 사용자 정보 배치 조회 완료`);
-    return userInfoMap;
-  } catch (error) {
-    console.error('❌ 배치 사용자 정보 조회 실패:', error);
-    return {};
-  }
-};
 
 /**
  * 해시태그로 게시물 검색
@@ -419,9 +394,22 @@ export const searchPostsByHashtag = async (
     const posts: PostData[] = [];
 
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       posts.push({
         id: doc.id,
-        ...doc.data(),
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        video: data.video || null,
+        location: data.location,
+        createdAt: data.createdAt,
+        likeCount: data.likeCount || 0,
+        bookmarkCount: data.bookmarkCount || 0,
+        // 🚀 좋아요/북마크 정보 포함!
+        likedBy: data.likedBy || {},
+        bookmarkedBy: data.bookmarkedBy || {},
+        comments: data.comments || 0,
+        isVisible: data.isVisible
       } as PostData);
     });
 
@@ -454,9 +442,22 @@ export const searchPostsByLocation = async (
     const posts: PostData[] = [];
 
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       posts.push({
         id: doc.id,
-        ...doc.data(),
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        video: data.video || null,
+        location: data.location,
+        createdAt: data.createdAt,
+        likeCount: data.likeCount || 0,
+        bookmarkCount: data.bookmarkCount || 0,
+        // 🚀 좋아요/북마크 정보 포함!
+        likedBy: data.likedBy || {},
+        bookmarkedBy: data.bookmarkedBy || {},
+        comments: data.comments || 0,
+        isVisible: data.isVisible
       } as PostData);
     });
 
@@ -472,7 +473,8 @@ export const searchPostsByLocation = async (
  */
 export const getPostsByCountry = async (
   countryCode: string,
-  limitCount: number = 20
+  limitCount: number = 20,
+  currentUserId?: string
 ): Promise<PostData[]> => {
   try {
     const q = query(
@@ -487,9 +489,25 @@ export const getPostsByCountry = async (
     const posts: PostData[] = [];
 
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       posts.push({
         id: doc.id,
-        ...doc.data(),
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        video: data.video || null,
+        location: data.location,
+        createdAt: data.createdAt,
+        likeCount: data.likeCount || 0,
+        bookmarkCount: data.bookmarkCount || 0,
+        // 🚀 좋아요/북마크 정보 포함!
+        likedBy: data.likedBy || {},
+        bookmarkedBy: data.bookmarkedBy || {},
+        comments: data.comments || 0,
+        isVisible: data.isVisible,
+        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
+        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
+        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
       } as PostData);
     });
 
@@ -507,7 +525,8 @@ export const getPostsByCountry = async (
 export const getPostsByCity = async (
   countryCode: string,
   cityCode: string,
-  limitCount: number = 20
+  limitCount: number = 20,
+  currentUserId?: string
 ): Promise<PostData[]> => {
   try {
     const q = query(
@@ -523,9 +542,25 @@ export const getPostsByCity = async (
     const posts: PostData[] = [];
 
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       posts.push({
         id: doc.id,
-        ...doc.data(),
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        video: data.video || null,
+        location: data.location,
+        createdAt: data.createdAt,
+        likeCount: data.likeCount || 0,
+        bookmarkCount: data.bookmarkCount || 0,
+        // 🚀 좋아요/북마크 정보 포함!
+        likedBy: data.likedBy || {},
+        bookmarkedBy: data.bookmarkedBy || {},
+        comments: data.comments || 0,
+        isVisible: data.isVisible,
+        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
+        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
+        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
       } as PostData);
     });
 

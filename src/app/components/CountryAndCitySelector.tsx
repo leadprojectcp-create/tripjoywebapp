@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import styles from './CountryAndCitySelector.module.css';
 
@@ -21,18 +22,22 @@ interface CountryAndCitySelectorProps {
   onSelectionChange: (countryCode: string, cityCode: string) => void;
   onLocationTextChange?: (text: string) => void;
   className?: string;
+  variant?: 'pc' | 'mobile';
+  renderTrigger?: boolean; // 트리거 UI(타이틀) 노출 여부
 }
 
 export interface CountryAndCitySelectorRef {
   openMobileModal: () => void;
 }
 
-const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndCitySelectorProps>(({
+const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndCitySelectorProps>(({ 
   selectedCountry = '',
   selectedCity = '',
   onSelectionChange,
   onLocationTextChange,
-  className = ''
+  className = '',
+  variant = 'pc',
+  renderTrigger = true
 }, ref) => {
   const { t, currentLanguage } = useTranslationContext();
   
@@ -43,6 +48,34 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   const [loadingCities, setLoadingCities] = useState(false);
   const [currentCountry, setCurrentCountry] = useState(selectedCountry);
   const [currentCity, setCurrentCity] = useState(selectedCity);
+
+  // props가 변경될 때 내부 상태 업데이트
+  useEffect(() => {
+    setCurrentCountry(selectedCountry);
+    setCurrentCity(selectedCity);
+  }, [selectedCountry, selectedCity]);
+
+  // 로컬 스토리지에서 지역 정보 불러오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedCountry = localStorage.getItem('dashboard_selectedCountry');
+      const savedCity = localStorage.getItem('dashboard_selectedCity');
+      
+      console.log('CountryAndCitySelector 로컬 스토리지에서 불러온 값들:', {
+        savedCountry,
+        savedCity
+      });
+      
+      if (savedCountry && !selectedCountry) {
+        setCurrentCountry(savedCountry);
+        console.log('CountryAndCitySelector currentCountry 설정됨:', savedCountry);
+      }
+      if (savedCity && !selectedCity) {
+        setCurrentCity(savedCity);
+        console.log('CountryAndCitySelector currentCity 설정됨:', savedCity);
+      }
+    }
+  }, [selectedCountry, selectedCity]);
   
   // 커스텀 드롭다운 상태
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -297,21 +330,38 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   };
 
   const getSelectedLocationText = () => {
+    console.log('CountryAndCitySelector getSelectedLocationText 호출:', {
+      currentCountry,
+      currentCity,
+      countriesLength: countries.length,
+      citiesLength: cities.length,
+      currentLanguage
+    });
+
     if (!currentCountry && !currentCity) {
+      console.log('국가/도시가 선택되지 않음, whereToGo 반환');
       return t('whereToGo');
     }
 
     const country = countries.find(c => c.code === currentCountry);
     const city = cities.find(c => c.code === currentCity);
     
+    console.log('찾은 국가/도시 데이터:', { country, city });
+    
     const countryName = country?.names[currentLanguage] || country?.names['en'] || '';
     const cityName = city?.names[currentLanguage] || city?.names['en'] || '';
 
+    console.log('최종 국가/도시 이름:', { countryName, cityName });
+
     if (countryName && cityName) {
-      return `${countryName} | ${cityName}`;
+      const result = `${cityName}, ${countryName}`;
+      console.log('도시+국가 조합 반환:', result);
+      return result;
     } else if (countryName) {
+      console.log('국가만 반환:', countryName);
       return countryName;
     } else {
+      console.log('데이터 없음, whereToGo 반환');
       return t('whereToGo');
     }
   };
@@ -332,22 +382,29 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
 
   return (
     <>
-      {/* 숨겨진 컴포넌트 (모든 기능은 유지하되 UI는 숨김) */}
-      <div style={{ display: 'none' }}>
-        <div className={styles['mobile-title']} onClick={handleTitleClick}>
-          <img src="/icons/location_pin.svg" alt="location" width={24} height={24} />
+      {/* 실제 표시되는 위치 선택기 - 변이별 단일 렌더 (숨김 가능) */}
+      {renderTrigger && variant === 'pc' && (
+        <div className={styles['pc-title']} onClick={handleTitleClick}>
+          <img src="/icons/location_icon.svg" alt="location" width={24} height={24} />
           {getSelectedLocationText()}
           <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
         </div>
-      </div>
+      )}
+      {renderTrigger && variant === 'mobile' && (
+        <div className={styles['mobile-title']} onClick={handleTitleClick}>
+          <img src="/icons/location_icon.svg" alt="location" width={24} height={24} />
+          {getSelectedLocationText()}
+          <img src="/icons/stat_minus.svg" alt="dropdown" width={20} height={20} />
+        </div>
+      )}
 
-      {/* 모달 (PC는 중앙 팝업, 모바일은 하단 슬라이드) */}
-      {isLocationModalOpen && (
+      {/* 모달 (PC는 중앙 팝업, 모바일은 하단 슬라이드) - body에 포털로 렌더링 */}
+      {isLocationModalOpen && createPortal(
         <div className={styles['location-modal-overlay']} onClick={handleCancelSelection}>
           <div className={`${styles['location-modal']} ${isLocationModalOpen ? styles['open'] : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles['modal-header']}>
               <h3 className={styles['modal-title']}>
-                <img src="/icons/location_pin.svg" alt="location" width={20} height={20} />
+                <img src="/icons/location_icon.svg" alt="location" width={20} height={20} />
                 {t('whereToGo')}
               </h3>
               <button className={styles['modal-close']} onClick={handleCancelSelection}>×</button>
@@ -429,7 +486,8 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
               <button className={`${styles['modal-button']} ${styles['apply-button']}`} onClick={handleApplySelection}>적용</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

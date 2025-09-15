@@ -1,18 +1,22 @@
 "use client";
 
 import React, { useState, useRef, useEffect, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
-import { getPosts, PostData, getPostsByCountry, getPostsByCity, getUsersBatch } from "../services/postService";
-import { doc, getDoc } from 'firebase/firestore';
+import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../services/postService";
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from "../services/firebase";
 import CountryAndCitySelector, { CountryAndCitySelectorRef } from "../components/CountryAndCitySelector";
 import { PostCard } from "../components/PostCard";
-import { VideoSection } from "../components/VideoSection";
+const DynamicVideoSection = dynamic(() => import("../components/VideoSection").then(m => m.VideoSection), {
+  ssr: false,
+  loading: () => <div style={{ height: 220 }} />
+});
 import styles from "./style.module.css";
 
 export default function Dashboard() {
@@ -30,6 +34,9 @@ export default function Dashboard() {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userInfoCache, setUserInfoCache] = useState<Record<string, any>>({});
+  const [visibleCount, setVisibleCount] = useState<number>(4);
+  const [showVideoSection, setShowVideoSection] = useState<boolean>(false);
+  const videoSentinelRef = useRef<HTMLDivElement | null>(null);
   
   // 필터링 상태 관리
   const [selectedCountry, setSelectedCountry] = useState('');
@@ -38,63 +45,128 @@ export default function Dashboard() {
   // 위치 선택 관련
   const [locationText, setLocationText] = useState('');
   const countryCitySelectorRef = useRef<CountryAndCitySelectorRef>(null);
+
+  // 로컬 스토리지에서 선택된 위치 복원
+  useEffect(() => {
+    const savedCountry = localStorage.getItem('dashboard_selectedCountry');
+    const savedCity = localStorage.getItem('dashboard_selectedCity');
+    const savedLocationText = localStorage.getItem('dashboard_locationText');
+    
+    if (savedCountry) {
+      setSelectedCountry(savedCountry);
+    }
+    if (savedCity) {
+      setSelectedCity(savedCity);
+    }
+    if (savedLocationText) {
+      setLocationText(savedLocationText);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && posts.length > 4) {
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        // @ts-ignore
+        window.requestIdleCallback(() => setVisibleCount(Math.min(8, posts.length)));
+      } else {
+        setTimeout(() => setVisibleCount(Math.min(8, posts.length)), 0);
+      }
+    } else if (!isLoading) {
+      setVisibleCount(posts.length);
+    }
+  }, [isLoading, posts]);
+
+  useEffect(() => {
+    if (!videoSentinelRef.current || showVideoSection) return;
+    const el = videoSentinelRef.current;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setShowVideoSection(true);
+          io.disconnect();
+        }
+      });
+    }, { rootMargin: "200px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [showVideoSection]);
+
+  // AppBar에서 지역 선택 이벤트 수신
+  useEffect(() => {
+    const handleLocationSelectionChanged = (event: CustomEvent) => {
+      const { countryCode, cityCode } = event.detail;
+      console.log('대시보드에서 AppBar 지역 선택 이벤트 수신:', { countryCode, cityCode });
+      
+      // 대시보드의 지역 선택 상태 업데이트
+      setSelectedCountry(countryCode);
+      setSelectedCity(cityCode);
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('dashboard_selectedCountry', countryCode);
+      localStorage.setItem('dashboard_selectedCity', cityCode);
+    };
+
+    window.addEventListener('locationSelectionChanged', handleLocationSelectionChanged as EventListener);
+    
+    return () => {
+      window.removeEventListener('locationSelectionChanged', handleLocationSelectionChanged as EventListener);
+    };
+  }, []);
   
 
   // 로그인 상태와 관계없이 Dashboard는 접근 가능
   // (게시물 읽기는 로그인 불필요)
 
-  // 🚀 게시물 데이터 즉시 로드 (캐싱 없음!)
+  // 🚀 게시물 먼저 로드 후 필요한 사용자만 병렬 조회
   useEffect(() => {
-    const loadPosts = async () => {
+    const loadPostsWithUsers = async () => {
       setIsLoading(true);
-      
       try {
-        let postsData: PostData[];
-        
+        let postsData: PostData[] = [];
         if (selectedCity) {
-          console.log('🔍 도시별 게시물 로드 중...', selectedCountry, selectedCity);
-          postsData = await getPostsByCity(selectedCountry, selectedCity);
+          postsData = await getPostsByCity(selectedCountry, selectedCity, 12, user?.uid);
         } else if (selectedCountry) {
-          console.log('🔍 국가별 게시물 로드 중...', selectedCountry);
-          postsData = await getPostsByCountry(selectedCountry);  
+          postsData = await getPostsByCountry(selectedCountry, 12, user?.uid);
         } else {
-          console.log('🔍 전체 게시물 로드 중...');
-          postsData = await getPosts();
+          postsData = await getPosts(12, undefined, user?.uid);
         }
-        
-        console.log('✅ 게시물 데이터 로드 완료:', postsData.length);
         setPosts(postsData);
-        
-        // 🚀 병렬로 사용자 정보 조회 (UI 블로킹 없음!)
-        if (postsData.length > 0) {
-          const userIds = postsData.map(post => post.userId);
-          // 사용자 정보는 백그라운드에서 로드하고 UI는 즉시 표시
-          getUsersBatch(userIds).then(userInfoMap => {
-            setUserInfoCache(prev => ({ ...prev, ...userInfoMap }));
-          }).catch(error => {
-            console.error('❌ 사용자 정보 로드 실패:', error);
-          });
-        }
+
+        const authorIds = Array.from(new Set(postsData.map(p => p.userId).filter(Boolean)));
+        const userMap: Record<string, any> = {};
+        await Promise.all(authorIds.map(async (uid) => {
+          try {
+            const snap = await getDoc(doc(db, 'users', uid));
+            if (snap.exists()) userMap[uid] = snap.data();
+          } catch {}
+        }));
+        setUserInfoCache(userMap);
       } catch (error) {
-        console.error('❌ 게시물 로드 실패:', error);
+        console.error('❌ 게시물/사용자 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    // 🚀 인증 로딩을 기다리지 않고 즉시 로드!
-    loadPosts();
-  }, [selectedCountry, selectedCity]);
+    loadPostsWithUsers();
+  }, [selectedCountry, selectedCity, user?.uid]);
 
   // 위치 선택 관련 함수들
   const handleCountryCitySelect = (countryCode: string, cityCode: string) => {
     console.log('🔄 위치 변경:', { countryCode, cityCode });
     setSelectedCountry(countryCode);
     setSelectedCity(cityCode);
+    
+    // 로컬 스토리지에 저장
+    localStorage.setItem('dashboard_selectedCountry', countryCode);
+    localStorage.setItem('dashboard_selectedCity', cityCode);
   };
 
   const handleLocationTextChange = (text: string) => {
     setLocationText(text);
+    
+    // 로컬 스토리지에 위치 텍스트 저장
+    localStorage.setItem('dashboard_locationText', text);
+    
     // AppBar에 위치 텍스트 업데이트 전달
     window.dispatchEvent(new CustomEvent('locationTextChanged', { 
       detail: { text } 
@@ -172,7 +244,10 @@ export default function Dashboard() {
               <div className={styles['trending-section']}>
                 <h2>
                   {selectedCountry || selectedCity ? (
-                    t('filteredPosts')
+                    <>
+                      <img src="/icons/popular-bolt.svg" alt="인기" width="24" height="24" />
+                      {t('filteredPosts')}
+                    </>
                   ) : (
                     <>
                       <img src="/icons/popular-bolt.svg" alt="인기" width="24" height="24" />
@@ -189,13 +264,15 @@ export default function Dashboard() {
                 ) : (
                   <div className={styles['content-grid']}>
                     {posts.length > 0 ? (
-                      posts.slice(0, 8).map((post) => ( // 최대 8개 (4개씩 2줄)
+                      posts.slice(0, visibleCount).map((post, idx) => (
                         <PostCard
                           key={post.id}
                           post={post}
                           userInfo={userInfoCache[post.userId]}
+                          currentUser={user} // 🚀 사용자 정보 전달 (user가 없어도 렌더링)
                           showUserInfo={true}
                           cardClassName={styles['content-card']}
+                          aboveTheFold={idx < 4}
                         />
                       ))
                     ) : (
@@ -208,10 +285,13 @@ export default function Dashboard() {
               </div>
 
               {/* Video Section */}
-              <VideoSection 
-                posts={posts}
-                userInfoCache={userInfoCache}
-              />
+              <div ref={videoSentinelRef} />
+              {showVideoSection && (
+                <DynamicVideoSection 
+                  posts={posts}
+                  userInfoCache={userInfoCache}
+                />
+              )}
             </div>
           </div>
         
@@ -225,6 +305,7 @@ export default function Dashboard() {
           selectedCity={selectedCity}
           onSelectionChange={handleCountryCitySelect}
           onLocationTextChange={handleLocationTextChange}
+          renderTrigger={false}
         />
       </div>
     </>

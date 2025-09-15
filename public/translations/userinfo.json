@@ -241,5 +241,23 @@
     "ja": "フィリピン",
     "th": "ฟิลิปปินส์",
     "fil": "Pilipinas"
+  },
+  "myPoints": {
+    "ko": "내 포인트",
+    "en": "My Points",
+    "vi": "Điểm của tôi",
+    "zh": "我的积分",
+    "ja": "マイポイント",
+    "th": "คะแนนของฉัน",
+    "fil": "Aking mga Puntos"
+  },
+  "settings": {
+    "ko": "설정",
+    "en": "Settings",
+    "vi": "Cài đặt",
+    "zh": "设置",
+    "ja": "設定",
+    "th": "การตั้งค่า",
+    "fil": "Mga Setting"
   }
 }

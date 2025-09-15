@@ -20,7 +20,7 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
 
   // video 필드가 있는 게시물만 필터링 (최대 5개)
   const videoPosts = posts
-    .filter(post => post.video && post.video.url && post.video.url.trim() !== '')
+    .filter(post => post.video && (post.video.urls?.thumbnail || post.video.url))
     .slice(0, 5);
 
   // 슬라이드 이동 함수
@@ -64,7 +64,7 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
   // 비디오 썸네일 URL 생성
   const getVideoThumbnail = (post: PostData) => {
     if (post.video?.urls?.thumbnail) {
-      return `${post.video.urls.thumbnail}?tr=w-240,h-360,c-maintain_ratio`;
+      return `${post.video.urls.thumbnail}?tr=w-320,h-480,c-maintain_ratio`;
     }
     return post.video?.url || '';
   };
@@ -89,10 +89,14 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
       const video = videoRefs.current[postId];
       if (video) {
         if (hoveredVideo === postId) {
-          video.play().catch(console.error);
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
         } else {
-          video.pause();
-          video.currentTime = 0; // 처음으로 되돌리기
+          if (!video.paused) {
+            video.pause();
+          }
+          video.currentTime = 0;
         }
       }
     });
@@ -132,7 +136,7 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
                   }}
                   className={styles.video}
                   poster={getVideoThumbnail(post)}
-                  preload="metadata"
+                  preload="none"
                   muted
                   loop
                   playsInline

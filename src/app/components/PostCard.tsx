@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike, checkLikeStatus } from '../services/interactionService';
+import { toggleLike } from '../services/interactionService';
 import { bunnyService } from '../services/bunnyService';
 import styles from './PostCard.module.css';
 
@@ -21,30 +21,44 @@ interface PostCardProps {
     nationality?: string;
     city?: string;
   };
+  currentUser?: any; // 현재 로그인한 사용자 정보
   showUserInfo?: boolean; // user-info 표시 여부
   cardClassName?: string; // 각 페이지별 고유 클래스명
   onInteractionChange?: (postId: string, type: 'like', isActive: boolean) => void; // 상호작용 변경 콜백
   showSettings?: boolean; // 설정 메뉴 표시 여부
   onEdit?: (postId: string) => void; // 수정 콜백
   onDelete?: (postId: string) => void; // 삭제 콜백
+  aboveTheFold?: boolean; // 최초 뷰포트 상단 영역 여부(이미지 우선 로드)
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ 
+const PostCardComponent: React.FC<PostCardProps> = ({ 
   post, 
   userInfo = { name: '사용자', location: '위치 미상' },
+  currentUser,
   showUserInfo = true,
   cardClassName = 'content-card', // 기본값은 기존 클래스명
   onInteractionChange,
   showSettings = false,
   onEdit,
-  onDelete
+  onDelete,
+  aboveTheFold = false
 }) => {
   const { t, currentLanguage } = useTranslationContext();
   const { user } = useAuthContext();
   const router = useRouter();
 
+  // 🚀 성능 최적화: 디버깅 로그 제거
+
   const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
-  const [isLiked, setIsLiked] = useState(false);
+  
+  // 🚀 좋아요 토글을 위한 로컬 상태 (낙관적 업데이트용)
+  const [localIsLiked, setLocalIsLiked] = useState<boolean | null>(null);
+  
+  // 🚀 가장 빠른 방법: 서버에서 미리 계산된 값 사용!
+  const isLiked = localIsLiked !== null ? localIsLiked : 
+    (post.isLikedByCurrentUser !== undefined ? post.isLikedByCurrentUser : 
+     (currentUser?.uid && post.likedBy?.[currentUser.uid]) || 
+     (user?.uid && post.likedBy?.[user.uid]) || false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +66,18 @@ export const PostCard: React.FC<PostCardProps> = ({
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const isMountedRef = useRef(true);
+
+  // 🚀 사용자 정보가 로드되면 즉시 좋아요 상태 업데이트
+  useEffect(() => {
+    const activeUser = currentUser || user;
+    if (activeUser?.uid && post.likedBy) {
+      const hasLiked = activeUser.uid in post.likedBy && post.likedBy[activeUser.uid] !== null;
+      if (localIsLiked === null) {
+        setLocalIsLiked(hasLiked);
+      }
+    }
+  }, [currentUser?.uid, user?.uid, post.likedBy, localIsLiked]);
+
   
   // 국가/도시 데이터 상태
   const [countries, setCountries] = useState<any[]>([]);
@@ -217,7 +243,14 @@ export const PostCard: React.FC<PostCardProps> = ({
   // 🚀 이미지 URL 추출 (useMemo로 최적화 - 무한 렌더링 방지)
   const imageUrls = useMemo(() => {
     if (post.images && post.images.length > 0) {
-      return post.images.map(img => img.url);
+      return post.images.map(img => {
+        // tr:n-ik_ml_thumbnail 파라미터 제거하여 일관성 있는 URL 생성
+        let cleanUrl = img.url;
+        if (cleanUrl.includes('tr:n-ik_ml_thumbnail')) {
+          cleanUrl = cleanUrl.replace('tr:n-ik_ml_thumbnail/', '');
+        }
+        return cleanUrl;
+      });
     }
     return [];
   }, [post.images]); // post.images가 변경될 때만 재계산
@@ -280,13 +313,12 @@ export const PostCard: React.FC<PostCardProps> = ({
   }, [checkScrollPosition, imageUrls.length]); // 배열 길이만 체크하여 안정성 확보
 
   // 🚀 이미지 프리로딩 (빠른 로딩을 위해)
+  // 🚀 이미지 프리로딩 최적화 (첫 번째 이미지만 우선 로드)
   useEffect(() => {
     if (imageUrls.length > 0) {
-      // 썸네일 이미지들을 미리 로드 (200x200 크기로)
-      const thumbnailUrls = imageUrls.map(url => 
-        `${url}?width=200&height=200&fit=cover&quality=100`
-      );
-      bunnyService.preloadImages(thumbnailUrls).catch(error => {
+      // 첫 번째 이미지만 우선 로드 (성능 최적화)
+      const firstImageUrl = `${imageUrls[0]}?width=200&height=200&fit=cover&quality=100`;
+      bunnyService.preloadImages([firstImageUrl]).catch(error => {
         console.warn('이미지 프리로딩 실패:', error);
       });
     }
@@ -304,22 +336,6 @@ export const PostCard: React.FC<PostCardProps> = ({
     };
   }, []);
 
-  // 좋아요 상태 초기화
-  useEffect(() => {
-    const initializeInteractionStatus = async () => {
-      if (!user || !post.id) return;
-      
-      try {
-        const likedStatus = await checkLikeStatus(post.id, user.uid);
-        setIsLiked(likedStatus);
-      } catch (error) {
-        console.error('상호작용 상태 초기화 실패:', error);
-      }
-    };
-
-    initializeInteractionStatus();
-  }, [user, post.id]);
-
   // 좋아요 토글 핸들러
   const handleLikeToggle = useCallback(async () => {
     if (!user || !post.id || isLoading) return;
@@ -328,12 +344,12 @@ export const PostCard: React.FC<PostCardProps> = ({
     
     // 낙관적 업데이트 (UI 반응성을 위해)
     const optimisticIsLiked = !isLiked;
-    setIsLiked(optimisticIsLiked);
+    setLocalIsLiked(optimisticIsLiked);
     
     try {
       const result = await toggleLike(post.id, user.uid);
       // 서버 응답으로 최종 상태 업데이트 (서버가 진실의 원천)
-      setIsLiked(result.isLiked);
+      setLocalIsLiked(result.isLiked);
       setLikesCount(result.newCount);
       
       // 콜백 호출 (상위 컴포넌트에 상태 변경 알림)
@@ -343,7 +359,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     } catch (error) {
       console.error('좋아요 토글 실패:', error);
       // 에러 발생 시 원래 상태로 복원
-      setIsLiked(isLiked);
+      setLocalIsLiked(null); // 로컬 상태 초기화하여 원래 상태로 복원
     } finally {
       setIsLoading(false);
     }
@@ -432,14 +448,64 @@ export const PostCard: React.FC<PostCardProps> = ({
 
 
 
-  // 날짜 포맷팅
+  // 날짜 포맷팅 (더 안전한 처리)
   const formatDate = (timestamp: any) => {
-    if (!timestamp) return t('justNow') || '방금 전';
+    console.log('🔍 formatDate 입력값:', timestamp, '타입:', typeof timestamp);
     
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    if (!timestamp) {
+      console.log('❌ timestamp가 없음');
+      return t('justNow') || '방금 전';
+    }
+    
+    let date: Date;
+    
+    try {
+      // Firebase Timestamp 객체인 경우
+      if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+        console.log('📅 Firebase Timestamp로 변환:', date);
+      }
+      // toDate() 메서드가 있는 경우 (Firestore Timestamp)
+      else if (timestamp && typeof timestamp.toDate === 'function') {
+        date = timestamp.toDate();
+        console.log('📅 toDate() 메서드로 변환:', date);
+      }
+      // 이미 Date 객체인 경우
+      else if (timestamp instanceof Date) {
+        date = timestamp;
+        console.log('📅 이미 Date 객체:', date);
+      }
+      // 숫자 타임스탬프인 경우
+      else if (typeof timestamp === 'number') {
+        date = new Date(timestamp);
+        console.log('📅 숫자 타임스탬프로 변환:', date);
+      }
+      // 문자열인 경우
+      else if (typeof timestamp === 'string') {
+        date = new Date(timestamp);
+        console.log('📅 문자열로 변환:', date);
+      }
+      else {
+        console.warn('❌ 알 수 없는 타임스탬프 형식:', timestamp);
+        return t('justNow') || '방금 전';
+      }
+      
+      // 유효한 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        console.warn('❌ 유효하지 않은 날짜:', timestamp);
+        return t('justNow') || '방금 전';
+      }
+      
+    } catch (error) {
+      console.error('❌ 날짜 변환 오류:', error, timestamp);
+      return t('justNow') || '방금 전';
+    }
+    
     const now = new Date();
     const diffTime = now.getTime() - date.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    console.log('📊 날짜 차이:', diffDays, '일');
     
     if (diffDays === 0) return t('today') || '오늘';
     if (diffDays === 1) return t('oneDayAgo') || '1일 전';
@@ -477,7 +543,9 @@ export const PostCard: React.FC<PostCardProps> = ({
         <img 
           src={`${imageUrls[0]}?width=400&height=400&fit=cover&quality=100`} 
           alt="게시물 이미지"
-          loading="lazy"
+          loading={aboveTheFold ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={aboveTheFold ? "high" : "auto"}
           onClick={handleImageClick}
           style={{ cursor: 'pointer' }}
           onError={(e) => {
@@ -532,7 +600,9 @@ export const PostCard: React.FC<PostCardProps> = ({
               <img 
                 src={`${imageUrl}?width=400&height=400&fit=cover&quality=100`} 
                 alt={`게시물 이미지 ${index + 1}`}
-                loading="lazy"
+                loading={index < 1 && aboveTheFold ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={index < 1 && aboveTheFold ? "high" : "auto"}
                 onClick={handleImageClick}
                 style={{ cursor: 'pointer' }}
                 onError={(e) => {
@@ -721,3 +791,6 @@ export const PostCard: React.FC<PostCardProps> = ({
     </div>
   );
 };
+
+// 🚀 원래 방식으로 복원
+export const PostCard = PostCardComponent;

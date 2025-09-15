@@ -1,6 +1,6 @@
 .pageContainer {
   position: fixed;
-  top: 0;
+  top: 75px; /* PC에서 앱바 아래부터 시작 */
   left: 0;
   right: 0;
   bottom: 0;
@@ -336,7 +336,7 @@
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 0; /* 모바일에서는 패딩 제거 */
+    top: 0; /* 모바일에서는 상단부터 시작 */
     align-items: center; /* 모바일에서도 가운데 정렬 */
   }
   
@@ -438,7 +438,7 @@
 
 @media (max-width: 480px) {
   .pageContainer {
-    padding: 0; /* 작은 모바일에서도 패딩 제거 */
+    top: 0; /* 작은 모바일에서도 상단부터 시작 */
     align-items: flex-start; /* 작은 모바일에서도 상단 정렬 */
   }
   

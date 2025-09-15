@@ -38,36 +38,6 @@
   }
 }
 
-.location-selector {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 12px 12px;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  min-width: 300px;
-}
-
-.location-icon {
-  display: flex;
-  align-items: center;
-}
-
-.location-text {
-  display: flex;
-  align-items: center;
-  margin-left: 6px;
-}
-
-.location-arrow {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
 
 .app-bar-right {
   display: flex;
@@ -126,12 +96,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .menu-text {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1B1C1F;
 }
 
 
@@ -139,11 +110,6 @@
   font-weight: 600;
 }
 
-/* 드롭다운 메뉴 컨테이너 */
-.menu-dropdown-container {
-  position: relative;
-  display: inline-block;
-}
 
 /* 드롭다운 메뉴 */
 .menu-dropdown {
@@ -159,7 +125,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid #e0e0e0;
-  min-width: 200px;
+  width: 320px;
   overflow: hidden;
   animation: dropdownFadeIn 0.2s ease-out;
 }
@@ -172,25 +138,72 @@
   text-align: left;
   font-size: 14px;
   color: #333;
-  border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
+  height: 48px;
 }
 
 .menu-dropdown-content button:hover {
   background-color: #f8f9fa;
 }
 
-.menu-dropdown-content button:last-child {
-  border-bottom: none;
-}
 
 .menu-dropdown-content button svg {
   color: #666;
   flex-shrink: 0;
+}
+
+/* 사용자 정보 섹션 */
+.user-info-section {
+  padding: 0 16px 0 16px;
+}
+
+
+.user-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.user-name {
+  color: #1B1C1F;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.arrow-icon {
+  color: #999999;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.points-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 10px;
+  background: #F5F7F9;
+}
+
+.points-label {
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.points-value {
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .menu-divider {
@@ -227,9 +240,9 @@
 /* 모바일 메뉴 */
 .mobile-menu {
   background: white;
-  width: 280px;
+  width: 80vw;
   height: 100vh;
-  padding: 20px;
+  padding: 20px 0;
   overflow-y: auto;
   position: relative;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
@@ -269,11 +282,9 @@
 
 .mobile-menu-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0 16px;
 }
 
 .mobile-menu-header h3 {
@@ -307,27 +318,17 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 16px 0;
+  padding: 12px 16px;
   text-align: left;
-  font-size: 16px;
+  font-size: 14px;
   color: #333;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
-}
-
-.mobile-menu-items button:hover {
-  background-color: #f8f9fa;
-}
-
-.mobile-menu-items button:last-child {
-  border-bottom: none;
-}
-
-.mobile-menu-items button {
+  height: 48px;
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
+
 
 .mobile-menu-divider {
   height: 1px;
@@ -337,21 +338,27 @@
 
 /* 모바일 설정 섹션 */
 .mobile-settings-section {
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
-  margin: 10px 0;
-  padding: 10px 0;
 }
+
+/* PC 설정 섹션 */
+.pc-settings-section {
+}
+
+.pc-settings-section button {
+  color: #1B1C1F;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 
 .mobile-settings-section button {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 0;
   text-align: left;
-  font-size: 16px;
-  color: #333;
-  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1B1C1F;
   transition: background-color 0.2s ease;
 }
 
@@ -359,13 +366,40 @@
   background-color: #f8f9fa;
 }
 
-.mobile-settings-section button:last-child {
-  border-bottom: none;
-}
-
 .mobile-settings-section button svg {
   color: #666;
   flex-shrink: 0;
+}
+
+/* 로그아웃 버튼 스타일 통일 */
+.mobile-menu-items button {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1B1C1F;
+}
+
+/* 로그아웃 구분선 */
+.logout-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0;
+}
+
+/* 설정 섹션 구분선 */
+.settings-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0;
+}
+
+
+/* 버전 버튼 스타일 */
+.mobile-settings-section button:has(span:last-child) {
+  justify-content: space-between;
+}
+
+.pc-settings-section button:has(span:last-child) {
+  justify-content: space-between;
 }
 
 /* Responsive Design */
@@ -398,20 +432,26 @@
   cursor: pointer;
   padding: 8px 12px;
   font-size: 14px;
-  color: #333;
+  color: #1B1C1F;
+  font-weight: 600;
   border-radius: 6px;
   transition: all 0.2s ease;
   white-space: nowrap;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .desktop-menu-item.active {
   font-weight: 600;
 }
 
+/* 드롭다운 메뉴 컨테이너 */
+.desktop-menu .menu-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
 
 /* AppBar 컨테이너 스타일 */
 .app-bar-container {
@@ -434,23 +474,37 @@
   justify-content: space-between;
 }
 
-.app-bar-row-1 {
+/* PC용 AppBar */
+.pc-app-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
 }
 
-.app-bar-row-2 {
-  display: none;
+/* 모바일용 AppBar */
+.mobile-app-bar-row-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-.pc-location {
-  display: flex !important;
+.mobile-app-bar-row-2 {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.app-bar-center {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-start;
+  margin-left: 20px;
 }
 
 .app-bar-right {
-  gap: 24px;
+  gap: 20px;
 }
 
 .desktop-menu {
@@ -465,14 +519,11 @@
 @media (max-width: 480px) {
   .app-bar {
     height: auto; /* 자동 높이 */
-    /* min-height: 60px; */ /* 기본 최소 높이 (위치 선택기 없을 때) */
-    border-bottom: none; /* 모바일에서는 하단 테두리 제거 */
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border-bottom: 1px solid #e0e0e0; /* 모바일에서는 하단 테두리 표시 */
   }
 
-  /* Dashboard 페이지일 때만 2줄 높이 적용 */
-  .app-bar:has(.app-bar-row-2) {
-    min-height: 100px; /* 2줄을 위한 최소 높이 */
-  }
 
   .app-bar-container {
     display: flex;
@@ -482,38 +533,35 @@
     margin: 0; /* 모바일에서는 중앙 정렬 해제 */
   }
   
-  .app-bar-row-1 {
+  /* PC용 AppBar 숨김 */
+  .pc-app-bar {
+    display: none;
+  }
+
+  /* 모바일용 AppBar 표시 */
+  .mobile-app-bar-row-1 {
     display: flex;
     justify-content: space-between;
     width: 100%;
   }
 
-  .app-bar-left {
+  .mobile-app-bar-row-1 .app-bar-left {
     gap: 12px;
     justify-content: flex-start;
-    flex-wrap: nowrap !important; /* 요소들이 다음 줄로 넘어가지 않도록 */
+    flex-wrap: nowrap !important;
+    flex: 0 0 auto;
   }
 
-  .app-bar-right {
+  .mobile-app-bar-row-1 .app-bar-right {
     justify-content: flex-end;
     gap: 8px;
+    flex: 0 0 auto;
   }
 
-  .app-bar-row-2 {
+  .mobile-app-bar-row-2 {
     width: 100%;
     margin-top: 8px;
-    display: block; /* 모바일에서는 2번째 줄 표시 */
-  }
-
-  .app-bar-row-2 .location-selector {
-    width: 100%; /* app-bar 컨테이너 안에서 100% */
-    display: flex !important; /* 강제로 표시 */
-    /* PC와 동일한 스타일 유지 - 둥근 모서리와 테두리 */
-  }
-
-  /* 모바일에서 PC용 위치 선택기 완전히 숨김 */
-  .pc-location {
-    display: none !important;
+    display: block;
   }
 
   /* 모바일에서 데스크톱 메뉴 숨김 */
@@ -525,7 +573,7 @@
   /* 모바일에서 모바일 버튼 표시 */
   .mobile-menu-button {
     display: block;
-    padding: 8px;
+    padding: 8px 0;
     border-radius: 50%;
   }
   

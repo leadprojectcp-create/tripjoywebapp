@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { LanguageSelector } from "./LanguageSelector";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { useAuthContext } from "../contexts/AuthContext";
+import CountryAndCitySelector from "./CountryAndCitySelector";
 import "./AppBar.css";
 
 interface AppBarProps {
@@ -23,7 +24,7 @@ export const AppBar = ({
   const router = useRouter();
   const pathname = usePathname();
   const { t, currentLanguage, changeLanguage } = useTranslationContext();
-  const { logout, isAuthenticated } = useAuthContext();
+  const { logout, isAuthenticated, user } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -31,6 +32,8 @@ export const AppBar = ({
   
   // 위치 선택 관련 상태
   const [locationText, setLocationText] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
 
   // 현재 경로에 따라 활성화 상태 확인
   const isActive = (path: string) => {
@@ -55,13 +58,6 @@ export const AppBar = ({
     }
   };
 
-  // 위치 선택 관련 함수들
-  const handleLocationClick = () => {
-    // Dashboard에 위치 모달 열기 이벤트 전달
-    if (pathname === '/') {
-      window.dispatchEvent(new CustomEvent('openLocationModal'));
-    }
-  };
 
   // Dashboard에서 위치 텍스트 업데이트 수신
   useEffect(() => {
@@ -75,6 +71,26 @@ export const AppBar = ({
       window.removeEventListener('locationTextChanged', handleLocationTextUpdate as EventListener);
     };
   }, []);
+
+  // 로컬 스토리지에서 지역 정보 불러오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedCountry = localStorage.getItem('dashboard_selectedCountry');
+      const savedCity = localStorage.getItem('dashboard_selectedCity');
+      const savedLocationText = localStorage.getItem('dashboard_locationText');
+      
+      console.log('AppBar 로컬 스토리지에서 불러온 값들:', {
+        savedCountry,
+        savedCity,
+        savedLocationText
+      });
+      
+      if (savedCountry) setSelectedCountry(savedCountry);
+      if (savedCity) setSelectedCity(savedCity);
+      if (savedLocationText) setLocationText(savedLocationText);
+    }
+  }, []);
+
 
   useEffect(() => {
     setMounted(true);
@@ -91,6 +107,7 @@ export const AppBar = ({
       window.removeEventListener('resize', checkIsMobile);
     };
   }, []);
+
 
   const handleBackClick = () => {
     router.back();
@@ -187,192 +204,238 @@ export const AppBar = ({
   };
 
   return (
+    <>
     <div className="app-bar">
       <div className="app-bar-container">
-        {/* 첫 번째 줄: 로고와 버튼들 */}
-        <div className="app-bar-row-1">
-          <div className="app-bar-left">
-            {showBackButton && (
-              <button className="back-button" onClick={handleBackClick}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-            )}
-            {showLogo && (
-              <div className="logo-container" onClick={handleLogoClick}>
-                <Image 
-                  src="/logo.png" 
-                  alt="TRIPJOY Logo" 
-                  width={100} 
-                  height={32} 
-                  priority
-                  className="logo-image"
+        {/* PC용 AppBar - 한 줄 구조 */}
+        {!isMobile && (
+          <div className="pc-app-bar">
+            <div className="app-bar-left">
+              {showBackButton && (
+                <button className="back-button" onClick={handleBackClick}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              )}
+              {showLogo && (
+                <div className="logo-container" onClick={handleLogoClick}>
+                  <Image 
+                    src="/logo.png" 
+                    alt="TRIPJOY Logo" 
+                    width={100} 
+                    height={32} 
+                    priority
+                    className="logo-image"
+                  />
+                </div>
+              )}
+              {!showLogo && title && (
+                <div className="app-bar-title">
+                  {title}
+                </div>
+              )}
+            </div>
+
+            {/* PC에서만 위치 선택기 */}
+            {pathname === '/' && (
+              <div className="app-bar-center">
+                <CountryAndCitySelector
+                  variant="pc"
+                  selectedCountry={selectedCountry}
+                  selectedCity={selectedCity}
+                  onSelectionChange={(countryCode, cityCode) => {
+                    setSelectedCountry(countryCode);
+                    setSelectedCity(cityCode);
+                    console.log('AppBar에서 지역 선택:', { countryCode, cityCode });
+                    window.dispatchEvent(new CustomEvent('locationSelectionChanged', {
+                      detail: { countryCode, cityCode }
+                    }));
+                  }}
+                  onLocationTextChange={setLocationText}
                 />
               </div>
             )}
-            
-            {/* Title 표시 (showLogo가 false일 때) */}
-            {!showLogo && title && (
-              <div className="app-bar-title">
-                {title}
-              </div>
-            )}
-            
-            {/* PC에서 위치 선택기 표시 */}
-            {pathname === '/' && (
-              <div className="location-selector pc-location" onClick={handleLocationClick}>
-                <span className="location-icon">
-                  <img src="/icons/location_pin.svg" alt="location" width={20} height={20} />
-                </span>
-                <span className="location-text">
-                  {locationText || t('whereToGo')}
-                </span>
-                <span className="location-arrow">
-                  <img src="/icons/stat_minus.svg" alt="dropdown" width={16} height={16} />
-                </span>
-              </div>
-            )}
-          </div>
 
-          <div className="app-bar-right">
-          {/* 데스크톱 메뉴 */}
-          <div className="desktop-menu">
-            <button className={`desktop-menu-item ${isActive('/post-upload') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/post-upload')}>
-              <Image 
-                src={isActive('/post-upload') ? "/icons/upload_active.svg" : "/icons/upload.svg"} 
-                alt="Upload" 
-                width={24} 
-                height={24}
-              />
-              {t('uploadPost')}
-            </button>
-            <button className={`desktop-menu-item ${isActive('/trip-tour') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/trip-tour')}>
-              <Image 
-                src={isActive('/trip-tour') ? "/icons/triptour_active.svg" : "/icons/triptour.svg"} 
-                alt="Trip Tour" 
-                width={24} 
-                height={24}
-              />
-              {t('tripTour')}
-            </button>
-            <button className={`desktop-menu-item ${isActive('/profile') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/profile')}>
-              <Image 
-                src={isActive('/profile') ? "/icons/profile_active.svg" : "/icons/profile.svg"} 
-                alt="Profile" 
-                width={24} 
-                height={24}
-              />
-              {t('profile')}
-            </button>
-            <button className={`desktop-menu-item ${isActive('/chat') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/chat')}>
-              <Image 
-                src={isActive('/chat') ? "/icons/message_active.svg" : "/icons/message.svg"} 
-                alt="Message" 
-                width={24} 
-                height={24}
-              />
-              {t('chat')}
-            </button>
-          </div>
-          
-          {/* 햄버거 메뉴 버튼 */}
-          <div className="menu-dropdown-container">
-            <button className="mobile-menu-button" onClick={handleMenuClick}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="menu-text">{t('menu')}</span>
-            </button>
-            
-            {/* PC 드롭다운 메뉴 */}
-            {!isMobile && isMenuOpen && (
-              <div className="menu-dropdown">
-                <div className="menu-dropdown-content">
-                  <button onClick={() => handleAuthRequiredMenuClick('/wishlist')}>
+            <div className="app-bar-right">
+              <div className="desktop-menu">
+                <button className={`desktop-menu-item ${isActive('/trip-tour') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/trip-tour')}>
+                  <Image 
+                    src={isActive('/trip-tour') ? "/icons/triptour_active.png" : "/icons/triptour.png"} 
+                    alt="Trip Tour" 
+                    width={26} 
+                    height={26}
+                  />
+                  {t('tripTour')}
+                </button>
+                <button className={`desktop-menu-item ${isActive('/post-upload') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/post-upload')}>
+                  <Image 
+                    src={isActive('/post-upload') ? "/icons/upload_active.png" : "/icons/upload.png"} 
+                    alt="Upload" 
+                    width={26} 
+                    height={26}
+                  />
+                  {t('uploadPost')}
+                </button>
+                <button className={`desktop-menu-item ${isActive('/profile') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/profile')}>
+                  <Image 
+                    src={isActive('/profile') ? "/icons/profile_active.png" : "/icons/profile.png"} 
+                    alt="Profile" 
+                    width={26} 
+                    height={26}
+                  />
+                  {t('profile')}
+                </button>
+                <button className={`desktop-menu-item ${isActive('/chat') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/chat')}>
+                  <Image 
+                    src={isActive('/chat') ? "/icons/message_active.png" : "/icons/message.png"} 
+                    alt="Message" 
+                    width={26} 
+                    height={26}
+                  />
+                  {t('chat')}
+                </button>
+                
+                <div className="menu-dropdown-container">
+                  <button className="mobile-menu-button" onClick={handleMenuClick}>
                     <Image 
-                      src={isActive('/wishlist') ? "/icons/activity_active.svg" : "/icons/activity.svg"} 
-                      alt="Wishlist" 
-                      width={20} 
-                      height={20}
+                      src="/icons/menu.png" 
+                      alt="Menu" 
+                      width={26} 
+                      height={26}
                     />
-                    {t('wishlist')}
+                    <span className="menu-text">{t('menu')}</span>
                   </button>
-                  <button onClick={() => handleSettingsItemClick('notifications')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
-                    </svg>
-                    {t('notifications')}
-                  </button>
-                  <button onClick={() => handleSettingsItemClick('customer-service')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                    </svg>
-                    {t('customerService')}
-                  </button>
-                  <button onClick={() => handleSettingsItemClick('faq')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" fill="currentColor"/>
-                    </svg>
-                    {t('faq')}
-                  </button>
-                  <button onClick={() => handleSettingsItemClick('notice')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                    </svg>
-                    {t('notice')}
-                  </button>
-                  <button onClick={() => handleSettingsItemClick('version')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19v2h-1.5v17.5c0 .83-.67 1.5-1.5 1.5H8c-.83 0-1.5-.67-1.5-1.5V4H5V2h4.5V.5c0-.83.67-1.5 1.5-1.5h3c.83 0 1.5.67 1.5 1.5V2h4.5z" fill="currentColor"/>
-                    </svg>
-                    {t('version')} (0.1.0)
-                  </button>
-                  <button onClick={() => handleSettingsItemClick('delete-account')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
-                    </svg>
-                    {t('deleteAccount')}
-                  </button>
-                  <div className="menu-divider"></div>
-                  {isAuthenticated ? (
-                    <button onClick={handleLogoutClick}>{t('logout')}</button>
-                  ) : (
-                    <button onClick={() => { setIsMenuOpen(false); router.push('/auth/login'); }}>{t('login')}</button>
+                  
+                  {isMenuOpen && (
+                    <div className="menu-dropdown">
+                      <div className="menu-dropdown-content">
+                        {isAuthenticated && user && (
+                          <div className="user-info-section">
+                            <div className="user-name-row" onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}>
+                              <span className="user-name">{user.name}</span>
+                              <svg className="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                              </svg>
+                            </div>
+                            <div className="points-container">
+                              <span className="points-label">{t('myPoints')}</span>
+                              <span className="points-value">{user.points || 0}P</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="settings-divider"></div>
+                        <div className="pc-settings-section">
+                          <button onClick={() => handleSettingsItemClick('notifications')}>
+                            {t('notifications')}
+                          </button>
+                          <button onClick={() => handleSettingsItemClick('customer-service')}>
+                            {t('customerService')}
+                          </button>
+                          <button onClick={() => handleSettingsItemClick('faq')}>
+                            {t('faq')}
+                          </button>
+                          <button onClick={() => handleSettingsItemClick('notice')}>
+                            {t('notice')}
+                          </button>
+                          <button onClick={() => handleSettingsItemClick('settings')}>
+                            {t('settings')}
+                          </button>
+                          <button onClick={() => handleSettingsItemClick('version')}>
+                            <span>{t('version')}</span>
+                            <span>V. 0.1.0</span>
+                          </button>
+                        </div>
+                        <div className="logout-divider"></div>
+                        {isAuthenticated ? (
+                          <button onClick={handleLogoutClick}>{t('logout')}</button>
+                        ) : (
+                          <button onClick={() => { setIsMenuOpen(false); router.push('/auth/login'); }}>{t('login')}</button>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
-            )}
-          </div>
-
-        </div>
-
-        </div>
-
-        {/* 두 번째 줄: 위치 선택기 (Dashboard 페이지에서만 표시) */}
-        {pathname === '/' && (
-          <div className="app-bar-row-2">
-            <div className="location-selector" onClick={handleLocationClick}>
-              <span className="location-icon">
-                <img src="/icons/location_pin.svg" alt="location" width={20} height={20} />
-              </span>
-              <span className="location-text">
-                {locationText || t('whereToGo')}
-              </span>
-              <span className="location-arrow">
-                <img src="/icons/stat_minus.svg" alt="dropdown" width={16} height={16} />
-              </span>
             </div>
           </div>
         )}
+
+        {/* 모바일용 AppBar - 두 줄 구조 */}
+        {isMobile && (
+          <>
+            {/* 첫 번째 줄: 로고와 메뉴 */}
+            <div className="mobile-app-bar-row-1">
+              <div className="app-bar-left">
+                {showBackButton && (
+                  <button className="back-button" onClick={handleBackClick}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                )}
+                {showLogo && (
+                  <div className="logo-container" onClick={handleLogoClick}>
+                    <Image 
+                      src="/logo.png" 
+                      alt="TRIPJOY Logo" 
+                      width={100} 
+                      height={32} 
+                      priority
+                      className="logo-image"
+                    />
+                  </div>
+                )}
+                {!showLogo && title && (
+                  <div className="app-bar-title">
+                    {title}
+                  </div>
+                )}
+              </div>
+
+              <div className="app-bar-right">
+                <button className="mobile-menu-button" onClick={handleMenuClick}>
+                  <Image 
+                    src="/icons/menu.png" 
+                    alt="Menu" 
+                    width={26} 
+                    height={26}
+                  />
+                  <span className="menu-text">{t('menu')}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 두 번째 줄: 위치 선택기 */}
+            {pathname === '/' && (
+              <div className="mobile-app-bar-row-2">
+                <CountryAndCitySelector
+                  variant="mobile"
+                  selectedCountry={selectedCountry}
+                  selectedCity={selectedCity}
+                  onSelectionChange={(countryCode, cityCode) => {
+                    setSelectedCountry(countryCode);
+                    setSelectedCity(cityCode);
+                    console.log('AppBar에서 지역 선택:', { countryCode, cityCode });
+                    window.dispatchEvent(new CustomEvent('locationSelectionChanged', {
+                      detail: { countryCode, cityCode }
+                    }));
+                  }}
+                  onLocationTextChange={setLocationText}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
+    </div>
       
       {/* 모바일 사이드 드로우 메뉴 */}
       {mounted && isMobile && isMenuOpen && createPortal(
         <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
           <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
-              <h3>{t('menu')}</h3>
               <button className="mobile-menu-close" onClick={() => setIsMenuOpen(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -380,58 +443,48 @@ export const AppBar = ({
               </button>
             </div>
             <div className="mobile-menu-items">
-              {/* 찜목록 항목 */}
-              <button onClick={() => handleAuthRequiredMenuClick('/wishlist')}>
-                <Image 
-                  src={isActive('/wishlist') ? "/icons/activity_active.svg" : "/icons/activity.svg"} 
-                  alt="Wishlist" 
-                  width={20} 
-                  height={20}
-                />
-                {t('wishlist')}
-              </button>
+              {/* 사용자 정보 섹션 */}
+              {isAuthenticated && user && (
+                <div className="user-info-section">
+                  <div className="user-name-row" onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}>
+                    <span className="user-name">{user.name}</span>
+                    <svg className="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
+                    </svg>
+                  </div>
+                  <div className="points-container">
+                    <span className="points-label">{t('myPoints')}</span>
+                    <span className="points-value">{user.points || 0}P</span>
+                  </div>
+                </div>
+              )}
               
               {/* 설정 항목들 */}
+              <div className="settings-divider"></div>
               <div className="mobile-settings-section">
                 <button onClick={() => handleSettingsItemClick('notifications')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
-                  </svg>
                   {t('notifications')}
                 </button>
                 <button onClick={() => handleSettingsItemClick('customer-service')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
-                  </svg>
                   {t('customerService')}
                 </button>
                 <button onClick={() => handleSettingsItemClick('faq')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" fill="currentColor"/>
-                  </svg>
                   {t('faq')}
                 </button>
                 <button onClick={() => handleSettingsItemClick('notice')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                  </svg>
                   {t('notice')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('version')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19v2h-1.5v17.5c0 .83-.67 1.5-1.5 1.5H8c-.83 0-1.5-.67-1.5-1.5V4H5V2h4.5V.5c0-.83.67-1.5 1.5-1.5h3c.83 0 1.5.67 1.5 1.5V2h4.5z" fill="currentColor"/>
-                  </svg>
-                  {t('version')} (0.1.0)
+                <button onClick={() => handleSettingsItemClick('settings')}>
+                  {t('settings')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('delete-account')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
-                  </svg>
-                  {t('deleteAccount')}
+                <button onClick={() => handleSettingsItemClick('version')}>
+                  <span>{t('version')}</span>
+                  <span>V. 0.1.0</span>
                 </button>
               </div>
               
               {/* 로그인/로그아웃 버튼 */}
+              <div className="logout-divider"></div>
               {isAuthenticated ? (
                 <button onClick={handleLogoutClick}>{t('logout')}</button>
               ) : (
@@ -463,7 +516,6 @@ export const AppBar = ({
         </div>,
         document.body
       )}
-      
-    </div>
+    </>
   );
 };

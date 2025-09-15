@@ -2,7 +2,9 @@
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { PostData, getUsersBatch } from '../services/postService';
+import { PostData, getPosts } from '../services/postService';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { AppBar } from '../components/AppBar';
 import { BottomNavigator } from '../components/BottomNavigator';
@@ -109,9 +111,28 @@ function ShortsContent() {
     const fetchPosts = async () => {
       try {
         setIsLoading(true);
-        const { getPosts } = await import('../services/postService');
         
-        const allPostsData = await getPosts();
+        // 🚀 가장 빠른 방법: 게시물과 사용자 정보를 동시에!
+        const [allPostsData, userInfoMap] = await Promise.all([
+          // 게시물 로드 (현재 사용자 ID 포함)
+          getPosts(50, undefined, undefined), // shorts는 사용자 인증 없이도 접근 가능
+          
+          // 사용자 정보 로드 (게시물과 동시에!)
+          (async () => {
+            try {
+              const usersSnapshot = await getDocs(collection(db, 'users'));
+              const userMap: Record<string, any> = {};
+              usersSnapshot.forEach((doc) => {
+                userMap[doc.id] = doc.data();
+              });
+              return userMap;
+            } catch (error) {
+              console.error('사용자 정보 로드 실패:', error);
+              return {};
+            }
+          })()
+        ]);
+        
         const videoOnlyPosts = filterVideoPosts(allPostsData);
         
         // 전체 비디오 게시물 저장
@@ -134,11 +155,7 @@ function ShortsContent() {
         }
         
         setPosts(filteredPosts);
-        
-        // 사용자 정보 캐시
-        const userIds = [...new Set(filteredPosts.map((post: PostData) => post.userId))];
-        const users = await getUsersBatch(userIds);
-        setUserInfoCache(users); // getUsersBatch는 이미 Record<string, any>를 반환
+        setUserInfoCache(userInfoMap);
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
