@@ -258,8 +258,8 @@ const PostUploadContent: React.FC = () => {
     video.onloadedmetadata = () => {
       window.URL.revokeObjectURL(video.src);
       const duration = video.duration;
-      
-      if (duration > 15) {
+
+      if (duration > 16) {
         alert(t('videoDurationLimit'));
         return;
       }
