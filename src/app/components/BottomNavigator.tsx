@@ -45,7 +45,7 @@ const PostIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/icons/upload.svg" 
+      src="/icons/upload.png" 
       alt="Post" 
       width={28} 
       height={28}
@@ -89,7 +89,7 @@ const ProfileIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/icons/profile.svg" 
+      src="/icons/profile.png" 
       alt="Profile" 
       width={28} 
       height={28}
@@ -111,7 +111,7 @@ const TripTourIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/icons/triptour.svg" 
+      src="/icons/triptour.png" 
       alt="Trip Tour" 
       width={28} 
       height={28}
@@ -133,7 +133,7 @@ const ChatIcon = ({ isActive }: { isActive: boolean }) => {
   
   return (
     <Image 
-      src="/icons/message.svg" 
+      src="/icons/message.png" 
       alt="Chat" 
       width={28} 
       height={28}

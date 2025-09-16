@@ -8,9 +8,9 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { toggleLike, checkLikeStatus } from './post-hooks/usePostInteractions';
 import { bunnyService } from '../services/bunnyService';
 import styles from './ProfilePostCard.module.css';
-import { PostHeader } from './post-sections/PostHeader';
-import { PostMedia } from './post-sections/PostMedia';
-import { PostFooter } from './post-sections/PostFooter';
+import { PostHeader } from '../dashboard/postcard/PostHeader';
+import { PostMedia } from '../dashboard/postcard/PostMedia';
+import { PostFooter } from '../dashboard/postcard/PostFooter';
 import { usePostLocationTranslations, buildImageUrls, formatPostDate } from './post-hooks/usePostData';
 
 interface ProfilePostCardProps {

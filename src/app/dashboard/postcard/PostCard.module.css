@@ -1,0 +1,76 @@
+/* PostCard 전용 대시보드 스타일 */
+
+/* 미디어 컨테이너 (4칸 그리드) */
+.mediaGrid {
+  width: 630px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.mediaSlot {
+  width: 154px;
+  height: 205px;
+  background: #f5f6f8;
+  overflow: hidden;
+}
+
+.mediaSlot:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.mediaSlot:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.mediaPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: #f5f6f8;
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 기존 단일/슬라이더 컨테이너 폭만 고정 */
+.cardImage.singleImage { width: 630px; height: auto; position: relative; }
+.cardImage.imageSlider { width: 630px; height: auto; }
+
+/* ===== 헤더 영역 (사용자 정보) ===== */
+.cardHeader { display: flex; justify-content: space-between; align-items: center; padding: 0 0 8px 0; }
+.userInfo { display: flex; align-items: center; gap: 10px; }
+.userAvatar { width: 40px; height: 40px; border-radius: 50%; background: #f1f3f5; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+.userAvatar img { width: 100%; height: 100%; object-fit: cover; }
+.userDetails { display: flex; flex-direction: column; }
+.userName { font-size: 16px; font-weight: 700; color: #1B1C1F; line-height: 1.2; }
+.userLocation { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.locationIcon { width: 12px; height: 12px; }
+.locationText { font-size: 12px; color: #4E5968; font-weight: 600; }
+.headerPlaceName { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; font-weight: 600; }
+.settingsMenuContainer { position: relative; margin-left: auto; }
+.settingsBtn { background: none; border: none; font-size: 20px; font-weight: bold; cursor: pointer; padding: 6px; border-radius: 50%; color: #657786; }
+.settingsBtn:hover { background: rgba(0,0,0,0.06); color: #14171a; }
+.settingsDropdown { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e1e8ed; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 120px; overflow: hidden; }
+.settingsOption { display: block; width: 100%; padding: 10px 14px; background: none; border: none; text-align: left; cursor: pointer; font-size: 14px; color: #14171a; }
+.settingsOption:hover { background: #f7f9fa; }
+.settingsOption.delete { color: #e0245e; }
+.settingsOption.delete:hover { background: #ffeef2; }
+
+/* ===== 푸터 영역 (좋아요, 공유 등) ===== */
+.cardFooter { padding: 12px 0 0 0; }
+.actionButtonsRow { display: flex; align-items: center; gap: 16px; }
+.actionBtn { display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: background-color 0.2s; }
+.actionBtn:hover { background: rgba(0,0,0,0.05); }
+.actionBtn.liked { color: #e0245e; }
+.actionIcon { display: flex; align-items: center; }
+.actionCount { font-size: 14px; font-weight: 600; color: #333; }
+.shareBtn { margin-left: auto; }
+.shareMenu { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e1e8ed; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 140px; overflow: hidden; margin-top: 4px; }
+.shareOption { display: block; width: 100%; padding: 10px 14px; background: none; border: none; text-align: left; cursor: pointer; font-size: 14px; color: #14171a; }
+.shareOption:hover { background: #f7f9fa; }
+.dateContainer { margin-top: 8px; }
+.dateBadge { font-size: 12px; color: #657786; background: #f7f9fa; padding: 4px 8px; border-radius: 12px; }

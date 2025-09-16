@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+import styles from './PostCard.module.css';
 
 interface PostFooterProps {
-  styles: Record<string, string>;
   isLiked: boolean;
   likesCount: number;
   isLoading?: boolean;
@@ -15,7 +15,6 @@ interface PostFooterProps {
 }
 
 export const PostFooter: React.FC<PostFooterProps> = ({
-  styles,
   isLiked,
   likesCount,
   isLoading = false,
@@ -78,5 +77,3 @@ export const PostFooter: React.FC<PostFooterProps> = ({
 };
 
 export default PostFooter;
-
-

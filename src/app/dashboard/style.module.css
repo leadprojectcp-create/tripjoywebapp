@@ -21,7 +21,7 @@
 /* Main Content */
 .main-content {
   flex: 1; /* 남은 공간 모두 사용 */
-  padding: 30px 24px; /* 좌우 패딩 추가 */
+  padding: 30px 0; /* 좌우 패딩 추가 */
   margin-top: 60px; /* AppBar 높이만큼 아래로 */
   min-height: calc(100vh - 60px); /* AppBar 높이만큼 빼기 */
   display: flex;
@@ -113,18 +113,18 @@
 
 .content-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
   justify-items: start; /* 카드들을 왼쪽 정렬 */
   width: 100%;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .main-content {
-    width: calc(100% - 250px); /* 오른쪽 사이드바가 숨겨지므로 왼쪽 사이드바만 고려 */
-  }
+.content-card {
+  width: 630px;
+  box-sizing: border-box;
 }
+
+/* Responsive Design */
 
 @media (max-width: 768px) {
   .main-content {
@@ -136,7 +136,7 @@
   }
   
   .content-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
@@ -166,7 +166,7 @@
   }
   
   .content-grid {
-    grid-template-columns: 1fr 1fr; /* 모바일에서는 두 개씩 */
+    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
     justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
     gap: 8px; /* 카드 간격 줄임 */
@@ -260,7 +260,7 @@
   }
   
   .content-grid {
-    grid-template-columns: 1fr 1fr; /* 모바일에서는 두 개씩 */
+    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
     justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
     gap: 8px; /* 카드 간격 줄임 */
@@ -374,13 +374,6 @@
 @media (min-width: 1024px) {
   .body-content {
     min-height: calc(100vh - 75px); /* PC AppBar 높이 75px 반영 */
-  }
-  
-  .main-content {
-    margin-top: 75px; /* PC AppBar 높이 75px 반영 */
-    min-height: calc(100vh - 75px);
-    max-width: 1280px;
-    padding: 30px 24px;
   }
   
   .top-section {

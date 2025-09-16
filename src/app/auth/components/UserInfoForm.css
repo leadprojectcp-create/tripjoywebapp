@@ -1,0 +1,868 @@
+.userinfo-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.userinfo-container {
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  min-height: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: pageSlideIn 0.3s ease-out;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.userinfo-header {
+  padding: 20px 20px 0 20px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.userinfo-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.userinfo-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.userinfo-form {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+
+
+.form-input:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+}
+
+.form-input.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.form-input.disabled {
+  background: #f0f0f0;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.form-select {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+
+
+.form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+}
+
+.form-select.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+
+
+.gender-tabs {
+  display: flex;
+  gap: 12px;
+}
+
+.gender-tab {
+  flex: 1;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+
+
+.gender-tab.selected {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.country-select {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.country-select:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+}
+
+.country-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.country-select.error {
+  border-color: #ff4757;
+}
+
+/* Birth Input Group Styles */
+.birth-input-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.birth-select {
+  flex: 1;
+}
+
+/* Custom Birth Dropdown Styles */
+.custom-birth-dropdown {
+  position: relative;
+  flex: 1;
+}
+
+.birth-dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.birth-dropdown-button:hover {
+  border-color: #007bff;
+  background: white;
+}
+
+.birth-dropdown-button.open {
+  background: white;
+  border-color: #007bff;
+}
+
+.birth-dropdown-button.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.birth-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.birth-dropdown-list.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.birth-option {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.birth-option:hover {
+  background: #f8f9fa;
+}
+
+.birth-option.selected {
+  background: #007bff;
+  color: white;
+}
+
+.birth-option:last-child {
+  border-bottom: none;
+}
+
+/* Referral Input Group Styles */
+.referral-input-group {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.referral-input-group .form-input {
+  flex: 1;
+}
+
+.referral-check-button {
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  background: #e0e0e0;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.referral-check-button:hover {
+  background: #d0d0d0;
+}
+
+/* Phone Input Group Styles */
+.phone-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.phone-input-group .custom-country-dropdown {
+  width: 100%;
+}
+
+.phone-input-group .form-input {
+  width: 100%;
+}
+
+/* Custom Country Dropdown Styles */
+.custom-country-dropdown {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+}
+
+.country-dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.country-dropdown-button:hover {
+  border-color: #007bff;
+  background: white;
+}
+
+.country-dropdown-button.open {
+  background: white;
+  border-color: #007bff;
+}
+
+.country-dropdown-button.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.country-dropdown-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.country-flag {
+  font-size: 18px;
+  min-width: 20px;
+}
+
+.country-code {
+  font-size: 14px;
+  color: #666;
+}
+
+.country-name {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.country-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.country-dropdown-list.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f1f3f4;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.country-option:last-child {
+  border-bottom: none;
+}
+
+.country-option:hover {
+  background: #f8f9fa;
+}
+
+.country-option.selected {
+  background: #007bff;
+  color: white;
+}
+
+.country-option.selected .country-code,
+.country-option.selected .country-name {
+  color: white;
+}
+
+.country-option .country-dropdown-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.country-option .country-flag {
+  font-size: 18px;
+  min-width: 20px;
+}
+
+.country-option .country-code {
+  font-size: 14px;
+  color: #666;
+}
+
+.country-option .country-name {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.country-option.selected .country-code,
+.country-option.selected .country-name {
+  color: white;
+}
+
+.country-code-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 160px;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+
+
+.country-code-button.open {
+  background: white;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.country-code-button.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.country-flag-name {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+
+.dropdown-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+  color: #666;
+  margin-left: 4px;
+}
+
+.country-code-button.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.country-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.country-option {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+
+
+.country-option.selected {
+  background: #007bff;
+  color: white;
+}
+
+.country-option:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.country-option:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Phone Number Input Styles */
+.phone-number-input {
+  flex: 1;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+.phone-number-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.phone-number-input.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.loading-placeholder {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  color: #666;
+  font-size: 16px;
+  text-align: center;
+}
+
+.referral-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.referral-input-group .form-input {
+  flex: 1;
+}
+
+.verify-button {
+  padding: 16px 20px;
+  border: 1px solid #007bff;
+  border-radius: 12px;
+  background: white;
+  color: #007bff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+
+
+.complete-button {
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: #ff4757;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+}
+
+
+
+.error-message {
+  color: #ff4757;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .userinfo-modal {
+    margin: 20px;
+    max-width: calc(100vw - 40px);
+    min-height: 500px;
+  }
+  
+  .userinfo-form {
+    padding: 16px;
+  }
+  
+
+  
+  .gender-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .referral-input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .verify-button {
+    width: 100%;
+  }
+
+  /* 모바일에서 휴대폰 입력 */
+  .phone-input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .custom-country-dropdown .country-code-button {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+/* 기존 스타일 제거됨 - 위에서 새로 정의됨 */
+
+/* 휴대폰 입력 그룹 내부 요소 마진 제거 */
+.phone-input-group .form-input {
+  margin: 0;
+}
+
+/* Custom Birth Date Dropdown Styles */
+.birth-inputs {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.custom-birth-dropdown {
+  position: relative;
+  flex: 1;
+  z-index: 50;
+}
+
+.birth-dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 54px;
+  box-sizing: border-box;
+}
+
+
+
+.birth-dropdown-button.open {
+  background: white;
+  border-color: #007bff;
+}
+
+.birth-dropdown-button.error {
+  border-color: #ff4757;
+  background: #fff5f5;
+}
+
+.birth-value {
+  flex: 1;
+  text-align: left;
+  color: #333;
+}
+
+.birth-dropdown-button .birth-value {
+  color: #666;
+}
+
+.birth-dropdown-button:not(:placeholder-shown) .birth-value,
+.birth-dropdown-button.has-value .birth-value {
+  color: #333;
+}
+
+.birth-dropdown-button .dropdown-arrow {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+  color: #666;
+  margin-left: 4px;
+}
+
+.birth-dropdown-button.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.birth-dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.birth-option {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.birth-option:hover {
+  background: #f8f9fa;
+}
+
+
+
+.birth-option.selected {
+  background: #007bff;
+  color: white;
+}
+
+.birth-option:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.birth-option:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ff4757;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background: #ff3742;
+}
+
+/* Mobile Responsive for Birth Inputs */
+@media (max-width: 480px) {
+  .birth-inputs {
+    gap: 8px;
+  }
+  
+  .custom-birth-dropdown {
+    min-width: 0;
+  }
+  
+  .birth-dropdown-button {
+    font-size: 14px;
+    padding: 14px 10px;
+    height: 50px;
+  }
+  
+  .birth-option {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}

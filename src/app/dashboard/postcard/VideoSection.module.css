@@ -1,0 +1,155 @@
+.videoSection {
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  color: #1B1C1F;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  width: 100%;
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+}
+
+.videoScrollContainer {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 0 16px 0;
+  scroll-behavior: smooth;
+}
+
+.videoScrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.videoCard {
+  flex: 0 0 230px; /* 가로 최대 230px */
+  max-width: 230px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  scroll-snap-align: start;
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4; /* 3:4 비율 */
+  height: auto;
+  background: #000;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 1;
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.prevButton { left: -20px; }
+.nextButton { right: -20px; }
+
+.indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #D1D5DB;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.indicator.active { background: #237AF2; }
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .videoSection { align-items: stretch; width: 100%; }
+  .sectionTitle { text-align: left; width: 100%; }
+  .videoCard { flex: 0 0 160px; max-width: 160px; min-width: 160px; }
+  .videoWrapper { aspect-ratio: 3/4; height: auto; }
+  .videoScrollContainer { gap: 12px; padding: 0 0 12px 0; }
+  .navButton { width: 36px; height: 36px; }
+  .prevButton { left: -18px; }
+  .nextButton { right: -18px; }
+}
+
+@media (max-width: 480px) {
+  .videoSection { align-items: stretch; width: 100%; }
+  .sectionTitle { text-align: left; width: 100%; }
+  .videoCard { flex: 0 0 160px; max-width: 160px; min-width: 160px; }
+  .videoWrapper { aspect-ratio: 3/4; height: auto; }
+  .videoScrollContainer { gap: 10px; padding: 0 0 10px 0; }
+  .navButton { width: 32px; height: 32px; }
+  .prevButton { left: -16px; }
+  .nextButton { right: -16px; }
+}

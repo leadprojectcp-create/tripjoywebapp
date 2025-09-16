@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { PostData } from '../../services/postService';
+import styles from './PostCard.module.css';
 
 interface PostHeaderProps {
-  styles: Record<string, string>; // CSS Module 객체를 그대로 전달
-  post: any;
+  post: PostData;
   userInfo?: {
     name: string;
     location: string;
@@ -16,11 +17,10 @@ interface PostHeaderProps {
   onEdit?: (postId: string) => void;
   onDelete?: (postId: string) => void;
   onProfileClick?: () => void;
-  translatePostLocation: (postLocation: any) => string;
+  translatePostLocation: () => string;
 }
 
 export const PostHeader: React.FC<PostHeaderProps> = ({
-  styles,
   post,
   userInfo = { name: '사용자', location: '위치 미상' },
   showUserInfo = true,
@@ -31,6 +31,18 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   translatePostLocation
 }) => {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setShowSettingsMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSettingsToggle = useCallback(() => {
     setShowSettingsMenu(prev => !prev);
@@ -59,12 +71,12 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           </div>
           <div className={styles.userDetails}>
             <div className={styles.userName}>{userInfo.name}</div>
-            {translatePostLocation(post?.location) && (
+            {translatePostLocation() && (
               <div className={styles.userLocation}>
-                <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
-                <span className={styles.locationText}>
-                  {translatePostLocation(post.location)}
-                </span>
+                <svg className={styles.locationIcon} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <span className={styles.locationText}>{translatePostLocation()}</span>
               </div>
             )}
           </div>
@@ -73,13 +85,15 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
 
       {!showUserInfo && post?.location && (
         <div className={styles.headerPlaceName}>
-          <img src="/assets/location.svg" alt="위치" className={styles.locationIcon} />
+          <svg className={styles.locationIcon} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
           {post.location.name}
         </div>
       )}
 
       {showSettings && (
-        <div className={styles.settingsMenuContainer}>
+        <div className={styles.settingsMenuContainer} ref={settingsRef}>
           <button 
             className={styles.settingsBtn}
             onClick={handleSettingsToggle}
@@ -104,5 +118,3 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
 };
 
 export default PostHeader;
-
-

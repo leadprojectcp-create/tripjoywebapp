@@ -33,6 +33,18 @@ export async function POST(request: NextRequest) {
 
     const folder = `tripjoy/${postId}`;
 
+    // Bunny Stream 환경변수 가드 (로컬 개발 시 누락되는 경우 500 -> 원인 메시지)
+    if (type === 'video-stream') {
+      const missing: string[] = [];
+      if (!process.env.BUNNY_STREAM_LIBRARY_ID) missing.push('BUNNY_STREAM_LIBRARY_ID');
+      if (!process.env.BUNNY_STREAM_API_KEY) missing.push('BUNNY_STREAM_API_KEY');
+      if (!process.env.BUNNY_STREAM_CDN_BASE) missing.push('BUNNY_STREAM_CDN_BASE');
+      if (missing.length) {
+        console.error('❌ Bunny Stream env missing:', missing);
+        return NextResponse.json({ error: `Bunny Stream env missing: ${missing.join(', ')}` }, { status: 500 });
+      }
+    }
+
     // Bunny Stream 경로: 비디오 생성 -> 바이너리 업로드 -> HLS/포스터 URL 반환
     if (type === 'video-stream') {
       const created = await bunnyStreamService.createVideo(`${postId}-${Date.now()}`);

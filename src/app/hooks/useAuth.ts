@@ -55,8 +55,8 @@ const getUserDataFromFirestore = async (uid: string): Promise<UserData | null> =
 
 export const useAuth = () => {
   const [user, setUser] = useState<UserData | null>(null);
-  // 초기 렌더 차단 방지를 위해 false로 시작 (콘텐츠 선렌더링)
-  const [isLoading, setIsLoading] = useState(false);
+  // 초기에는 인증 상태가 확정되지 않았으므로 true로 시작해야 보호 라우트에서 조기 리다이렉트가 발생하지 않음
+  const [isLoading, setIsLoading] = useState(true);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const router = useRouter();
 
@@ -231,7 +231,18 @@ export const useAuth = () => {
 
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const isDashboardFirstLoad = path === '/' || path === '/dashboard';
-    if (isDashboardFirstLoad && typeof window !== 'undefined') {
+    const isProtectedPath = (p: string) => {
+      return p.startsWith('/post-upload') ||
+             p.startsWith('/profile') ||
+             p.startsWith('/wishlist') ||
+             p.startsWith('/chat') ||
+             p.startsWith('/post/');
+    };
+
+    if (typeof window !== 'undefined' && isProtectedPath(path)) {
+      // 보호 라우트에서는 즉시 리스너 시작 (조기 리다이렉트 방지)
+      startAuthListener();
+    } else if (isDashboardFirstLoad && typeof window !== 'undefined') {
       const start = () => startAuthListener();
       window.addEventListener('load', start, { once: true });
       // 보장 타임아웃 (이미지 onload 이전에 지연이 너무 길면 1800ms에 시작)

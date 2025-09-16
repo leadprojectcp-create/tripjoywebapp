@@ -3,7 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslationContext } from '../contexts/TranslationContext';
-import { CuratorData } from '../services/curatorService';
+// 임시 타입 정의
+interface CuratorData {
+  id: string;
+  name: string;
+  profileImage?: string;
+  photoUrl?: string;
+  bio?: string;
+  birthDate?: string;
+  gender?: string;
+  location?: string;
+  nationality?: string;
+  followerCount?: number;
+  followingCount?: number;
+}
 import { getFollowStats } from '../services/followService';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';

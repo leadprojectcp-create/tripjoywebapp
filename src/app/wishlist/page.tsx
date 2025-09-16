@@ -5,7 +5,7 @@ import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
-import { PostCard } from "../components/PostCard";
+import { PostCard } from "../dashboard/postcard/PostCard";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { getUserLikedPosts } from "../components/post-hooks/usePostInteractions";
 import { PostData } from "../services/postService";

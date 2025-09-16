@@ -12,9 +12,9 @@ import { getPosts, PostData, getPostsByCountry, getPostsByCity } from "../servic
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from "../services/firebase";
 import CountryAndCitySelector, { CountryAndCitySelectorRef } from "../components/CountryAndCitySelector";
-import { PostCard } from "../components/PostCard";
+import { PostCard } from "./postcard/PostCard";
 import { BannerSlider } from "./banner";
-const DynamicVideoSection = dynamic(() => import("../components/VideoSection").then(m => m.VideoSection), {
+const DynamicVideoSection = dynamic(() => import("./postcard/VideoSection").then(m => m.VideoSection), {
   ssr: false,
   loading: () => <div style={{ height: 220 }} />
 });
@@ -232,32 +232,6 @@ export default function Dashboard() {
           <div className={styles['main-content']}>
               {/* Banner Section */}
               <BannerSlider 
-                banners={[
-                  {
-                    id: "banner-1",
-                    title: "여행의 새로운 경험을 시작하세요",
-                    subtitle: "전 세계 여행자들과 함께하는 특별한 순간들을 발견해보세요",
-                    showGradient: true
-                  },
-                  {
-                    id: "banner-2", 
-                    title: "특별한 여행 스토리를 공유하세요",
-                    subtitle: "당신만의 독특한 여행 경험을 다른 사람들과 나누어보세요",
-                    showGradient: true
-                  },
-                  {
-                    id: "banner-3",
-                    title: "현지인 추천 여행지",
-                    subtitle: "현지인만이 알고 있는 숨겨진 명소들을 만나보세요",
-                    showGradient: true
-                  },
-                  {
-                    id: "banner-4",
-                    title: "실시간 인기 여행지",
-                    subtitle: "지금 가장 핫한 여행지와 트렌드를 확인해보세요",
-                    showGradient: true
-                  }
-                ]}
                 height="180px"
                 autoSlide={true}
                 autoSlideInterval={5000}

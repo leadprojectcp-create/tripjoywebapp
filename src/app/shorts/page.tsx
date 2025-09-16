@@ -28,6 +28,13 @@ function ShortsContent() {
   
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
+  const safePlay = React.useCallback((el: HTMLVideoElement) => {
+    el.play().catch((err: any) => {
+      if (err?.name !== 'AbortError' && err?.name !== 'NotAllowedError') {
+        console.error(err);
+      }
+    });
+  }, []);
 
   // 비디오 게시물만 필터링
   const videoPosts = filterVideoPosts(posts);
@@ -169,21 +176,25 @@ function ShortsContent() {
 
   // 현재 비디오 재생/일시정지
   useEffect(() => {
-    // 모든 비디오 일시정지
+    // 모든 비디오 일시정지 (현재 비디오는 즉시 재생 시도하지 않음)
     Object.keys(videoRefs.current).forEach(postId => {
       const video = videoRefs.current[postId];
       if (video) {
         video.pause();
-        video.currentTime = 0;
       }
     });
-    
-    // 현재 비디오만 재생
+
     const currentVideo = videoRefs.current[videoPosts[currentIndex]?.id || ''];
-    if (currentVideo && !isPaused) {
-      currentVideo.play().catch(console.error);
+    if (!currentVideo) return;
+    if (isPaused) {
+      currentVideo.pause();
+      return;
     }
-  }, [currentIndex, videoPosts, isPaused]);
+    // 소스가 붙어 있고 재생 가능 상태면 안전 재생
+    if (currentVideo.readyState >= 2) {
+      safePlay(currentVideo);
+    }
+  }, [currentIndex, videoPosts, isPaused, safePlay]);
 
   const handleScroll = (direction: 'up' | 'down') => {
     if (direction === 'up' && currentIndex > 0) {
@@ -270,13 +281,27 @@ function ShortsContent() {
     return post.video?.urls?.original || post.video?.url || '';
   };
 
-  // 현재 인덱스 비디오에 HLS 붙이기
+  // 현재 인덱스 비디오에 HLS 붙이기 (중복 초기화/AbortError 방지)
+  const hlsRef = useRef<Hls | null>(null);
+  const attachedIdRef = useRef<string | null>(null);
   useEffect(() => {
     const post = videoPosts[currentIndex];
     if (!post) return;
     const url = getVideoUrl(post);
     const videoEl = videoRefs.current[post.id || ''];
     if (!videoEl || !url) return;
+    // 동일 영상에 중복 부착 방지
+    if (attachedIdRef.current === post.id) return;
+    // 이전 정리
+    try {
+      videoEl.pause();
+      videoEl.removeAttribute('src');
+      videoEl.load();
+    } catch {}
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
 
     let hls: Hls | null = null;
     const isHls = url.endsWith('.m3u8');
@@ -286,19 +311,27 @@ function ShortsContent() {
         hls = new Hls({ maxBufferLength: 10 });
         hls.loadSource(url);
         hls.attachMedia(videoEl);
+        hlsRef.current = hls;
       } else if (videoEl.canPlayType('application/vnd.apple.mpegURL')) {
         videoEl.src = url;
       }
     } else {
       videoEl.src = url;
     }
+    attachedIdRef.current = post.id || null;
+
+    const onCanPlay = () => {
+      if (!isPaused) safePlay(videoEl);
+    };
+    videoEl.addEventListener('canplay', onCanPlay, { once: true } as any);
+    // microtask로 한 번 더 시도
+    setTimeout(() => { if (!isPaused) safePlay(videoEl); }, 0);
 
     return () => {
-      if (hls) {
-        hls.destroy();
-      }
+      // cleanup은 다음 부착 시 선행 정리에서 처리
+      videoEl.removeEventListener('canplay', onCanPlay as any);
     };
-  }, [currentIndex, videoPosts]);
+  }, [currentIndex, videoPosts, isPaused, safePlay]);
 
   // 모바일에서는 앱바 숨김
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;

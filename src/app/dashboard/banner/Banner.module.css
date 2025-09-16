@@ -26,6 +26,36 @@
   display: flex;
   gap: 16px; /* 배너 간 갭 16px */
   transition: transform 0.3s ease-in-out;
+  width: fit-content;
+}
+
+/* 모바일 완전 새로운 방식 */
+@media (max-width: 768px) {
+  .bannerSlider {
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .sliderContainer {
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .sliderViewport {
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .sliderTrack {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+  
+  .bannerItem {
+    width: 100%;
+    flex: 0 0 100%;
+    position: relative;
+  }
 }
 
 .bannerItem {
@@ -41,26 +71,22 @@
 
 .bannerItem:last-child {}
 
-.backgroundImage {
-  position: absolute;
-  top: 0;
-  left: 0;
+.bannerImage {
   width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 1;
+  height: auto;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  aspect-ratio: 630 / 180;
 }
 
-.gradientOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 50%, #2E5B8A 100%);
-  z-index: 2;
+@media (max-width: 768px) {
+  .bannerImage {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
 }
 
 .content {
@@ -163,9 +189,6 @@
 }
 
 @media (max-width: 480px) {
-  .bannerItem {
-    margin-right: 8px; /* 더 작은 갭 */
-  }
   
   .content {
     padding: 20px 8px;

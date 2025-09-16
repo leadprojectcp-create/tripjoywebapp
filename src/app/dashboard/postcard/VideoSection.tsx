@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Hls from 'hls.js';
 import { useRouter } from 'next/navigation';
-import { useTranslationContext } from '../contexts/TranslationContext';
-import { PostData } from '../services/postService';
+import { useTranslationContext } from '../../contexts/TranslationContext';
+import { PostData } from '../../services/postService';
 import styles from './VideoSection.module.css';
 
 interface VideoSectionProps {
@@ -36,14 +37,12 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
     setCurrentIndex(index);
   };
 
-  // 다음 슬라이드
   const nextSlide = () => {
     if (currentIndex < videoPosts.length - 1) {
       scrollToSlide(currentIndex + 1);
     }
   };
 
-  // 이전 슬라이드
   const prevSlide = () => {
     if (currentIndex > 0) {
       scrollToSlide(currentIndex - 1);
@@ -53,7 +52,6 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
   // 게시물 클릭 핸들러
   const handlePostClick = (postId: string | undefined) => {
     if (postId) {
-      // 비디오 게시물의 인덱스 찾기
       const videoIndex = videoPosts.findIndex(post => post.id === postId);
       if (videoIndex !== -1) {
         router.push(`/shorts?index=${videoIndex}`);
@@ -69,15 +67,57 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
     return post.video?.url || '';
   };
 
-  // 마우스 오버 핸들러
+  // HLS 인스턴스 캐시
+  const hlsRefs = useRef<{ [key: string]: Hls | null }>({});
+
+  // 마우스 오버 핸들러 (HLS attach)
   const handleMouseEnter = (postId: string | undefined) => {
-    if (postId) {
-      setHoveredVideo(postId);
+    if (!postId) return;
+    setHoveredVideo(postId);
+    const post = videoPosts.find(p => p.id === postId);
+    const videoEl = videoRefs.current[postId];
+    if (!post || !videoEl) return;
+    const url = post.video?.urls?.original || post.video?.url || '';
+    if (!url.endsWith('.m3u8')) return; // MP4 제거: HLS만 지원
+    videoEl.muted = true;
+    if (hlsRefs.current[postId]) {
+      if (videoEl.readyState >= 2) {
+        videoEl.play().catch(() => {});
+      }
+      return;
+    }
+    if (Hls.isSupported()) {
+      const hls = new Hls({ maxBufferLength: 10 });
+      hlsRefs.current[postId] = hls;
+      hls.loadSource(url);
+      hls.attachMedia(videoEl);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        videoEl.play().catch(() => {});
+      });
+    } else if (videoEl.canPlayType('application/vnd.apple.mpegURL')) {
+      videoEl.src = url;
+      const onCanPlay = () => videoEl.play().catch(() => {});
+      videoEl.addEventListener('canplay', onCanPlay, { once: true } as any);
     }
   };
 
   const handleMouseLeave = () => {
+    const postId = hoveredVideo || '';
     setHoveredVideo(null);
+    const videoEl = postId ? videoRefs.current[postId] : null;
+    if (videoEl) {
+      try {
+        videoEl.pause();
+        videoEl.currentTime = 0;
+        const hls = hlsRefs.current[postId];
+        if (hls) {
+          hls.destroy();
+          hlsRefs.current[postId] = null;
+        }
+        videoEl.removeAttribute('src');
+        videoEl.load();
+      } catch {}
+    }
   };
 
   // 비디오 ref 관리
@@ -87,22 +127,15 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
   useEffect(() => {
     Object.keys(videoRefs.current).forEach(postId => {
       const video = videoRefs.current[postId];
-      if (video) {
-        if (hoveredVideo === postId) {
-          if (video.paused) {
-            video.play().catch(() => {});
-          }
-        } else {
-          if (!video.paused) {
-            video.pause();
-          }
-          video.currentTime = 0;
-        }
-      }
+      if (!video) return;
+      if (hoveredVideo === postId) return;
+      try {
+        video.pause();
+        video.currentTime = 0;
+      } catch {}
     });
   }, [hoveredVideo]);
 
-  // 동영상이 없으면 렌더링하지 않음
   if (videoPosts.length === 0) {
     return null;
   }
@@ -113,39 +146,12 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
         <img src="/icons/play.svg" alt="동영상" width="24" height="24" />
         {t('localRecommendedTripPlay')}
       </h2>
-      
       <div className={styles.videoContainer}>
-        <div 
-          ref={scrollContainerRef}
-          className={styles.videoScrollContainer}
-        >
+        <div ref={scrollContainerRef} className={styles.videoScrollContainer}>
           {videoPosts.map((post, index) => (
-            <div 
-              key={post.id}
-              className={styles.videoCard}
-              onClick={() => handlePostClick(post.id)}
-              onMouseEnter={() => handleMouseEnter(post.id)}
-              onMouseLeave={handleMouseLeave}
-            >
+            <div key={post.id} className={styles.videoCard} onClick={() => handlePostClick(post.id)} onMouseEnter={() => handleMouseEnter(post.id)} onMouseLeave={handleMouseLeave}>
               <div className={styles.videoWrapper}>
-                <video 
-                  ref={(el) => {
-                    if (post.id) {
-                      videoRefs.current[post.id] = el;
-                    }
-                  }}
-                  className={styles.video}
-                  poster={getVideoThumbnail(post)}
-                  preload="none"
-                  muted
-                  loop
-                  playsInline
-                >
-                  <source src={post.video?.urls?.original || post.video?.url} type="video/mp4" />
-                  <source src={post.video?.urls?.original || post.video?.url} type="video/webm" />
-                  <source src={post.video?.urls?.original || post.video?.url} type="video/ogg" />
-                  브라우저가 동영상을 지원하지 않습니다.
-                </video>
+                <video ref={(el) => { if (post.id) { videoRefs.current[post.id] = el; } }} className={styles.video} poster={getVideoThumbnail(post)} preload="metadata" muted loop playsInline />
                 {hoveredVideo !== post.id && (
                   <div className={styles.playButton}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
@@ -157,43 +163,22 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
             </div>
           ))}
         </div>
-
-        {/* 네비게이션 버튼 */}
         {videoPosts.length > 1 && (
           <>
-            <button 
-              className={`${styles.navButton} ${styles.prevButton}`}
-              onClick={prevSlide}
-              disabled={currentIndex === 0}
-            >
+            <button className={`${styles.navButton} ${styles.prevButton}`} onClick={prevSlide} disabled={currentIndex === 0}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
               </svg>
             </button>
-            
-            <button 
-              className={`${styles.navButton} ${styles.nextButton}`}
-              onClick={nextSlide}
-              disabled={currentIndex === videoPosts.length - 1}
-            >
+            <button className={`${styles.navButton} ${styles.nextButton}`} onClick={nextSlide} disabled={currentIndex === videoPosts.length - 1}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
               </svg>
             </button>
           </>
         )}
-
-        {/* 인디케이터 */}
         {videoPosts.length > 1 && (
-          <div className={styles.indicators}>
-            {videoPosts.map((_, index) => (
-              <button
-                key={index}
-                className={`${styles.indicator} ${index === currentIndex ? styles.active : ''}`}
-                onClick={() => scrollToSlide(index)}
-              />
-            ))}
-          </div>
+          <div className={styles.indicators}></div>
         )}
       </div>
     </div>

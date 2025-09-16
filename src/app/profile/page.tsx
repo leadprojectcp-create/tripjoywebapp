@@ -225,16 +225,21 @@ function ProfileContent() {
     try {
       console.log('🗑️ 게시물 삭제 시작:', postId);
       const success = await deletePost(postId, user.uid);
-      
+
       if (success) {
         console.log('✅ 게시물 삭제 완료');
         alert('게시물이 삭제되었습니다.');
-        // 페이지 새로고침으로 목록 업데이트
-        window.location.reload();
-      } else {
-        console.error('❌ 게시물 삭제 실패');
-        alert('게시물 삭제에 실패했습니다.');
+        // 리로드 없이 로컬 상태만 업데이트
+        setUserPosts(prev => prev.filter(p => p.id !== postId));
+        setProfileData(prev => ({
+          ...prev,
+          postCount: Math.max(0, prev.postCount - 1)
+        }));
+        return;
       }
+
+      console.error('❌ 게시물 삭제 실패');
+      alert('게시물 삭제에 실패했습니다.');
     } catch (error) {
       console.error('❌ 게시물 삭제 중 오류:', error);
       alert('게시물 삭제 중 오류가 발생했습니다.');
@@ -600,7 +605,7 @@ function ProfileContent() {
                         <button className={styles.uploadBtn} onClick={handleUploadPost}>
                           <span className={styles.uploadIcon}>
                             <img
-                              src="/icons/upload.svg"
+                              src="/icons/upload.png"
                               alt="업로드"
                               width="27"
                               height="27"
