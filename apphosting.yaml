@@ -87,6 +87,20 @@ env:
 
   - variable: BUNNY_STORAGE_URL
     value: https://storage.bunnycdn.com/tripjoy
+
+  # Bunny Stream Configuration
+  - variable: BUNNY_STREAM_LIBRARY_ID
+    value: "495375"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: BUNNY_STREAM_API_KEY
+    value: "bf407e08-db40-467d-a54df12f8c80-2a9d-4fb0"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: BUNNY_STREAM_CDN_BASE
+    value: "https://vz-e7e57e10-247.b-cdn.net"
     availability:
       - BUILD
       - RUNTIME

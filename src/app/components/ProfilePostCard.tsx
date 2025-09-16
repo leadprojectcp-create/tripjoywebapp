@@ -5,9 +5,13 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike, checkLikeStatus } from '../services/interactionService';
+import { toggleLike, checkLikeStatus } from './post-hooks/usePostInteractions';
 import { bunnyService } from '../services/bunnyService';
 import styles from './ProfilePostCard.module.css';
+import { PostHeader } from './post-sections/PostHeader';
+import { PostMedia } from './post-sections/PostMedia';
+import { PostFooter } from './post-sections/PostFooter';
+import { usePostLocationTranslations, buildImageUrls, formatPostDate } from './post-hooks/usePostData';
 
 interface ProfilePostCardProps {
   post: PostData;
@@ -43,7 +47,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   const { user } = useAuthContext();
   const router = useRouter();
 
-  const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
+  // (슬라이더 상태는 공통 미디어 섹션으로 위임)
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -215,69 +219,17 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   };
 
   // 🚀 이미지 URL 추출 (useMemo로 최적화 - 무한 렌더링 방지)
-  const imageUrls = useMemo(() => {
-    if (post.images && post.images.length > 0) {
-      return post.images.map(img => img.url);
-    }
-    return [];
-  }, [post.images]); // post.images가 변경될 때만 재계산
+  const imageUrls = useMemo(() => buildImageUrls(post.images as any), [post.images]);
 
 
   // 🚀 스크롤 위치 확인 함수 (useCallback으로 최적화 - 무한 렌더링 방지)
-  const checkScrollPosition = useCallback(() => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-        setSliderState({
-          canScrollLeft: scrollLeft > 0,
-          canScrollRight: scrollLeft < scrollWidth - clientWidth - 1
-        });
-      }
-    } catch (error) {
-      // 오류 무시 - 개발 환경에서만 발생하는 문제
-      console.warn('Scroll position check failed:', error);
-    }
-  }, []); // 의존성 없음 (sliderRef는 ref이므로 안정적)
+  // (슬라이더 상태 체크는 공통 미디어 섹션으로 위임)
 
   // 🚀 슬라이더 스크롤 함수 (useCallback으로 최적화)
-  const scrollSlider = useCallback((direction: 'left' | 'right') => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        // 반응형: 컨테이너 너비에 따라 스크롤 양 결정
-        const containerWidth = sliderRef.current.offsetWidth;
-        const scrollAmount = containerWidth;
-        const currentScroll = sliderRef.current.scrollLeft;
-        const targetScroll = direction === 'left' 
-          ? currentScroll - scrollAmount 
-          : currentScroll + scrollAmount;
-        
-        sliderRef.current.scrollTo({
-          left: targetScroll,
-          behavior: 'smooth'
-        });
-        
-        // 스크롤 후 상태 업데이트 (컴포넌트가 여전히 마운트되어 있는지 확인)
-        const timeoutId = setTimeout(() => {
-          try {
-            if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-              checkScrollPosition();
-            }
-          } catch (error) {
-            console.warn('Scroll timeout callback failed:', error);
-          }
-        }, 300);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    } catch (error) {
-      console.warn('Scroll slider failed:', error);
-    }
-  }, [checkScrollPosition]); // checkScrollPosition에 의존
+  // (스크롤 로직 공통화)
 
   // 🚀 컴포넌트 마운트 시 스크롤 상태 초기화 (최적화된 의존성)
-  useEffect(() => {
-    checkScrollPosition();
-  }, [checkScrollPosition, imageUrls.length]); // 배열 길이만 체크하여 안정성 확보
+  // (초기화 로직 공통화)
 
   // 🚀 이미지 프리로딩 (빠른 로딩을 위해)
   useEffect(() => {
@@ -470,113 +422,7 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
     }
   }, [onDelete, post.id]);
 
-  // 단일 이미지 렌더링
-  const renderSingleImage = () => (
-    <>
-      <div className={`${styles.cardImage} ${styles.singleImage}`}>
-        <img 
-          src={`${imageUrls[0]}?width=400&height=400&fit=cover&quality=100`} 
-          alt="게시물 이미지"
-          loading="lazy"
-          onClick={handleImageClick}
-          style={{ cursor: 'pointer' }}
-          onError={(e) => {
-            try {
-              const target = e.currentTarget;
-              if (target && target.parentNode && isMountedRef.current) {
-                target.style.display = 'none';
-                const nextSibling = target.nextElementSibling as HTMLElement;
-                if (nextSibling && nextSibling.parentNode) {
-                  nextSibling.style.display = 'flex';
-                }
-              }
-            } catch (error) {
-              // 오류 무시 - 개발 환경에서만 발생하는 문제
-              console.warn('Image error handling failed:', error);
-            }
-          }}
-        />
-        <div className={styles.imagePlaceholder} style={{ display: 'none' }}>
-          📷
-        </div>
-      </div>
-      {/* Dot Indicator - 단일 이미지 밖에 표시 */}
-      <div className={styles.dotIndicator}>
-        <div className={`${styles.dot} ${styles.active}`}></div>
-      </div>
-    </>
-  );
-
-
-  // 다중 이미지 슬라이더 렌더링
-  const renderImageSlider = () => (
-    <>
-      <div className={styles.imageSliderContainer}>
-        <button 
-          className={`${styles.sliderArrow} ${styles.left} ${!sliderState.canScrollLeft ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('left')}
-          aria-label="이전 이미지"
-        >
-          ‹
-        </button>
-        <div 
-          className={`${styles.cardImage} ${styles.imageSlider}`} 
-          ref={sliderRef}
-          onScroll={() => {
-            checkScrollPosition();
-            handleSliderScroll();
-          }}
-        >
-          {imageUrls.map((imageUrl, index) => (
-            <div key={index} className={styles.imageItem}>
-              <img 
-                src={`${imageUrl}?width=400&height=400&fit=cover&quality=100`} 
-                alt={`게시물 이미지 ${index + 1}`}
-                loading="lazy"
-                onClick={handleImageClick}
-                style={{ cursor: 'pointer' }}
-                onError={(e) => {
-                  try {
-                    const target = e.currentTarget;
-                    if (target && target.parentNode && isMountedRef.current) {
-                      target.style.display = 'none';
-                      const nextSibling = target.nextElementSibling as HTMLElement;
-                      if (nextSibling && nextSibling.parentNode) {
-                        nextSibling.style.display = 'flex';
-                      }
-                    }
-                  } catch (error) {
-                    // 오류 무시 - 개발 환경에서만 발생하는 문제
-                    console.warn('Image error handling failed:', error);
-                  }
-                }}
-              />
-              <div className={styles.imagePlaceholder} style={{ display: 'none' }}>
-                📷
-              </div>
-            </div>
-          ))}
-        </div>
-        <button 
-          className={`${styles.sliderArrow} ${styles.right} ${!sliderState.canScrollRight ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('right')}
-          aria-label="다음 이미지"
-        >
-          ›
-        </button>
-      </div>
-      {/* Dot Indicator - 이미지 슬라이더 컨테이너 밖에 표시 */}
-      <div className={styles.dotIndicator}>
-        {imageUrls.map((_, index) => (
-          <div
-            key={index}
-            className={`${styles.dot} ${index === currentSlideIndex ? styles.active : ''}`}
-            onClick={() => handleDotClick(index)}
-          />
-        ))}
-      </div>
-    </>
-  );
+  const mediaImages = useMemo(() => imageUrls.map(url => ({ url })), [imageUrls]);
 
   return (
     <div className={styles[cardClassName] || styles.contentCard}>
@@ -641,82 +487,24 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
         )}
       </div>
 
-      {/* 이미지 영역 */}
-      {(() => {
-        if (imageUrls.length === 0) {
-          return (
-            <div className={`${styles.cardImage} ${styles.singleImage}`}>
-              <div className={styles.imagePlaceholder}>
-                📷
-              </div>
-            </div>
-          );
-        } else if (imageUrls.length === 1) {
-          return renderSingleImage();
-        } else {
-          return renderImageSlider();
-        }
-      })()}
+      <PostMedia 
+        styles={styles}
+        images={mediaImages}
+        onClickImage={handleImageClick}
+      />
 
       {/* 카드 푸터 */}
-      <div className={styles.cardFooter}>
-        {/* 액션 버튼들 - 찜(왼쪽)과 공유하기(오른쪽) */}
-        <div className={styles.actionButtonsRow}>
-          <button 
-            className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
-            onClick={handleLikeToggle}
-            disabled={isLoading}
-          >
-            <span className={styles.actionIcon}>
-              <img 
-                src={isLiked ? "/icons/like_active.svg" : "/icons/like.svg"} 
-                alt={isLiked ? "좋아요 취소" : "좋아요"}
-                width="20"
-                height="20"
-              />
-            </span>
-            <span className={styles.actionCount}>{likesCount}</span>
-          </button>
-          
-          <button 
-            className={`${styles.actionBtn} ${styles.shareBtn} ${showShareMenu ? styles.active : ''}`}
-            onClick={handleShareToggle}
-          >
-            <span className={styles.actionIcon}>
-              <img 
-                src={showShareMenu ? "/icons/share_active.svg" : "/icons/share.svg"} 
-                alt="공유하기"
-                width="20"
-                height="20"
-              />
-            </span>
-          </button>
-        </div>
-        
-        {/* 공유 메뉴 */}
-        {showShareMenu && (
-          <div className={styles.shareMenu}>
-            <button onClick={() => handleShare('copy')} className={styles.shareOption}>
-              📋 {t('copyLink') || '링크 복사'}
-            </button>
-            <button onClick={() => handleShare('facebook')} className={styles.shareOption}>
-              📘 Facebook
-            </button>
-            <button onClick={() => handleShare('twitter')} className={styles.shareOption}>
-              🐦 Twitter
-            </button>
-            <button onClick={() => handleShare('whatsapp')} className={styles.shareOption}>
-              📱 WhatsApp
-            </button>
-          </div>
-        )}
-
-        {/* 날짜 표시 - 푸터 맨 아래 오른쪽 */}
-        <div className={styles.dateContainer}>
-          <span className={styles.dateBadge}>{formatDate(post.createdAt)}</span>
-        </div>
-
-      </div>
+      <PostFooter 
+        styles={styles}
+        isLiked={isLiked}
+        likesCount={likesCount}
+        isLoading={isLoading}
+        showShareMenu={showShareMenu}
+        onToggleLike={handleLikeToggle}
+        onToggleShare={handleShareToggle}
+        onShare={handleShare}
+        dateText={formatPostDate(post.createdAt, t)}
+      />
 
     </div>
   );

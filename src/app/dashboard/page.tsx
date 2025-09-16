@@ -27,6 +27,10 @@ export default function Dashboard() {
     isAuthenticated,
     isLoading: authLoading
   } = useAuthContext();
+  // 인증 완료를 기다리지 않고 선렌더링을 위해 localStorage에 저장된 uid를 즉시 활용
+  const earlyUid: string | undefined = typeof window !== 'undefined'
+    ? (JSON.parse(localStorage.getItem('tripjoy_user') || 'null')?.uid as string | undefined)
+    : undefined;
   
   const { t, currentLanguage } = useTranslationContext();
   const unreadMessageCount = useUnreadMessageCount();
@@ -39,30 +43,21 @@ export default function Dashboard() {
   const [showVideoSection, setShowVideoSection] = useState<boolean>(false);
   const videoSentinelRef = useRef<HTMLDivElement | null>(null);
   
-  // 필터링 상태 관리
-  const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
+  // 필터링 상태 관리 (초기값을 로컬스토리지에서 즉시 복원)
+  const [selectedCountry, setSelectedCountry] = useState(
+    typeof window !== 'undefined' ? (localStorage.getItem('dashboard_selectedCountry') || '') : ''
+  );
+  const [selectedCity, setSelectedCity] = useState(
+    typeof window !== 'undefined' ? (localStorage.getItem('dashboard_selectedCity') || '') : ''
+  );
   
-  // 위치 선택 관련
-  const [locationText, setLocationText] = useState('');
+  // 위치 선택 관련 (텍스트도 즉시 복원)
+  const [locationText, setLocationText] = useState(
+    typeof window !== 'undefined' ? (localStorage.getItem('dashboard_locationText') || '') : ''
+  );
   const countryCitySelectorRef = useRef<CountryAndCitySelectorRef>(null);
 
-  // 로컬 스토리지에서 선택된 위치 복원
-  useEffect(() => {
-    const savedCountry = localStorage.getItem('dashboard_selectedCountry');
-    const savedCity = localStorage.getItem('dashboard_selectedCity');
-    const savedLocationText = localStorage.getItem('dashboard_locationText');
-    
-    if (savedCountry) {
-      setSelectedCountry(savedCountry);
-    }
-    if (savedCity) {
-      setSelectedCity(savedCity);
-    }
-    if (savedLocationText) {
-      setLocationText(savedLocationText);
-    }
-  }, []);
+  // 초기 복원 useEffect 제거 (상태 초기화에서 복원)
 
   useEffect(() => {
     if (!isLoading && posts.length > 4) {
@@ -114,42 +109,74 @@ export default function Dashboard() {
     };
   }, []);
   
-
-  // 로그인 상태와 관계없이 Dashboard는 접근 가능
-  // (게시물 읽기는 로그인 불필요)
-
-  // 🚀 게시물 먼저 로드 후 필요한 사용자만 병렬 조회
+  // 🚀 게시물 먼저 로드 후 필요한 사용자만 병렬 조회 (user?.uid 변화에 재호출되지 않도록 고정)
   useEffect(() => {
+    let aborted = false;
     const loadPostsWithUsers = async () => {
       setIsLoading(true);
       try {
         let postsData: PostData[] = [];
         if (selectedCity) {
-          postsData = await getPostsByCity(selectedCountry, selectedCity, 12, user?.uid);
+          postsData = await getPostsByCity(selectedCountry, selectedCity, 8, earlyUid);
         } else if (selectedCountry) {
-          postsData = await getPostsByCountry(selectedCountry, 12, user?.uid);
+          postsData = await getPostsByCountry(selectedCountry, 8, earlyUid);
         } else {
-          postsData = await getPosts(12, undefined, user?.uid);
+          postsData = await getPosts(8, undefined, earlyUid);
         }
+        if (aborted) return;
         setPosts(postsData);
 
-        const authorIds = Array.from(new Set(postsData.map(p => p.userId).filter(Boolean)));
-        const userMap: Record<string, any> = {};
-        await Promise.all(authorIds.map(async (uid) => {
+        // 1) 우선 화면에 보이는 상단 N개의 작성자만 빠르게 조회
+        const INITIAL_COUNT = 4;
+        const initialAuthorIds = Array.from(new Set(
+          postsData.slice(0, INITIAL_COUNT).map(p => p.userId).filter(Boolean)
+        ));
+        const initialUserMap: Record<string, any> = { ...userInfoCache };
+        await Promise.all(initialAuthorIds.map(async (uid) => {
+          if (initialUserMap[uid]) return; // 캐시된 경우 생략
           try {
             const snap = await getDoc(doc(db, 'users', uid));
-            if (snap.exists()) userMap[uid] = snap.data();
+            if (snap.exists()) initialUserMap[uid] = snap.data();
           } catch {}
         }));
-        setUserInfoCache(userMap);
+        if (aborted) return;
+        setUserInfoCache(initialUserMap);
+        setIsLoading(false); // 상단 영역 먼저 노출
+
+        // 2) 나머지 작성자 정보는 백그라운드로 채우기
+        const remainingAuthorIds = Array.from(new Set(
+          postsData.map(p => p.userId).filter(Boolean)
+        )).filter(uid => !initialAuthorIds.includes(uid));
+        if (remainingAuthorIds.length > 0) {
+          const restMap: Record<string, any> = {};
+          await Promise.all(remainingAuthorIds.map(async (uid) => {
+            if (initialUserMap[uid]) return;
+            try {
+              const snap = await getDoc(doc(db, 'users', uid));
+              if (snap.exists()) restMap[uid] = snap.data();
+            } catch {}
+          }));
+          if (aborted) return;
+          setUserInfoCache(prev => ({ ...prev, ...restMap }));
+        }
       } catch (error) {
         console.error('❌ 게시물/사용자 로드 실패:', error);
-      } finally {
         setIsLoading(false);
       }
     };
     loadPostsWithUsers();
-  }, [selectedCountry, selectedCity, user?.uid]);
+    return () => { aborted = true; };
+  }, [selectedCountry, selectedCity]);
+
+  // ✅ 사용자 UID가 나중에 준비되면, 재조회 없이 좋아요 상태만 즉시 동기화
+  useEffect(() => {
+    if (!user?.uid || posts.length === 0) return;
+    const uid = user.uid;
+    setPosts(prev => prev.map(p => ({
+      ...p,
+      isLikedByCurrentUser: !!(p.likedBy && p.likedBy[uid])
+    })));
+  }, [user?.uid]);
 
   // 위치 선택 관련 함수들
   const handleCountryCitySelect = (countryCode: string, cityCode: string) => {

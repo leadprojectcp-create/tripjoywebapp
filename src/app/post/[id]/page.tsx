@@ -12,7 +12,7 @@ import { useUnreadMessageCount } from '../../hooks/useUnreadMessageCount';
 import { PostDetailCard } from '../../components/PostDetailCard';
 import { getPostById, PostData } from '../../services/postService';
 import { getUserById } from '../../auth/services/authService';
-import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../../services/interactionService';
+import { toggleLike, toggleBookmark, checkLikeStatus, checkBookmarkStatus } from '../../components/post-hooks/usePostInteractions';
 import { PostDetailHeader } from './PostDetailHeader';
 import { LocationInfoSection } from './LocationInfoSection';
 import { usePostTranslation } from './usePostTranslation';

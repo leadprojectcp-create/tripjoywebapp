@@ -18,7 +18,6 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { bunnyService } from './bunnyService';
-import { extractVideoThumbnail } from '../utils/videoThumbnail';
 import { LocationDetails } from '../components/GoogleMapsLocationPicker';
 
 // Bunny.net 업로드 인터페이스
@@ -902,59 +901,40 @@ export const uploadVideoToBunny = async (
   file: File,
   postId: string
 ): Promise<UploadedImage> => {
-  try {
-    // 1. 비디오 업로드
-    const result = await bunnyService.uploadVideo(file, `${postId}/videos`);
-    
-    if (result.success && result.url) {
-      // 2. 썸네일 추출
-      console.log('🎬 비디오 썸네일 추출 중...');
-      const thumbnailResult = await extractVideoThumbnail(file);
-      
-      let thumbnailUrl = result.url; // 기본값은 비디오 URL
-      
-      if (thumbnailResult.success && thumbnailResult.blob) {
-        try {
-          console.log('🎬 썸네일 직접 업로드 시작...');
-          
-          // 클라이언트에서 직접 Bunny.net에 업로드
-          const thumbnailFile = new File([thumbnailResult.blob], `thumbnail_${Date.now()}.png`, {
-            type: 'image/png'
-          });
-          
-          const thumbnailUploadResult = await bunnyService.uploadFile(
-            thumbnailFile, 
-            `${postId}/thumbnails`
-          );
-          
-          if (thumbnailUploadResult.success && thumbnailUploadResult.url) {
-            thumbnailUrl = thumbnailUploadResult.url;
-            console.log('✅ 비디오 썸네일 직접 업로드 완료:', thumbnailUrl);
-          } else {
-            console.warn('⚠️ 썸네일 직접 업로드 실패:', thumbnailUploadResult.error);
-          }
-        } catch (error) {
-          console.warn('⚠️ 썸네일 직접 업로드 실패, 비디오 URL 사용:', error);
-        }
-      } else {
-        console.warn('⚠️ 썸네일 추출 실패, 비디오 URL 사용:', thumbnailResult.error);
-      }
-      
-      return {
-        id: `vid_${Date.now()}`,
-        url: result.url,
-        originalName: file.name,
-        size: file.size,
-        urls: {
-          original: result.url,
-          thumbnail: thumbnailUrl
-        }
-      };
-    } else {
-      throw new Error(result.error || 'Upload failed');
-    }
-  } catch (error) {
-    console.error('❌ 비디오 업로드 실패:', error);
-    throw error;
+  // Bunny Stream을 사용하는 서버 API로 위임하여 업로드 및 URL 생성
+  const form = new FormData();
+  form.append('file', file);
+  form.append('type', 'video-stream');
+  form.append('postId', postId);
+
+  const res = await fetch('/api/bunny/upload', {
+    method: 'POST',
+    body: form
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Video upload failed: ${res.status} ${text}`);
   }
+
+  const json = await res.json();
+  // json: { success, videoId, url (HLS), posterUrl }
+  if (!json.success || !json.url) {
+    throw new Error(json.error || 'Video upload failed');
+  }
+
+  const videoId = json.videoId || `vid_${Date.now()}`;
+  const hlsUrl = json.url as string;
+  const posterUrl = (json.posterUrl as string) || hlsUrl;
+
+  return {
+    id: videoId,
+    url: hlsUrl,
+    originalName: file.name,
+    size: file.size,
+    urls: {
+      original: hlsUrl,
+      thumbnail: posterUrl
+    }
+  };
 };

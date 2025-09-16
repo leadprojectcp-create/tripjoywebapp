@@ -4,9 +4,13 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike, checkLikeStatus } from '../services/interactionService';
+import { toggleLike, checkLikeStatus } from './post-hooks/usePostInteractions';
 import { translateText, LANGUAGE_CODES, LanguageCode } from '../services/translateService';
 import styles from './PostDetailCard.module.css';
+import { PostHeader } from './post-sections/PostHeader';
+import { PostMedia } from './post-sections/PostMedia';
+import { PostFooter } from './post-sections/PostFooter';
+import { usePostLocationTranslations, buildImageUrls, formatPostDate } from './post-hooks/usePostData';
 
 interface PostDetailCardProps {
   post: PostData;
@@ -73,67 +77,13 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
   }, [post.images, post.video]); // post.images와 post.video가 변경될 때만 재계산
 
   // 🚀 스크롤 위치 확인 함수 (useCallback으로 최적화 - 무한 렌더링 방지)
-  const checkScrollPosition = useCallback(() => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-        setSliderState({
-          canScrollLeft: scrollLeft > 0,
-          canScrollRight: scrollLeft < scrollWidth - clientWidth - 1
-        });
-      }
-    } catch (error) {
-      // 오류 무시 - 개발 환경에서만 발생하는 문제
-      console.warn('Scroll position check failed:', error);
-    }
-  }, []); // 의존성 없음 (sliderRef는 ref이므로 안정적)
+  // (슬라이더 상태 체크는 공통 미디어 섹션으로 위임)
 
   // 🚀 슬라이더 스크롤 함수 (useCallback으로 최적화)
-  const scrollSlider = useCallback((direction: 'left' | 'right') => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        // 반응형: 컨테이너 너비에 따라 스크롤 양 결정
-        const containerWidth = sliderRef.current.offsetWidth;
-        const scrollAmount = containerWidth;
-        const currentScroll = sliderRef.current.scrollLeft;
-        const targetScroll = direction === 'left' 
-          ? currentScroll - scrollAmount 
-          : currentScroll + scrollAmount;
-        
-        sliderRef.current.scrollTo({
-          left: targetScroll,
-          behavior: 'smooth'
-        });
-        
-        // 스크롤 후 상태 업데이트 (컴포넌트가 여전히 마운트되어 있는지 확인)
-        const timeoutId = setTimeout(() => {
-          try {
-            if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-              checkScrollPosition();
-              
-              // 스크롤 후 현재 인덱스 계산하여 비디오 정지 체크
-              const itemWidth = sliderRef.current.offsetWidth;
-              const newIndex = Math.round(sliderRef.current.scrollLeft / itemWidth);
-              if (playingVideoIndex !== null && mediaUrls[newIndex]?.type !== 'video') {
-                setPlayingVideoIndex(null);
-              }
-            }
-          } catch (error) {
-            console.warn('Scroll timeout callback failed:', error);
-          }
-        }, 300);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    } catch (error) {
-      console.warn('Scroll slider failed:', error);
-    }
-  }, [checkScrollPosition, playingVideoIndex, mediaUrls]); // 의존성 추가
+  // (스크롤 로직 공통화)
 
   // 🚀 컴포넌트 마운트 시 스크롤 상태 초기화 (최적화된 의존성)
-  useEffect(() => {
-    checkScrollPosition();
-  }, [checkScrollPosition, mediaUrls.length]); // 배열 길이만 체크하여 안정성 확보
+  // (초기화 로직 공통화)
 
   // 🚀 컴포넌트 언마운트 시 정리
   useEffect(() => {
@@ -328,170 +278,31 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
     return date.toLocaleDateString();
   };
 
-  // 단일 미디어 렌더링 (이미지 또는 비디오)
-  const renderSingleMedia = () => {
-    const media = mediaUrls[0];
-    return (
-      <div className={styles.imageContainer}>
-        <div className={`${styles.cardImage} ${styles.singleImage}`}>
-          {media.type === 'video' ? (
-            <div className={styles.videoContainer}>
-              {playingVideoIndex === 0 ? (
-                <video 
-                  className={styles.videoPlayer}
-                  controls
-                  autoPlay
-                  onEnded={handleVideoPause}
-                >
-                  <source src={media.videoUrl} type="video/mp4" />
-                  비디오를 재생할 수 없습니다.
-                </video>
-              ) : (
-                <>
-                      <img 
-                        src={media.thumbnail || media.videoUrl || media.original} 
-                        alt="비디오 썸네일"
-                        loading="lazy"
-                        onError={(e) => {
-                          console.error('비디오 썸네일 로드 실패:', media.thumbnail || media.videoUrl || media.original);
-                          // 비디오 썸네일이 없으면 비디오 자체를 표시
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                  <button 
-                    className={styles.playButton}
-                    onClick={() => handleVideoPlay(0)}
-                    aria-label="비디오 재생"
-                  >
-                    ▶
-                  </button>
-                </>
-              )}
-            </div>
-          ) : (
-            <img 
-              src={media.original} 
-              alt="게시물 이미지"
-              loading="lazy"
-            />
-          )}
-        </div>
-        <div className={styles.dotIndicator}>
-          <div className={`${styles.dot} ${styles.active}`}></div>
-        </div>
-      </div>
-    );
-  };
+  // 공통 미디어 섹션 데이터 구성
+  const mediaImages = useMemo(() => mediaUrls.filter(m => m.type === 'image').map(m => ({ url: m.original })), [mediaUrls]);
+  const mediaVideo = useMemo(() => {
+    const vid = mediaUrls.find(m => m.type === 'video');
+    return vid ? { url: vid.videoUrl || vid.original, thumbnail: vid.thumbnail } : null;
+  }, [mediaUrls]);
 
-  // 다중 미디어 슬라이더 렌더링 (이미지 + 비디오)
-  const renderMediaSlider = () => (
-    <div className={styles.imageContainer}>
-      <div className={styles.imageSliderContainer}>
-        <button 
-          className={`${styles.sliderArrow} ${styles.left} ${!sliderState.canScrollLeft ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('left')}
-          aria-label="이전 미디어"
-        >
-          ‹
-        </button>
-        <div 
-          className={`${styles.cardImage} ${styles.imageSlider}`} 
-          ref={sliderRef}
-          onScroll={() => {
-            checkScrollPosition();
-            handleSliderScroll();
-          }}
-        >
-          {mediaUrls.map((media, index) => (
-            <div key={index} className={styles.imageItem}>
-              {media.type === 'video' ? (
-                <div className={styles.videoContainer}>
-                  {playingVideoIndex === index ? (
-                    <video 
-                      className={styles.videoPlayer}
-                      controls
-                      autoPlay
-                      onEnded={handleVideoPause}
-                    >
-                      <source src={media.videoUrl} type="video/mp4" />
-                      비디오를 재생할 수 없습니다.
-                    </video>
-                  ) : (
-                    <>
-                      <img 
-                        src={media.thumbnail ? `${media.thumbnail.split('?')[0]}?width=400&height=533&fit=cover&quality=100` : (media.videoUrl || media.original)} 
-                        alt={`비디오 썸네일 ${index + 1}`}
-                        loading="lazy"
-                        onError={(e) => {
-                          console.error('비디오 썸네일 로드 실패:', media.thumbnail || media.videoUrl || media.original);
-                          // 비디오 썸네일이 없으면 비디오 자체를 표시
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      <button 
-                        className={styles.playButton}
-                        onClick={() => handleVideoPlay(index)}
-                        aria-label={`비디오 ${index + 1} 재생`}
-                      >
-                        ▶
-                      </button>
-                    </>
-                  )}
-                </div>
-              ) : (
-                <img 
-                  src={media.original} 
-                  alt={`게시물 이미지 ${index + 1}`}
-                  loading="lazy"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <button 
-          className={`${styles.sliderArrow} ${styles.right} ${!sliderState.canScrollRight ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('right')}
-          aria-label="다음 미디어"
-        >
-          ›
-        </button>
-      </div>
-      <div className={styles.dotIndicator}>
-        {mediaUrls.map((_, index) => (
-          <div
-            key={index}
-            className={`${styles.dot} ${index === currentSlideIndex ? styles.active : ''}`}
-            onClick={() => handleDotClick(index)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  // (미디어 슬라이더는 공통 섹션 사용)
 
   return (
     <div className={styles.postDetailCard}>
 
-      {/* 미디어 영역 - 9:16 비율 (이미지 + 비디오) */}
-      {(() => {
-        if (mediaUrls.length === 0) {
-          return (
-            <div className={styles.imageContainer}>
-              <div className={`${styles.cardImage} ${styles.singleImage}`}>
-                <div className={styles.imagePlaceholder}>
-                  📷
-                </div>
-              </div>
-              <div className={styles.dotIndicator}>
-                <div className={`${styles.dot} ${styles.active}`}></div>
-              </div>
-            </div>
-          );
-        } else if (mediaUrls.length === 1) {
-          return renderSingleMedia();
-        } else {
-          return renderMediaSlider();
-        }
-      })()}
+      <PostHeader 
+        styles={styles}
+        post={post}
+        showUserInfo={false}
+        showSettings={false}
+        translatePostLocation={() => ''}
+      />
+
+      <PostMedia 
+        styles={styles}
+        images={mediaImages}
+        video={mediaVideo}
+      />
 
       {/* 카드 푸터 */}
       <div className={styles.cardFooter}>
@@ -573,7 +384,7 @@ export const PostDetailCard: React.FC<PostDetailCardProps> = ({
             
             {/* 글작성 날짜 - 오른쪽 정렬 */}
             <div className={styles.postDate}>
-              {formatDate(post.createdAt)}
+              {formatPostDate(post.createdAt, t)}
             </div>
           </div>
         </div>

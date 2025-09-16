@@ -5,9 +5,13 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike } from '../services/interactionService';
+import { toggleLike } from './post-hooks/usePostInteractions';
 import { bunnyService } from '../services/bunnyService';
 import styles from './PostCard.module.css';
+import { PostHeader } from './post-sections/PostHeader';
+import { PostMedia } from './post-sections/PostMedia';
+import { PostFooter } from './post-sections/PostFooter';
+import { usePostLocationTranslations, buildImageUrls, formatPostDate } from './post-hooks/usePostData';
 
 interface PostCardProps {
   post: PostData;
@@ -49,22 +53,23 @@ const PostCardComponent: React.FC<PostCardProps> = ({
 
   // 🚀 성능 최적화: 디버깅 로그 제거
 
-  const [sliderState, setSliderState] = useState({ canScrollLeft: false, canScrollRight: true });
-  
   // 🚀 좋아요 토글을 위한 로컬 상태 (낙관적 업데이트용)
   const [localIsLiked, setLocalIsLiked] = useState<boolean | null>(null);
   
   // 🚀 가장 빠른 방법: 서버에서 미리 계산된 값 사용!
+  // 인증 대기 없이 초기 좋아요 상태 계산 (early uid 선반영)
+  const earlyUid: string | undefined = typeof window !== 'undefined'
+    ? (JSON.parse(localStorage.getItem('tripjoy_user') || 'null')?.uid as string | undefined)
+    : undefined;
   const isLiked = localIsLiked !== null ? localIsLiked : 
     (post.isLikedByCurrentUser !== undefined ? post.isLikedByCurrentUser : 
+     (earlyUid && post.likedBy?.[earlyUid]) ||
      (currentUser?.uid && post.likedBy?.[currentUser.uid]) || 
      (user?.uid && post.likedBy?.[user.uid]) || false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const sliderRef = useRef<HTMLDivElement | null>(null);
   const isMountedRef = useRef(true);
 
   // 🚀 사용자 정보가 로드되면 즉시 좋아요 상태 업데이트
@@ -79,100 +84,10 @@ const PostCardComponent: React.FC<PostCardProps> = ({
   }, [currentUser?.uid, user?.uid, post.likedBy, localIsLiked]);
 
   
-  // 국가/도시 데이터 상태
-  const [countries, setCountries] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
+  // 위치 번역 훅 (공통 데이터 로딩/번역)
+  const { translatePostLocation } = usePostLocationTranslations(currentLanguage, post.location?.nationality);
 
-  // 국가 데이터 로드
-  useEffect(() => {
-    const loadCountries = async () => {
-      try {
-        const response = await fetch('/data/countries.json');
-        const data = await response.json();
-        setCountries(data.countries || []);
-      } catch (error) {
-        console.error('❌ 국가 데이터 로드 실패:', error);
-      }
-    };
-
-    loadCountries();
-  }, []);
-
-  // 도시 데이터 로드 (게시물 위치의 국가가 변경될 때)
-  useEffect(() => {
-    const loadCities = async (countryCode: string) => {
-      if (!countryCode) {
-        setCities([]);
-        return;
-      }
-
-      try {
-        const selectedCountryData = countries.find(c => c.code === countryCode);
-        if (!selectedCountryData) return;
-
-        const countryFileMap: Record<string, string> = {
-          'ko': 'kr', 'en': 'us', 'vi': 'vn', 'zh': 'cn',
-          'ja': 'jp', 'th': 'th', 'fil': 'ph'
-        };
-
-        const fileName = countryFileMap[selectedCountryData.name];
-        if (!fileName) return;
-
-        const response = await fetch(`/data/cities-${fileName}.json`);
-        const data = await response.json();
-        setCities(data.cities || []);
-      } catch (error) {
-        console.error('❌ 도시 데이터 로드 실패:', error);
-        setCities([]);
-      }
-    };
-
-    // 게시물 위치의 국가 코드로 도시 데이터 로드
-    if (post.location?.nationality) {
-      loadCities(post.location.nationality);
-    }
-  }, [post.location?.nationality, countries]);
-
-  // 국가코드를 현재 언어의 국가명으로 변환하는 함수
-  const translateCountry = (countryCode: string): string => {
-    if (!countryCode) return '';
-    
-    // 기본값들은 그대로 반환 (번역하지 않음)
-    if (countryCode === '위치 미상' || countryCode === '사용자') {
-      return countryCode;
-    }
-    
-    const country = countries.find(c => c.code === countryCode);
-    return country?.names[currentLanguage] || country?.names['en'] || countryCode;
-  };
-
-  // 도시코드를 현재 언어의 도시명으로 변환하는 함수
-  const translateCity = (cityCode: string): string => {
-    if (!cityCode) return '';
-    
-    const city = cities.find(c => c.code === cityCode);
-    return city?.names[currentLanguage] || city?.names['en'] || cityCode;
-  };
-
-  // 게시물 위치 정보를 번역하는 함수
-  const translatePostLocation = (postLocation: any): string => {
-    if (!postLocation) return '';
-    
-    // 국가/도시 코드가 있으면 번역하여 표시
-    if (postLocation.nationality && postLocation.city) {
-      const countryName = translateCountry(postLocation.nationality);
-      const cityName = translateCity(postLocation.city);
-      return `${countryName} · ${cityName}`;
-    }
-    
-    // 장소명이 있으면 그대로 표시
-    if (postLocation.name) {
-      return postLocation.name;
-    }
-    
-    // 기본값 없음
-    return '';
-  };
+  // translatePostLocation은 훅에서 제공됨
 
   // 성별을 현재 언어로 번역하는 함수
   const translateGender = (gender: string): string => {
@@ -240,87 +155,17 @@ const PostCardComponent: React.FC<PostCardProps> = ({
     return 0;
   };
 
-  // 🚀 이미지 URL 추출 (useMemo로 최적화 - 무한 렌더링 방지)
-  const imageUrls = useMemo(() => {
-    if (post.images && post.images.length > 0) {
-      return post.images.map(img => {
-        // tr:n-ik_ml_thumbnail 파라미터 제거하여 일관성 있는 URL 생성
-        let cleanUrl = img.url;
-        if (cleanUrl.includes('tr:n-ik_ml_thumbnail')) {
-          cleanUrl = cleanUrl.replace('tr:n-ik_ml_thumbnail/', '');
-        }
-        return cleanUrl;
-      });
-    }
-    return [];
-  }, [post.images]); // post.images가 변경될 때만 재계산
+  // 🚀 이미지 URL 정리 (공통 유틸)
+  const imageUrls = useMemo(() => buildImageUrls(post.images as any), [post.images]);
 
 
-  // 🚀 스크롤 위치 확인 함수 (useCallback으로 최적화 - 무한 렌더링 방지)
-  const checkScrollPosition = useCallback(() => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-        setSliderState({
-          canScrollLeft: scrollLeft > 0,
-          canScrollRight: scrollLeft < scrollWidth - clientWidth - 1
-        });
-      }
-    } catch (error) {
-      // 오류 무시 - 개발 환경에서만 발생하는 문제
-      console.warn('Scroll position check failed:', error);
-    }
-  }, []); // 의존성 없음 (sliderRef는 ref이므로 안정적)
+  // (슬라이더 로직은 PostMedia로 이동)
 
-  // 🚀 슬라이더 스크롤 함수 (useCallback으로 최적화)
-  const scrollSlider = useCallback((direction: 'left' | 'right') => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        // 반응형: 컨테이너 너비에 따라 스크롤 양 결정
-        const containerWidth = sliderRef.current.offsetWidth;
-        const scrollAmount = containerWidth;
-        const currentScroll = sliderRef.current.scrollLeft;
-        const targetScroll = direction === 'left' 
-          ? currentScroll - scrollAmount 
-          : currentScroll + scrollAmount;
-        
-        sliderRef.current.scrollTo({
-          left: targetScroll,
-          behavior: 'smooth'
-        });
-        
-        // 스크롤 후 상태 업데이트 (컴포넌트가 여전히 마운트되어 있는지 확인)
-        const timeoutId = setTimeout(() => {
-          try {
-            if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-              checkScrollPosition();
-            }
-          } catch (error) {
-            console.warn('Scroll timeout callback failed:', error);
-          }
-        }, 300);
-        
-        return () => clearTimeout(timeoutId);
-      }
-    } catch (error) {
-      console.warn('Scroll slider failed:', error);
-    }
-  }, [checkScrollPosition]); // checkScrollPosition에 의존
-
-  // 🚀 컴포넌트 마운트 시 스크롤 상태 초기화 (최적화된 의존성)
-  useEffect(() => {
-    checkScrollPosition();
-  }, [checkScrollPosition, imageUrls.length]); // 배열 길이만 체크하여 안정성 확보
-
-  // 🚀 이미지 프리로딩 (빠른 로딩을 위해)
-  // 🚀 이미지 프리로딩 최적화 (첫 번째 이미지만 우선 로드)
+  // 🚀 첫 이미지 초저해상 프리로드 (LQIP 느낌)
   useEffect(() => {
     if (imageUrls.length > 0) {
-      // 첫 번째 이미지만 우선 로드 (성능 최적화)
-      const firstImageUrl = `${imageUrls[0]}?width=200&height=200&fit=cover&quality=100`;
-      bunnyService.preloadImages([firstImageUrl]).catch(error => {
-        console.warn('이미지 프리로딩 실패:', error);
-      });
+      const firstImageUrl = `${imageUrls[0]}?width=60&height=60&fit=cover&quality=30`;
+      bunnyService.preloadImages([firstImageUrl]).catch(() => {});
     }
   }, [imageUrls]);
 
@@ -403,40 +248,7 @@ const PostCardComponent: React.FC<PostCardProps> = ({
     router.push(`/post/${post.id}`);
   }, [post.id, router]);
 
-  // dot indicator 클릭 핸들러
-  const handleDotClick = useCallback((index: number) => {
-    try {
-      if (isMountedRef.current) {
-        setCurrentSlideIndex(index);
-        if (sliderRef.current && sliderRef.current.parentNode) {
-          const slider = sliderRef.current;
-          // 반응형: 컨테이너 너비에 따라 아이템 너비 계산
-          const itemWidth = slider.offsetWidth;
-          slider.scrollTo({
-            left: itemWidth * index,
-            behavior: 'smooth'
-          });
-        }
-      }
-    } catch (error) {
-      console.warn('Dot click handler failed:', error);
-    }
-  }, []);
-
-  // 슬라이더 스크롤 시 현재 인덱스 업데이트
-  const handleSliderScroll = useCallback(() => {
-    try {
-      if (isMountedRef.current && sliderRef.current && sliderRef.current.parentNode) {
-        const slider = sliderRef.current;
-        // 반응형: 컨테이너 너비에 따라 아이템 너비 계산
-        const itemWidth = slider.offsetWidth;
-        const currentIndex = Math.round(slider.scrollLeft / itemWidth);
-        setCurrentSlideIndex(currentIndex);
-      }
-    } catch (error) {
-      console.warn('Slider scroll handler failed:', error);
-    }
-  }, []);
+  // (indicator/scroll 핸들러는 PostMedia 내부로 위임)
 
 
   // 프로필 클릭 핸들러 (프로필 페이지로 이동)
@@ -536,257 +348,45 @@ const PostCardComponent: React.FC<PostCardProps> = ({
     }
   }, [onDelete, post.id]);
 
-  // 단일 이미지 렌더링
-  const renderSingleImage = () => (
-    <>
-      <div className={`${styles.cardImage} ${styles.singleImage}`}>
-        <img 
-          src={`${imageUrls[0]}?width=400&height=400&fit=cover&quality=100`} 
-          alt="게시물 이미지"
-          loading={aboveTheFold ? "eager" : "lazy"}
-          decoding="async"
-          fetchPriority={aboveTheFold ? "high" : "auto"}
-          onClick={handleImageClick}
-          style={{ cursor: 'pointer' }}
-          onError={(e) => {
-            try {
-              const target = e.currentTarget;
-              if (target && target.parentNode && isMountedRef.current) {
-                target.style.display = 'none';
-                const nextSibling = target.nextElementSibling as HTMLElement;
-                if (nextSibling && nextSibling.parentNode) {
-                  nextSibling.style.display = 'flex';
-                }
-              }
-            } catch (error) {
-              // 오류 무시 - 개발 환경에서만 발생하는 문제
-              console.warn('Image error handling failed:', error);
-            }
-          }}
-        />
-        <div className={styles.imagePlaceholder} style={{ display: 'none' }}>
-          📷
-        </div>
-      </div>
-      {/* Dot Indicator - 단일 이미지 밖에 표시 */}
-      <div className={styles.dotIndicator}>
-        <div className={`${styles.dot} ${styles.active}`}></div>
-      </div>
-    </>
-  );
-
-
-  // 다중 이미지 슬라이더 렌더링
-  const renderImageSlider = () => (
-    <>
-      <div className={styles.imageSliderContainer}>
-        <button 
-          className={`${styles.sliderArrow} ${styles.left} ${!sliderState.canScrollLeft ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('left')}
-          aria-label="이전 이미지"
-        >
-          ‹
-        </button>
-        <div 
-          className={`${styles.cardImage} ${styles.imageSlider}`} 
-          ref={sliderRef}
-          onScroll={() => {
-            checkScrollPosition();
-            handleSliderScroll();
-          }}
-        >
-          {imageUrls.map((imageUrl, index) => (
-            <div key={index} className={styles.imageItem}>
-              <img 
-                src={`${imageUrl}?width=400&height=400&fit=cover&quality=100`} 
-                alt={`게시물 이미지 ${index + 1}`}
-                loading={index < 1 && aboveTheFold ? "eager" : "lazy"}
-                decoding="async"
-                fetchPriority={index < 1 && aboveTheFold ? "high" : "auto"}
-                onClick={handleImageClick}
-                style={{ cursor: 'pointer' }}
-                onError={(e) => {
-                  try {
-                    const target = e.currentTarget;
-                    if (target && target.parentNode && isMountedRef.current) {
-                      target.style.display = 'none';
-                      const nextSibling = target.nextElementSibling as HTMLElement;
-                      if (nextSibling && nextSibling.parentNode) {
-                        nextSibling.style.display = 'flex';
-                      }
-                    }
-                  } catch (error) {
-                    // 오류 무시 - 개발 환경에서만 발생하는 문제
-                    console.warn('Image error handling failed:', error);
-                  }
-                }}
-              />
-              <div className={styles.imagePlaceholder} style={{ display: 'none' }}>
-                📷
-              </div>
-            </div>
-          ))}
-        </div>
-        <button 
-          className={`${styles.sliderArrow} ${styles.right} ${!sliderState.canScrollRight ? styles.hidden : ''}`}
-          onClick={() => scrollSlider('right')}
-          aria-label="다음 이미지"
-        >
-          ›
-        </button>
-      </div>
-      {/* Dot Indicator - 이미지 슬라이더 컨테이너 밖에 표시 */}
-      <div className={styles.dotIndicator}>
-        {imageUrls.map((_, index) => (
-          <div
-            key={index}
-            className={`${styles.dot} ${index === currentSlideIndex ? styles.active : ''}`}
-            onClick={() => handleDotClick(index)}
-          />
-        ))}
-      </div>
-    </>
-  );
+  // 공통 미디어 섹션에 전달할 데이터 구성
+  const mediaImages = useMemo(() => imageUrls.map(url => ({ url })), [imageUrls]);
+  // 이미지가 많은 카드에서 첫 장만 먼저 렌더하도록 슬라이스 (초기 페인트)
+  const fastImages = useMemo(() => {
+    return aboveTheFold ? mediaImages : mediaImages.slice(0, 1);
+  }, [mediaImages, aboveTheFold]);
 
   return (
     <div className={styles[cardClassName] || styles.contentCard}>
-      {/* 카드 헤더 */}
-      <div className={styles.cardHeader}>
-        {showUserInfo && (
-          <div className={styles.userInfo} onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
-            <div className={styles.userAvatar}>
-              {userInfo.photoUrl || userInfo.profileImage ? (
-                <img src={userInfo.photoUrl || userInfo.profileImage} alt={userInfo.name} />
-              ) : (
-                <span>{userInfo.name.charAt(0)}</span>
-              )}
-            </div>
-            <div className={styles.userDetails}>
-              <div className={styles.userName}>{userInfo.name}</div>
-              {translatePostLocation(post.location) && (
-                <div className={styles.userLocation}>
-                  <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
-                  <span className={styles.locationText}>
-                    {translatePostLocation(post.location)}
-                  </span>
-                </div>
-              )}
-            </div>
-            
-          </div>
-        )}
-        
-        {/* user-info가 숨겨졌을 때 place-name을 상단에 표시 */}
-        {!showUserInfo && post.location && (
-          <div className={styles.headerPlaceName}>
-            <img src="/assets/location.svg" alt="위치" className={styles.locationIcon} />
-            {post.location.name}
-          </div>
-        )}
+      <PostHeader 
+        styles={styles}
+        post={post}
+        userInfo={userInfo}
+        showUserInfo={showUserInfo}
+        showSettings={showSettings}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onProfileClick={handleProfileClick}
+        translatePostLocation={translatePostLocation}
+      />
 
+      <PostMedia 
+        styles={styles}
+        images={fastImages}
+        onClickImage={handleImageClick}
+        aboveTheFold={aboveTheFold}
+      />
 
-
-        {/* 설정 메뉴 (본인 게시물인 경우에만 표시) */}
-        {showSettings && (
-          <div className={styles.settingsMenuContainer}>
-            <button 
-              className={styles.settingsBtn}
-              onClick={handleSettingsToggle}
-              title="설정"
-            >
-              ⋯
-            </button>
-            
-            {showSettingsMenu && (
-              <div className={styles.settingsDropdown}>
-                <button className={styles.settingsOption} onClick={handleEditClick}>
-                  수정하기
-                </button>
-                <button className={`${styles.settingsOption} ${styles.delete}`} onClick={handleDeleteClick}>
-                  삭제하기
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 이미지 영역 */}
-      {(() => {
-        if (imageUrls.length === 0) {
-          return (
-            <div className={`${styles.cardImage} ${styles.singleImage}`}>
-              <div className={styles.imagePlaceholder}>
-                📷
-              </div>
-            </div>
-          );
-        } else if (imageUrls.length === 1) {
-          return renderSingleImage();
-        } else {
-          return renderImageSlider();
-        }
-      })()}
-
-      {/* 카드 푸터 */}
-      <div className={styles.cardFooter}>
-        {/* 액션 버튼들 - 찜(왼쪽)과 공유하기(오른쪽) */}
-        <div className={styles.actionButtonsRow}>
-          <button 
-            className={`${styles.actionBtn} ${isLiked ? styles.liked : ''}`}
-            onClick={handleLikeToggle}
-            disabled={isLoading}
-          >
-            <span className={styles.actionIcon}>
-              <img 
-                src={isLiked ? "/icons/like_active.svg" : "/icons/like.svg"} 
-                alt={isLiked ? "좋아요 취소" : "좋아요"}
-                width="20"
-                height="20"
-              />
-            </span>
-            <span className={styles.actionCount}>{likesCount}</span>
-          </button>
-          
-          <button 
-            className={`${styles.actionBtn} ${styles.shareBtn} ${showShareMenu ? styles.active : ''}`}
-            onClick={handleShareToggle}
-          >
-            <span className={styles.actionIcon}>
-              <img 
-                src={showShareMenu ? "/icons/share_active.svg" : "/icons/share.svg"} 
-                alt="공유하기"
-                width="20"
-                height="20"
-              />
-            </span>
-          </button>
-        </div>
-        
-        {/* 공유 메뉴 */}
-        {showShareMenu && (
-          <div className={styles.shareMenu}>
-            <button onClick={() => handleShare('copy')} className={styles.shareOption}>
-              📋 {t('copyLink') || '링크 복사'}
-            </button>
-            <button onClick={() => handleShare('facebook')} className={styles.shareOption}>
-              📘 Facebook
-            </button>
-            <button onClick={() => handleShare('twitter')} className={styles.shareOption}>
-              🐦 Twitter
-            </button>
-            <button onClick={() => handleShare('whatsapp')} className={styles.shareOption}>
-              📱 WhatsApp
-            </button>
-          </div>
-        )}
-
-        {/* 날짜 표시 - 푸터 맨 아래 오른쪽 */}
-        <div className={styles.dateContainer}>
-          <span className={styles.dateBadge}>{formatDate(post.createdAt)}</span>
-        </div>
-
-      </div>
+      <PostFooter 
+        styles={styles}
+        isLiked={isLiked}
+        likesCount={likesCount}
+        isLoading={isLoading}
+        showShareMenu={showShareMenu}
+        onToggleLike={handleLikeToggle}
+        onToggleShare={handleShareToggle}
+        onShare={handleShare}
+        dateText={formatPostDate(post.createdAt, t)}
+      />
 
     </div>
   );

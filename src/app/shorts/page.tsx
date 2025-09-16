@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
+import Hls from 'hls.js';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PostData, getPosts } from '../services/postService';
 import { getDocs, collection } from 'firebase/firestore';
@@ -260,7 +261,7 @@ function ShortsContent() {
 
   const getVideoThumbnail = (post: PostData) => {
     if (post.video?.urls?.thumbnail) {
-      return `${post.video.urls.thumbnail}?tr=w-400,h-600,c-maintain_ratio`;
+      return post.video.urls.thumbnail;
     }
     return post.video?.url || '';
   };
@@ -268,6 +269,36 @@ function ShortsContent() {
   const getVideoUrl = (post: PostData) => {
     return post.video?.urls?.original || post.video?.url || '';
   };
+
+  // 현재 인덱스 비디오에 HLS 붙이기
+  useEffect(() => {
+    const post = videoPosts[currentIndex];
+    if (!post) return;
+    const url = getVideoUrl(post);
+    const videoEl = videoRefs.current[post.id || ''];
+    if (!videoEl || !url) return;
+
+    let hls: Hls | null = null;
+    const isHls = url.endsWith('.m3u8');
+
+    if (isHls) {
+      if (Hls.isSupported()) {
+        hls = new Hls({ maxBufferLength: 10 });
+        hls.loadSource(url);
+        hls.attachMedia(videoEl);
+      } else if (videoEl.canPlayType('application/vnd.apple.mpegURL')) {
+        videoEl.src = url;
+      }
+    } else {
+      videoEl.src = url;
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [currentIndex, videoPosts]);
 
   // 모바일에서는 앱바 숨김
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
@@ -351,12 +382,7 @@ function ShortsContent() {
                     loop
                     playsInline
                     autoPlay={index === currentIndex}
-                  >
-                    <source src={getVideoUrl(post)} type="video/mp4" />
-                    <source src={getVideoUrl(post)} type="video/webm" />
-                    <source src={getVideoUrl(post)} type="video/ogg" />
-                    브라우저가 동영상을 지원하지 않습니다.
-                  </video>
+                  />
                   {/* 터치 피드백 버튼 */}
                   {showPlayButton && index === currentIndex && (
                     <div className={styles.playButton}>

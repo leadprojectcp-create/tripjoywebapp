@@ -25,6 +25,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        {/* 성능: 인증/파이어스토어로의 초기 연결 지연 감소 */}
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
         <script
           src="https://developers.kakao.com/sdk/js/kakao.js"
           async

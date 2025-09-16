@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { auth } from '../services/firebase';
+import { db } from '../services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { signInWithEmail, getUserData, signOut } from '../auth/services/authService';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -26,39 +28,35 @@ interface UserData {
   };
 }
 
-// API로 사용자 데이터 가져오기
-const getUserDataViaAPI = async (uid: string): Promise<UserData | null> => {
+// Firestore에서 사용자 데이터 가져오기 (accounts:lookup 호출 회피)
+const getUserDataFromFirestore = async (uid: string): Promise<UserData | null> => {
   try {
-    console.log('🔍 API로 사용자 데이터 확인:', uid);
-    
-    const response = await fetch('/api/auth/user-management', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'check-user', uid })
-    });
-    
-    if (!response.ok) {
-      console.error('❌ 사용자 확인 API 실패:', response.status);
-      return null;
-    }
-    
-    const result = await response.json();
-    console.log('✅ 사용자 확인 API 결과:', result);
-    
-    if (result.exists && result.data) {
-      return result.data as UserData;
-    }
-    
-    return null;
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (!snap.exists()) return null;
+    const data = snap.data() as any;
+    return {
+      id: uid,
+      uid,
+      email: data.email || '',
+      name: data.name,
+      phoneNumber: data.phoneNumber,
+      birthDate: data.birthDate,
+      gender: data.gender,
+      location: data.location,
+      signupMethod: data.signupMethod,
+      isTemporary: data.isTemporary,
+      consents: data.consents
+    } as UserData;
   } catch (error) {
-    console.error('❌ 사용자 확인 오류:', error);
+    console.error('❌ Firestore 사용자 조회 실패:', error);
     return null;
   }
 };
 
 export const useAuth = () => {
   const [user, setUser] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // 초기 렌더 차단 방지를 위해 false로 시작 (콘텐츠 선렌더링)
+  const [isLoading, setIsLoading] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const router = useRouter();
 
@@ -77,12 +75,14 @@ export const useAuth = () => {
 
 
 
-    // Firebase Auth 상태 변경 감지
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    // Firebase Auth 상태 변경 감지 (초기 렌더 우선, 경로에 따라 지연 시작)
+    let unsubscribe: (() => void) | null = null;
+    const startAuthListener = () => {
+      unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // API로 사용자 정보 가져오기
-          const userData = await getUserDataViaAPI(firebaseUser.uid);
+          // Firestore로 사용자 정보 가져오기 (빠르고 계정조회 호출 없음)
+          const userData = await getUserDataFromFirestore(firebaseUser.uid);
           
           // 사용자 데이터 완성도 검사
           const isCompleteUser = userData && 
@@ -185,7 +185,7 @@ export const useAuth = () => {
           if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
             // 에러 케이스도 실제 Firestore 데이터 다시 확인
             try {
-              const realUserData = await getUserDataViaAPI(firebaseUser.uid);
+              const realUserData = await getUserDataFromFirestore(firebaseUser.uid);
               
               if (realUserData) {
                 
@@ -227,9 +227,26 @@ export const useAuth = () => {
       }
       setIsLoading(false);
     });
+    };
+
+    const path = typeof window !== 'undefined' ? window.location.pathname : '';
+    const isDashboardFirstLoad = path === '/' || path === '/dashboard';
+    if (isDashboardFirstLoad && typeof window !== 'undefined') {
+      const start = () => startAuthListener();
+      window.addEventListener('load', start, { once: true });
+      // 보장 타임아웃 (이미지 onload 이전에 지연이 너무 길면 1800ms에 시작)
+      setTimeout(() => {
+        try { start(); } catch {}
+      }, 1800);
+    } else if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      // @ts-ignore
+      window.requestIdleCallback(startAuthListener, { timeout: 600 });
+    } else {
+      setTimeout(startAuthListener, 200);
+    }
 
     return () => {
-      unsubscribe();
+      try { unsubscribe && unsubscribe(); } catch {}
     };
   }, []);
 

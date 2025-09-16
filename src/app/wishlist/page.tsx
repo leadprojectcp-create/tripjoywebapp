@@ -7,7 +7,7 @@ import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
 import { PostCard } from "../components/PostCard";
 import { useTranslationContext } from "../contexts/TranslationContext";
-import { getUserLikedPosts } from "../services/interactionService";
+import { getUserLikedPosts } from "../components/post-hooks/usePostInteractions";
 import { PostData } from "../services/postService";
 import { getUserData } from "../auth/services/authService";
 import styles from "./page.module.css";
