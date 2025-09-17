@@ -41,21 +41,11 @@ export const AppBar = ({
   };
 
   // 로그인이 필요한 페이지들
-  const requiresAuth = (path: string) => {
-    const authRequiredPaths = ['/wishlist', '/profile', '/chat', '/post-upload'];
-    return authRequiredPaths.includes(path);
-  };
-
-  // 메뉴 클릭 핸들러 (로그인 체크 포함)
+  // 메뉴 클릭 핸들러 (AuthGuard에서 로그인 체크 처리)
   const handleAuthRequiredMenuClick = (path: string) => {
-    if (requiresAuth(path) && !isAuthenticated) {
-      // 로그인이 필요한 페이지인데 로그인하지 않은 경우
-      router.push('/auth/login');
-    } else {
-      // 로그인이 필요없거나 이미 로그인된 경우
-      setIsMenuOpen(false);
-      router.push(path);
-    }
+    // AuthGuard에서 로그인 체크를 처리하므로 여기서는 단순히 페이지 이동만
+    setIsMenuOpen(false);
+    router.push(path);
   };
 
 

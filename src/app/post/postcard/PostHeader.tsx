@@ -3,7 +3,7 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { PostData } from '../../services/postService';
 import { useTranslationContext } from '../../contexts/TranslationContext';
-import styles from './PostCard.module.css';
+import styles from './postcard.module.css';
 
 interface PostHeaderProps {
   post: PostData;

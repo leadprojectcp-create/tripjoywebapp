@@ -96,7 +96,7 @@
 .trending-section {
   display: flex;
   flex-direction: column;
-  align-items: center; /* 전체 섹션을 가운데 정렬 */
+  align-items: flex-start; /* 전체 섹션을 왼쪽 정렬 */
 }
 
 .trending-section h2 {
@@ -169,7 +169,7 @@
     grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
     justify-items: stretch; /* 카드들이 전체 너비 사용 */
     width: 100%; /* 전체 너비 */
-    gap: 8px; /* 카드 간격 줄임 */
+    gap: 20px; /* 카드 간격 줄임 */
   }
   
   .top-section {
@@ -259,13 +259,6 @@
     box-sizing: border-box;
   }
   
-  .content-grid {
-    grid-template-columns: 1fr; /* 모바일에서는 한 개씩 */
-    justify-items: stretch; /* 카드들이 전체 너비 사용 */
-    width: 100%; /* 전체 너비 */
-    gap: 8px; /* 카드 간격 줄임 */
-  }
-  
   .main-title {
     font-size: 24px;
     /* PC에서는 클릭 불가 */
@@ -343,7 +336,7 @@
 @media (max-width: 480px) {
   .main-content {
     margin-left: 0; /* 모바일에서는 사이드바 없음 */
-    padding: 16px;
+    padding: 8px;
   }
   
   .popular-destinations {

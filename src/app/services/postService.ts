@@ -62,6 +62,7 @@ export interface PostData {
   businessHours?: string;
   recommendedMenu?: string;
   paymentMethod?: string;
+  postType?: string; // 'Local' 또는 'Traveler'
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
@@ -96,6 +97,7 @@ export const createPost = async (
   businessHours?: string,
   recommendedMenu?: string,
   paymentMethod?: string,
+  postType?: string,
   onProgress?: (progress: number) => void
 ): Promise<string> => {
   try {
@@ -198,6 +200,7 @@ export const createPost = async (
       businessHours: businessHours || '',
       recommendedMenu: recommendedMenu || '',
       paymentMethod: paymentMethod || '',
+      postType: postType || 'Traveler', // 포스트 타입 (현지인/여행자)
       createdAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       updatedAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       likeCount: 0, // 좋아요 카운트
@@ -346,6 +349,7 @@ export const getPosts = async (
         })) : [],
         video: data.video || null,
         location: data.location,
+        postType: data.postType, // postType 필드 추가
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
@@ -401,6 +405,7 @@ export const searchPostsByHashtag = async (
         images: data.images || [],
         video: data.video || null,
         location: data.location,
+        postType: data.postType, // postType 필드 추가
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
@@ -449,6 +454,7 @@ export const searchPostsByLocation = async (
         images: data.images || [],
         video: data.video || null,
         location: data.location,
+        postType: data.postType, // postType 필드 추가
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
@@ -496,6 +502,7 @@ export const getPostsByCountry = async (
         images: data.images || [],
         video: data.video || null,
         location: data.location,
+        postType: data.postType, // postType 필드 추가
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
@@ -514,6 +521,64 @@ export const getPostsByCountry = async (
     return posts;
   } catch (error) {
     console.error('국가별 게시물 조회 실패:', error);
+    throw error;
+  }
+};
+
+/**
+ * 위도/경도로 게시물 검색
+ */
+export const getPostsByLocation = async (
+  lat: number,
+  lng: number,
+  limitCount: number = 20,
+  currentUserId?: string
+): Promise<PostData[]> => {
+  try {
+    // Firestore는 복합 쿼리를 지원하지 않으므로, 모든 게시물을 가져와서 필터링
+    const q = query(
+      collection(db, 'posts'),
+      where('isVisible', '==', true),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount * 3) // 더 많이 가져와서 필터링
+    );
+
+    const querySnapshot = await getDocs(q);
+    const posts: PostData[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      
+      // 위도/경도가 일치하는 게시물만 필터링
+      if (data.location?.coordinates?.lat === lat && 
+          data.location?.coordinates?.lng === lng) {
+        posts.push({
+          id: doc.id,
+          userId: data.userId,
+          content: data.content,
+          images: data.images || [],
+          video: data.video || null,
+          location: data.location,
+          postType: data.postType,
+          createdAt: data.createdAt,
+          likeCount: data.likeCount || 0,
+          bookmarkCount: data.bookmarkCount || 0,
+          likedBy: data.likedBy || {},
+          bookmarkedBy: data.bookmarkedBy || {},
+          comments: data.comments || 0,
+          isVisible: data.isVisible,
+          isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
+          isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
+        } as PostData);
+      }
+    });
+
+    // 제한된 수만큼만 반환
+    const limitedPosts = posts.slice(0, limitCount);
+    console.log(`📍 위치(${lat}, ${lng})의 게시물 ${limitedPosts.length}개 조회됨`);
+    return limitedPosts;
+  } catch (error) {
+    console.error('Error fetching posts by location:', error);
     throw error;
   }
 };
@@ -549,6 +614,7 @@ export const getPostsByCity = async (
         images: data.images || [],
         video: data.video || null,
         location: data.location,
+        postType: data.postType, // postType 필드 추가
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
@@ -691,6 +757,7 @@ export const updatePost = async (
   businessHours?: string,
   recommendedMenu?: string,
   paymentMethod?: string,
+  postType?: string,
 ): Promise<boolean> => {
   try {
     console.log('📝 게시물 업데이트 시작:', postId);
@@ -756,6 +823,7 @@ export const updatePost = async (
       businessHours: businessHours || '',
       recommendedMenu: recommendedMenu || '',
       paymentMethod: paymentMethod || '',
+      postType: postType || 'Traveler', // 포스트 타입 (현지인/여행자)
       updatedAt: serverTimestamp() // Firestore 서버 타임스탬프 사용
     };
 

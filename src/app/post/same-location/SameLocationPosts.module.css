@@ -1,0 +1,195 @@
+.container {
+  width: 100%;
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid #E5E5E5;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1B1C1F;
+  margin-bottom: 24px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #7059FA;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.postsWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.postsSlider {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 4px 0;
+  scroll-snap-type: x mandatory;
+}
+
+.postsSlider::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.postItem {
+  flex: 0 0 calc(50% - 10px);
+  width: calc(50% - 10px);
+  min-width: 400px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  scroll-snap-align: start;
+}
+
+/* 카드 사이 구분선 - 짝수 번째 카드(2, 4, 6...)의 왼쪽에 표시 */
+.postItem:nth-child(even)::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: #E5E5E5;
+  z-index: 1;
+}
+
+/* 페이지 인디케이터 */
+.pageIndicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* 페이지 화살표 버튼 */
+.pageArrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #E5E5E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.pageArrow:hover:not(:disabled) {
+  background: #F7F7F7;
+  border-color: #7059FA;
+}
+
+.pageArrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageArrow svg {
+  width: 16px;
+  height: 16px;
+  color: #4E5968;
+}
+
+.pageArrow:hover:not(:disabled) svg {
+  color: #7059FA;
+}
+
+.pageDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E5E5E5;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.pageDot:hover {
+  background: #C4C4C4;
+}
+
+.pageDotActive {
+  width: 24px;
+  border-radius: 4px;
+  background: #7059FA;
+}
+
+.pageDotActive:hover {
+  background: #7059FA;
+}
+
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .container {
+    margin-top: 40px;
+    padding-top: 24px;
+  }
+  
+  .title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .postsSlider {
+    gap: 12px;
+  }
+  
+  .postItem {
+    flex: 0 0 calc(100% - 20px);
+    width: calc(100% - 20px);
+    min-width: 280px;
+    scroll-snap-align: center;
+  }
+  
+  /* 모바일에서는 구분선 제거 */
+  .postItem:nth-child(even)::before {
+    display: none;
+  }
+  
+  .pageIndicator {
+    margin-top: 16px;
+  }
+  
+  .pageArrow {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .pageArrow svg {
+    width: 14px;
+    height: 14px;
+  }
+}

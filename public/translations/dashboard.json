@@ -117,13 +117,13 @@
     "fil": "Mga post mula sa napiling lokasyon"
   },
   "popularPosts": {
-    "ko": "인기 게시물",
-    "en": "Popular Posts", 
-    "vi": "Bài đăng phổ biến",
-    "zh": "热门帖子",
-    "ja": "人気投稿",
-    "th": "โพสต์ยอดนิยม",
-    "fil": "Mga sikat na post"
+    "ko": "지금 뜨는 게시물",
+    "en": "Trending Posts Now", 
+    "vi": "Bài đăng đang thịnh hành",
+    "zh": "现在热门帖子",
+    "ja": "今話題の投稿",
+    "th": "โพสต์ที่กำลังฮิตตอนนี้",
+    "fil": "Mga trending na post ngayon"
   },
   "allCountries": {
     "ko": "전체 국가",
@@ -470,5 +470,41 @@
       "th": "ฟิลิปปินส์",
       "fil": "Pilipinas"
     }
+  },
+  "local": {
+    "ko": "현지인 추천",
+    "en": "Local Recommendation",
+    "vi": "Đề xuất của người địa phương",
+    "zh": "当地人推荐",
+    "ja": "現地人おすすめ",
+    "th": "แนะนำโดยคนท้องถิ่น",
+    "fil": "Inirerekomenda ng mga Lokal"
+  },
+  "traveler": {
+    "ko": "여행자 추천",
+    "en": "Traveler Recommendation",
+    "vi": "Đề xuất của du khách",
+    "zh": "旅行者推荐",
+    "ja": "旅行者おすすめ",
+    "th": "แนะนำโดยนักท่องเที่ยว",
+    "fil": "Inirerekomenda ng mga Manlalakbay"
+  },
+  "sameLocationPosts": {
+    "ko": "이 장소와 같은 게시물",
+    "en": "Posts from the same location",
+    "vi": "Bài viết từ cùng địa điểm",
+    "zh": "同一地点的帖子",
+    "ja": "同じ場所の投稿",
+    "th": "โพสต์จากสถานที่เดียวกัน",
+    "fil": "Mga post mula sa parehong lokasyon"
+  },
+  "nearbyRestaurants": {
+    "ko": "근처 추천 맛집",
+    "en": "Recommended restaurants nearby",
+    "vi": "Nhà hàng được đề xuất gần đây",
+    "zh": "附近推荐餐厅",
+    "ja": "近くのおすすめレストラン",
+    "th": "ร้านอาหารแนะนำใกล้เคียง",
+    "fil": "Mga inirerekomendang restaurant sa malapit"
   }
 }

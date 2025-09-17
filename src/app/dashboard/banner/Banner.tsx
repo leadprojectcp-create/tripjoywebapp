@@ -142,10 +142,10 @@ const BannerSlider: React.FC<BannerSliderProps> = ({
       if (isMobile) {
         const mobileWidth = Math.floor(window.innerWidth * 0.9); // 90% 너비
         const mobileHeight = Math.floor(mobileWidth * 180 / 630); // 630:180 비율
-        return `${url}${separator}width=${mobileWidth}&height=${mobileHeight}&fit=cover&quality=90`;
+        return `${url}${separator}width=${mobileWidth}&height=${mobileHeight}&fit=cover&quality=100`;
       }
       
-      return `${url}${separator}width=630&height=180&fit=cover&quality=90`;
+      return `${url}${separator}width=630&height=180&fit=cover&quality=100`;
     };
 
     return (

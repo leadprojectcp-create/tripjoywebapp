@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Hls from 'hls.js';
 import { useRouter } from 'next/navigation';
 import { useTranslationContext } from '../../contexts/TranslationContext';
@@ -14,15 +14,75 @@ interface VideoSectionProps {
 
 export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache }) => {
   const router = useRouter();
-  const { t } = useTranslationContext();
+  const { t, currentLanguage } = useTranslationContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [countryData, setCountryData] = useState<any[]>([]);
+  const [cityData, setCityData] = useState<any[]>([]);
 
   // video 필드가 있는 게시물만 필터링 (최대 5개)
   const videoPosts = posts
     .filter(post => post.video && (post.video.urls?.thumbnail || post.video.url))
     .slice(0, 5);
+
+  // 국가/도시 데이터 로드
+  useEffect(() => {
+    const loadCountryData = async () => {
+      try {
+        const response = await fetch('/data/countries.json');
+        const data = await response.json();
+        setCountryData(data.countries || []); // countries 배열 추출
+      } catch (error) {
+        console.error('국가 데이터 로드 실패:', error);
+      }
+    };
+
+    const loadCityData = async () => {
+      try {
+        const response = await fetch('/data/cities-kr.json');
+        const data = await response.json();
+        setCityData(data.cities || []); // cities 배열 추출
+      } catch (error) {
+        console.error('도시 데이터 로드 실패:', error);
+      }
+    };
+
+    loadCountryData();
+    loadCityData();
+  }, []);
+
+  // 위치 번역 함수
+  const translatePostLocation = useCallback((post: PostData) => {
+    const nationalityCode = post.location?.nationality;
+    const cityCode = post.location?.city;
+    
+    if (!nationalityCode && !cityCode) return '';
+    
+    // JSON 데이터에서 국가명 가져오기
+    const getCountryName = (code: string) => {
+      const country = countryData.find(c => c.code === code);
+      if (country) {
+        return country.names?.[currentLanguage] || country.names?.['en'] || code;
+      }
+      return code;
+    };
+    
+    // JSON 데이터에서 도시명 가져오기
+    const getCityName = (code: string) => {
+      const city = cityData.find((c: any) => c.code === code);
+      if (city) {
+        return city.names?.[currentLanguage] || city.names?.['en'] || code;
+      }
+      return code;
+    };
+    
+    const parts: string[] = [];
+    if (cityCode) parts.push(getCityName(cityCode));
+    if (nationalityCode) parts.push(getCountryName(nationalityCode));
+    
+    return parts.join(', ');
+  }, [currentLanguage, cityData, countryData]);
 
   // 슬라이드 이동 함수
   const scrollToSlide = (index: number) => {
@@ -142,23 +202,30 @@ export const VideoSection: React.FC<VideoSectionProps> = ({ posts, userInfoCache
 
   return (
     <div className={styles.videoSection}>
-      <h2 className={styles.sectionTitle}>
-        <img src="/icons/play.svg" alt="동영상" width="24" height="24" />
-        {t('localRecommendedTripPlay')}
-      </h2>
       <div className={styles.videoContainer}>
         <div ref={scrollContainerRef} className={styles.videoScrollContainer}>
           {videoPosts.map((post, index) => (
-            <div key={post.id} className={styles.videoCard} onClick={() => handlePostClick(post.id)} onMouseEnter={() => handleMouseEnter(post.id)} onMouseLeave={handleMouseLeave}>
-              <div className={styles.videoWrapper}>
-                <video ref={(el) => { if (post.id) { videoRefs.current[post.id] = el; } }} className={styles.video} poster={getVideoThumbnail(post)} preload="metadata" muted loop playsInline />
-                {hoveredVideo !== post.id && (
-                  <div className={styles.playButton}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                  </div>
-                )}
+            <div key={post.id} className={styles.videoCardContainer}>
+              {/* 위치 정보 표시 - 비디오 카드 밖에 */}
+              {translatePostLocation(post) && (
+                <div className={styles.locationInfo}>
+                  <span className={styles.locationText}>
+                    <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
+                    {translatePostLocation(post)}
+                  </span>
+                </div>
+              )}
+              <div className={styles.videoCard} onClick={() => handlePostClick(post.id)} onMouseEnter={() => handleMouseEnter(post.id)} onMouseLeave={handleMouseLeave}>
+                <div className={styles.videoWrapper}>
+                  <video ref={(el) => { if (post.id) { videoRefs.current[post.id] = el; } }} className={styles.video} poster={getVideoThumbnail(post)} preload="metadata" muted loop playsInline />
+                  {hoveredVideo !== post.id && (
+                    <div className={styles.playButton}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}

@@ -113,60 +113,13 @@ export const useAuth = () => {
             setUser(null); // 로그인 상태로 처리하지 않음
           }
           
-          // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
-          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 이미 위에서 가져온 userData 사용 (중복 API 호출 방지)
-            
-            if (isCompleteUser) {
-              // 완전한 사용자 - 홈으로 이동
-              console.log('✅ 완전한 사용자 - 홈으로 이동');
-              
-              // 앱에 로그인 알림 (앱에서 FCM 토큰 처리)
-              try {
-                const { notifyAppUserLogin } = await import('../services/fcmService');
-                notifyAppUserLogin(firebaseUser.uid);
-              } catch (error) {
-                console.log('📝 앱 알림 실패 (웹 브라우저일 수 있음)');
-              }
-              
-              // 네이티브 앱 환경에서는 자동 리다이렉트 하지 않음 (웹뷰 메시지로 처리)
-              if (window.location.search.includes('app=true') || 
-                  window.navigator.userAgent.includes('ReactNativeWebView')) {
-                console.log('📱 네이티브 앱 환경 - 자동 리다이렉트 건너뜀 (웹뷰 메시지로 처리)');
-                return;
-              }
-              
-              window.location.href = '/';
-            } else {
-              // Firestore에 데이터가 없는 신규 사용자 - 회원가입 플로우 필요
-              console.log('🆕 신규 사용자 - 회원가입 플로우로 이동');
-              
-              // 새 사용자 플래그 확인해서 로그인 방법 판단
-              const kakaoNewUser = localStorage.getItem('kakao_new_user');
-              const googleNewUser = localStorage.getItem('google_new_user');
-              const appleNewUser = localStorage.getItem('apple_new_user');
-              const emailNewUser = localStorage.getItem('email_new_user');
-              
-              let method = 'email';
-              if (kakaoNewUser) method = 'kakao';
-              else if (googleNewUser) method = 'google';  
-              else if (appleNewUser) method = 'apple';
-              else if (emailNewUser) method = 'email';
-              
-              console.log('🔍 회원가입 플로우 진입:', { 
-                method, 
-                uid: firebaseUser.uid,
-                flags: { kakaoNewUser, googleNewUser, appleNewUser, emailNewUser }
-              });
-              
-              // 소셜과 이메일을 완전히 분리
-              if (method === 'email') {
-                // 이메일 가입 플로우 (이메일 입력부터)
-                router.push('/auth/email');
-              } else {
-                // 소셜 가입 플로우 (약관 동의부터)
-                router.push(`/auth/terms?method=${method}&uid=${firebaseUser.uid}`);
-              }
+          // 앱에 로그인 알림 (앱에서 FCM 토큰 처리)
+          if (isCompleteUser) {
+            try {
+              const { notifyAppUserLogin } = await import('../services/fcmService');
+              notifyAppUserLogin(firebaseUser.uid);
+            } catch (error) {
+              console.log('📝 앱 알림 실패 (웹 브라우저일 수 있음)');
             }
           }
         } catch (error) {
@@ -181,50 +134,21 @@ export const useAuth = () => {
           setUser(defaultUserData);
           localStorage.setItem('tripjoy_user', JSON.stringify(defaultUserData));
           
-          // 로그인 성공 시 리다이렉션 처리 (로그인 페이지에 있을 때만)
-          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // 에러 케이스도 실제 Firestore 데이터 다시 확인
-            try {
-              const realUserData = await getUserDataFromFirestore(firebaseUser.uid);
-              
-              if (realUserData) {
-                
-                // 앱에 로그인 알림 (에러 케이스)
-                console.log('🔄 에러 케이스 로그인 성공 - 앱에 사용자 정보 전달');
-                try {
-                  const { notifyAppUserLogin } = await import('../services/fcmService');
-                  notifyAppUserLogin(firebaseUser.uid);
-                } catch (error) {
-                  console.log('📝 에러 케이스 앱 알림 실패 (웹 브라우저일 수 있음)');
-                }
-                
-                window.location.href = '/';
-              } else {
-                console.log('🔄 에러 후 재확인: Firestore에 사용자 데이터 없음 - 회원가입 플로우');
-                
-                // 새 사용자 플래그 확인해서 소셜 로그인인지 판단
-                const kakaoNewUser = localStorage.getItem('kakao_new_user');
-                const googleNewUser = localStorage.getItem('google_new_user');
-                const appleNewUser = localStorage.getItem('apple_new_user');
-                
-                let method = 'email';
-                if (kakaoNewUser) method = 'kakao';
-                else if (googleNewUser) method = 'google';  
-                else if (appleNewUser) method = 'apple';
-                
-                console.log('🔍 회원가입 플로우 진입 (에러 케이스):', { method, uid: firebaseUser.uid });
-                // 새 사용자는 회원가입 플로우 계속 진행 (리다이렉트 안 함)
-              }
-            } catch (retryError) {
-              console.log('⚠️ 재확인도 실패 - 새 사용자로 간주하여 회원가입 플로우 진행');
-              // 재확인도 실패하면 새 사용자로 간주
-            }
+          // 앱에 로그인 알림 (에러 케이스)
+          try {
+            const { notifyAppUserLogin } = await import('../services/fcmService');
+            notifyAppUserLogin(firebaseUser.uid);
+          } catch (error) {
+            console.log('📝 에러 케이스 앱 알림 실패 (웹 브라우저일 수 있음)');
           }
         }
       } else {
         setUser(null);
         localStorage.removeItem('tripjoy_user');
       }
+      
+      // 로그인 체크 완료 후에만 isLoading을 false로 설정
+      console.log('로그인 체크 완료:', { isAuthenticated: !!user, isLoading: false });
       setIsLoading(false);
     });
     };
@@ -235,25 +159,13 @@ export const useAuth = () => {
       return p.startsWith('/post-upload') ||
              p.startsWith('/profile') ||
              p.startsWith('/wishlist') ||
-             p.startsWith('/chat') ||
-             p.startsWith('/post/');
+             p.startsWith('/chat');
     };
 
-    if (typeof window !== 'undefined' && isProtectedPath(path)) {
-      // 보호 라우트에서는 즉시 리스너 시작 (조기 리다이렉트 방지)
+    // 모든 페이지에서 백그라운드 로그인 체크 즉시 시작
+    if (typeof window !== 'undefined') {
+      console.log('백그라운드 로그인 체크 시작:', path);
       startAuthListener();
-    } else if (isDashboardFirstLoad && typeof window !== 'undefined') {
-      const start = () => startAuthListener();
-      window.addEventListener('load', start, { once: true });
-      // 보장 타임아웃 (이미지 onload 이전에 지연이 너무 길면 1800ms에 시작)
-      setTimeout(() => {
-        try { start(); } catch {}
-      }, 1800);
-    } else if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      // @ts-ignore
-      window.requestIdleCallback(startAuthListener, { timeout: 600 });
-    } else {
-      setTimeout(startAuthListener, 200);
     }
 
     return () => {

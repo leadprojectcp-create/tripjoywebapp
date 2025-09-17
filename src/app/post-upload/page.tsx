@@ -13,6 +13,7 @@ import { AppBar } from '../components/AppBar';
 
 import GoogleMapsLocationPicker, { LocationDetails } from '../components/GoogleMapsLocationPicker';
 import PostUploadCountryCitySelector from '../components/PostUploadCountryCitySelector';
+import UploadProgressModal from './UploadProgressModal';
 import styles from './page.module.css';
 
 interface PostData {
@@ -75,10 +76,95 @@ const PostUploadContent: React.FC = () => {
   const [deletedExistingVideo, setDeletedExistingVideo] = useState<string | null>(null); // 삭제된 기존 동영상 URL
   const [existingPost, setExistingPost] = useState<PostServiceData | null>(null); // 기존 게시물 데이터
   const [draftCount, setDraftCount] = useState(0); // 임시저장 카운트
+  const [userLocation, setUserLocation] = useState<{nationality?: string, city?: string} | null>(null); // 사용자 위치 정보
 
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+
+  // 사용자 위치 정보 로드
+  useEffect(() => {
+    const loadUserLocation = async () => {
+      if (!user?.uid) return;
+      
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          console.log('🔍 사용자 데이터 전체:', userData);
+          console.log('🔍 userData.location:', userData.location);
+          
+          setUserLocation({
+            nationality: userData.location, // 문자열 "ko" 직접 사용
+            city: undefined // 사용자 데이터에는 city 정보 없음
+          });
+        }
+      } catch (error) {
+        console.error('사용자 위치 정보 로드 실패:', error);
+      }
+    };
+
+    loadUserLocation();
+  }, [user?.uid]);
+
+  // 포스트 타입 결정 함수 (현지인/여행자)
+  const getPostType = useCallback(async (selectedCountryCode: string, selectedCityCode: string): Promise<string> => {
+    console.log('🔍 getPostType 호출됨:');
+    console.log('  - userLocation:', userLocation);
+    console.log('  - selectedCountryCode:', selectedCountryCode);
+    console.log('  - selectedCityCode:', selectedCityCode);
+    
+    if (!userLocation) {
+      console.log('  - userLocation이 없음, Traveler 반환');
+      return 'Traveler'; // 위치 정보가 없으면 여행자로 기본 설정
+    }
+    
+    try {
+      // countries.json 로드
+      const response = await fetch('/data/countries.json');
+      const data = await response.json();
+      const countries = data.countries || [];
+      
+      // 사용자 국가 정보 찾기
+      console.log('  - countries 배열:', countries);
+      console.log('  - userLocation.nationality:', userLocation.nationality);
+      
+      const userCountry = countries.find((country: any) => {
+        const matchName = country.name === userLocation.nationality;
+        const matchCode = country.code === userLocation.nationality;
+        console.log(`    - ${country.name}(${country.code}): name=${matchName}, code=${matchCode}`);
+        return matchName || matchCode;
+      });
+      
+      // 선택한 국가 정보 찾기
+      console.log('  - selectedCountryCode:', selectedCountryCode);
+      const selectedCountry = countries.find((country: any) => {
+        const match = country.code === selectedCountryCode;
+        console.log(`    - ${country.name}(${country.code}): match=${match}`);
+        return match;
+      });
+      
+      console.log('  - userCountry:', userCountry);
+      console.log('  - selectedCountry:', selectedCountry);
+      
+      if (!userCountry || !selectedCountry) {
+        console.log('  - 국가 정보를 찾을 수 없음, Traveler 반환');
+        return 'Traveler';
+      }
+      
+      // 국가 코드로 비교
+      const isSameCountry = userCountry.code === selectedCountry.code;
+      console.log('  - isSameCountry:', isSameCountry, '(userCountry.code:', userCountry.code, '=== selectedCountry.code:', selectedCountry.code, ')');
+      
+      const result = isSameCountry ? 'Local' : 'Traveler';
+      console.log('  - 국가 비교 결과:', result);
+      return result;
+      
+    } catch (error) {
+      console.error('  - 국가 정보 로드 실패:', error);
+      return 'Traveler';
+    }
+  }, [userLocation]);
 
   // 수정 모드일 때 기존 게시물 데이터 로드
   useEffect(() => {
@@ -404,9 +490,9 @@ const PostUploadContent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // AuthGuard에서 로그인 체크를 처리하므로 여기서는 단순히 제출만
     if (!user?.uid) {
       alert('로그인이 필요합니다.');
-      router.push('/auth/login');
       return;
     }
 
@@ -417,6 +503,13 @@ const PostUploadContent: React.FC = () => {
 
     if (postData.images.length === 0 && previewImages.length === 0) {
       alert(t('mediaRequired'));
+      return;
+    }
+
+    // 최소 3장 이상 이미지 검증
+    const totalImages = postData.images.length + previewImages.length;
+    if (totalImages < 3) {
+      alert('사진은 최소 3장 이상 업로드해야 등록할 수 있어요.');
       return;
     }
 
@@ -456,6 +549,10 @@ const PostUploadContent: React.FC = () => {
         console.log('📷 남은 기존 이미지:', remainingExistingImages.length, '개');
         console.log('🖼️ 새 이미지:', newImages?.length || 0, '개');
         
+        // 포스트 타입 결정 (현지인/여행자)
+        const postType = await getPostType(postData.countryCode, postData.cityCode);
+        console.log('📝 포스트 타입 (수정):', postType, '선택한 위치:', postData.countryCode, postData.cityCode, '사용자 위치:', userLocation);
+        
         const success = await updatePost(
           editPostId,
           user.uid,
@@ -469,7 +566,8 @@ const PostUploadContent: React.FC = () => {
           existingPost?.video, // 기존 동영상
           postData.businessHours,
           postData.recommendedMenu,
-          postData.paymentMethod
+          postData.paymentMethod,
+          postType // 포스트 타입 추가
         );
 
         if (success) {
@@ -497,6 +595,9 @@ const PostUploadContent: React.FC = () => {
           .filter(img => !img.isExisting && img.file)
           .map(img => img.file!);
         
+        // 포스트 타입 결정 (현지인/여행자)
+        const postType = await getPostType(postData.countryCode, postData.cityCode);
+        console.log('📝 포스트 타입:', postType, '선택한 위치:', postData.countryCode, postData.cityCode, '사용자 위치:', userLocation);
 
         const postId = await createPost(
           user.uid,
@@ -511,6 +612,7 @@ const PostUploadContent: React.FC = () => {
           postData.businessHours,
           postData.recommendedMenu,
           postData.paymentMethod,
+          postType, // 포스트 타입 추가
           (progress: number) => {
             setUploadProgress(progress);
           }
@@ -811,35 +913,21 @@ const PostUploadContent: React.FC = () => {
                 className={styles['submit-btn']}
                 disabled={isUploading}
               >
-                {isUploading 
-                  ? `${isEditMode ? '수정' : '업로드'} 중... ${uploadProgress.toFixed(0)}%` 
-                  : isEditMode ? '게시물 수정' : t('createPost')
-                }
+                {isEditMode ? '게시물 수정' : t('createPost')}
               </button>
-              
-              {/* 업로드 진행률 표시 */}
-              {isUploading && (
-                <div className={styles['upload-progress']}>
-                  <div className={styles['progress-bar']}>
-                    <div 
-                      className={styles['progress-fill']}
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                  <div className={styles['progress-text']}>
-                    {uploadProgress < 80 
-                      ? '이미지 업로드 중...' 
-                      : uploadProgress < 95 
-                      ? '게시물 저장 중...' 
-                      : '완료 중...'}
-                  </div>
-                </div>
-              )}
             </div>
           </form>
           </div>
         </div>
       </div>
+      
+      {/* 업로드 진행 상태 모달 */}
+      <UploadProgressModal
+        isVisible={isUploading}
+        progress={uploadProgress}
+        images={previewImages.map(img => img.url).filter(Boolean)}
+        message={isEditMode ? '게시물을 수정하고 있습니다...' : '게시물을 업로드하고 있습니다...'}
+      />
     </AuthGuard>
   );
 };

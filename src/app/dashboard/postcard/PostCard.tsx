@@ -37,11 +37,28 @@ export const PostCard: React.FC<PostCardProps> = ({
   const [countryData, setCountryData] = useState<any[]>([]);
 
   const imageUrls = useMemo(() => (post.images || []).map((i: any) => i.url || i.urls?.original).filter(Boolean), [post.images]);
-  const mediaImages = useMemo(() => imageUrls.map(url => ({ url })), [imageUrls]);
+  const mediaImages = useMemo(() => {
+    const result = [];
+    if (imageUrls[0]) result.push({ url: imageUrls[0] });
+    // video는 별도 필드, urls.thumbnail로 접근
+    if (post.video && (post.video as any).urls?.thumbnail) {
+      result.push({ url: (post.video as any).urls.thumbnail, isVideo: true });
+    } else if (post.video && (post.video as any).thumbnail) {
+      result.push({ url: (post.video as any).thumbnail, isVideo: true });
+    }
+    for (let i = 1; i < imageUrls.length; i++) {
+      result.push({ url: imageUrls[i] });
+    }
+    return result;
+  }, [imageUrls, post.video]);
 
   const handleImageClick = useCallback(() => {
     if (post.id) router.push(`/post/${post.id}`);
   }, [post.id, router]);
+
+  const handleProfileClick = useCallback(() => {
+    if (post.userId) router.push(`/profile?userId=${post.userId}`);
+  }, [post.userId, router]);
 
   // 국가 데이터 로드
   useEffect(() => {
@@ -131,6 +148,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         userInfo={userInfo}
         showUserInfo={showUserInfo}
         showSettings={false}
+        onProfileClick={handleProfileClick}
         translatePostLocation={translatePostLocation}
       />
 
