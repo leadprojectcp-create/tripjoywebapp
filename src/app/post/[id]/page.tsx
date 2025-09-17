@@ -26,6 +26,8 @@ import { PostMedia } from '../postcard/PostMedia';
 import { PostFooter } from '../postcard/PostFooter';
 import { SameLocationPosts } from '../same-location/SameLocationPosts';
 import { NearbyRestaurants } from '../nearby-restaurants/NearbyRestaurants';
+import { CommentPopup } from '../comments/CommentPopup';
+import { getCommentCount } from '../../services/commentService';
 
 import styles from './page.module.css';
 import postcardStyles from '../postcard/postcard.module.css';
@@ -76,7 +78,9 @@ export default function PostDetailPage() {
   }, [post?.location, translatePostLocationRaw]);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarksCount, setBookmarksCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showCommentPopup, setShowCommentPopup] = useState(false);
   const [isLoadingInteraction, setIsLoadingInteraction] = useState(false);
   const [isTranslated, setIsTranslated] = useState(false);
   const [translatedContent, setTranslatedContent] = useState<string>('');
@@ -113,6 +117,15 @@ export default function PostDetailPage() {
         // 상호작용 상태 초기화
         setLikesCount(postData.likeCount || 0);
         setBookmarksCount(postData.bookmarkCount || 0);
+        setCommentsCount(postData.comments || 0);
+        
+        // 댓글 수 가져오기
+        try {
+          const count = await getCommentCount(postId);
+          setCommentsCount(count);
+        } catch (error) {
+          console.error('Failed to get comment count:', error);
+        }
 
         // 작성자 정보 가져오기
         if (postData.userId) {
@@ -482,10 +495,12 @@ export default function PostDetailPage() {
                       <PostFooter
                         isLiked={isLiked}
                         likesCount={likesCount}
+                        commentsCount={commentsCount}
                         isLoading={isLoadingInteraction}
                         showShareMenu={showShareMenu}
                         onToggleLike={handleLikeToggle}
                         onToggleShare={handleShareToggle}
+                        onToggleComment={() => setShowCommentPopup(true)}
                         onShare={handleShare}
                       />
                       
@@ -518,7 +533,7 @@ export default function PostDetailPage() {
                             onClick={handleToggleTranslate}
                             disabled={isContentTranslating}
                           >
-                            {isContentTranslating ? '번역 중...' : (isTranslated ? '원문 보기' : '번역하기')}
+                            {isContentTranslating ? t('translating') : (isTranslated ? t('showOriginal') : t('translate'))}
                           </button>
                           <span className={postcardStyles.postDate}>
                             {post.createdAt ? getRelativeTime(post.createdAt.toDate ? post.createdAt.toDate() : post.createdAt) : ''}
@@ -566,6 +581,14 @@ export default function PostDetailPage() {
         
         {/* Mobile Bottom Navigator */}
         <BottomNavigator />
+        
+        {/* Comment Popup */}
+        <CommentPopup
+          postId={postId}
+          isOpen={showCommentPopup}
+          onClose={() => setShowCommentPopup(false)}
+          onCommentCountUpdate={setCommentsCount}
+        />
       </ClientStyleProvider>
     
   );

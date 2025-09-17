@@ -506,5 +506,203 @@
     "ja": "近くのおすすめレストラン",
     "th": "ร้านอาหารแนะนำใกล้เคียง",
     "fil": "Mga inirerekomendang restaurant sa malapit"
+  },
+  "commentTitle": {
+    "ko": "댓글",
+    "en": "Comments",
+    "vi": "Bình luận",
+    "zh": "评论",
+    "ja": "コメント",
+    "th": "ความคิดเห็น",
+    "fil": "Mga Komento"
+  },
+  "commentLoading": {
+    "ko": "댓글을 불러오는 중...",
+    "en": "Loading comments...",
+    "vi": "Đang tải bình luận...",
+    "zh": "正在加载评论...",
+    "ja": "コメントを読み込み中...",
+    "th": "กำลังโหลดความคิดเห็น...",
+    "fil": "Naglo-load ng mga komento..."
+  },
+  "commentEmpty": {
+    "ko": "첫 번째 댓글을 작성해보세요!",
+    "en": "Be the first to comment!",
+    "vi": "Hãy là người đầu tiên bình luận!",
+    "zh": "成为第一个评论的人！",
+    "ja": "最初のコメントを書いてください！",
+    "th": "เป็นคนแรกที่แสดงความคิดเห็น!",
+    "fil": "Maging una na magkomento!"
+  },
+  "commentPlaceholder": {
+    "ko": "댓글을 입력하세요...",
+    "en": "Write a comment...",
+    "vi": "Viết bình luận...",
+    "zh": "写评论...",
+    "ja": "コメントを書く...",
+    "th": "เขียนความคิดเห็น...",
+    "fil": "Sumulat ng komento..."
+  },
+  "commentSubmit": {
+    "ko": "작성",
+    "en": "Post",
+    "vi": "Đăng",
+    "zh": "发布",
+    "ja": "投稿",
+    "th": "โพสต์",
+    "fil": "I-post"
+  },
+  "commentSubmitting": {
+    "ko": "작성 중...",
+    "en": "Posting...",
+    "vi": "Đang đăng...",
+    "zh": "发布中...",
+    "ja": "投稿中...",
+    "th": "กำลังโพสต์...",
+    "fil": "Nag-po-post..."
+  },
+  "commentEdit": {
+    "ko": "수정",
+    "en": "Edit",
+    "vi": "Chỉnh sửa",
+    "zh": "编辑",
+    "ja": "編集",
+    "th": "แก้ไข",
+    "fil": "I-edit"
+  },
+  "commentDelete": {
+    "ko": "삭제",
+    "en": "Delete",
+    "vi": "Xóa",
+    "zh": "删除",
+    "ja": "削除",
+    "th": "ลบ",
+    "fil": "Tanggalin"
+  },
+  "commentSave": {
+    "ko": "저장",
+    "en": "Save",
+    "vi": "Lưu",
+    "zh": "保存",
+    "ja": "保存",
+    "th": "บันทึก",
+    "fil": "I-save"
+  },
+  "commentCancel": {
+    "ko": "취소",
+    "en": "Cancel",
+    "vi": "Hủy",
+    "zh": "取消",
+    "ja": "キャンセル",
+    "th": "ยกเลิก",
+    "fil": "Kanselahin"
+  },
+  "commentConfirmDelete": {
+    "ko": "이 댓글을 삭제하시겠습니까?",
+    "en": "Are you sure you want to delete this comment?",
+    "vi": "Bạn có chắc chắn muốn xóa bình luận này?",
+    "zh": "您确定要删除此评论吗？",
+    "ja": "このコメントを削除してもよろしいですか？",
+    "th": "คุณแน่ใจหรือไม่ว่าต้องการลบความคิดเห็นนี้?",
+    "fil": "Sigurado ka bang gusto mong tanggalin ang komentong ito?"
+  },
+  "commentLoginRequired": {
+    "ko": "댓글을 작성하려면 로그인이 필요합니다.",
+    "en": "Please log in to comment.",
+    "vi": "Vui lòng đăng nhập để bình luận.",
+    "zh": "请登录以发表评论。",
+    "ja": "コメントするにはログインしてください。",
+    "th": "กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น",
+    "fil": "Mag-log in upang magkomento."
+  },
+  "commentJustNow": {
+    "ko": "방금 전",
+    "en": "Just now",
+    "vi": "Vừa xong",
+    "zh": "刚刚",
+    "ja": "たった今",
+    "th": "เมื่อสักครู่",
+    "fil": "Ngayon lang"
+  },
+  "commentMinutesAgo": {
+    "ko": "{{count}}분 전",
+    "en": "{{count}} minutes ago",
+    "vi": "{{count}} phút trước",
+    "zh": "{{count}}分钟前",
+    "ja": "{{count}}分前",
+    "th": "{{count}} นาทีที่แล้ว",
+    "fil": "{{count}} minuto ang nakalipas"
+  },
+  "commentHoursAgo": {
+    "ko": "{{count}}시간 전",
+    "en": "{{count}} hours ago",
+    "vi": "{{count}} giờ trước",
+    "zh": "{{count}}小时前",
+    "ja": "{{count}}時間前",
+    "th": "{{count}} ชั่วโมงที่แล้ว",
+    "fil": "{{count}} oras ang nakalipas"
+  },
+  "commentDaysAgo": {
+    "ko": "{{count}}일 전",
+    "en": "{{count}} days ago",
+    "vi": "{{count}} ngày trước",
+    "zh": "{{count}}天前",
+    "ja": "{{count}}日前",
+    "th": "{{count}} วันที่แล้ว",
+    "fil": "{{count}} araw ang nakalipas"
+  },
+  "commentErrorSubmit": {
+    "ko": "댓글 작성에 실패했습니다. 다시 시도해주세요.",
+    "en": "Failed to post comment. Please try again.",
+    "vi": "Không thể đăng bình luận. Vui lòng thử lại.",
+    "zh": "发表评论失败。请再试一次。",
+    "ja": "コメントの投稿に失敗しました。もう一度お試しください。",
+    "th": "ไม่สามารถโพสต์ความคิดเห็นได้ กรุณาลองอีกครั้ง",
+    "fil": "Nabigong mag-post ng komento. Pakisubukan muli."
+  },
+  "commentErrorDelete": {
+    "ko": "댓글 삭제에 실패했습니다. 다시 시도해주세요.",
+    "en": "Failed to delete comment. Please try again.",
+    "vi": "Không thể xóa bình luận. Vui lòng thử lại.",
+    "zh": "删除评论失败。请再试一次。",
+    "ja": "コメントの削除に失敗しました。もう一度お試しください。",
+    "th": "ไม่สามารถลบความคิดเห็นได้ กรุณาลองอีกครั้ง",
+    "fil": "Nabigong tanggalin ang komento. Pakisubukan muli."
+  },
+  "commentErrorUpdate": {
+    "ko": "댓글 수정에 실패했습니다. 다시 시도해주세요.",
+    "en": "Failed to update comment. Please try again.",
+    "vi": "Không thể cập nhật bình luận. Vui lòng thử lại.",
+    "zh": "更新评论失败。请再试一次。",
+    "ja": "コメントの更新に失敗しました。もう一度お試しください。",
+    "th": "ไม่สามารถอัปเดตความคิดเห็นได้ กรุณาลองอีกครั้ง",
+    "fil": "Nabigong i-update ang komento. Pakisubukan muli."
+  },
+  "translate": {
+    "ko": "번역하기",
+    "en": "Translate",
+    "vi": "Dịch",
+    "zh": "翻译",
+    "ja": "翻訳",
+    "th": "แปล",
+    "fil": "Isalin"
+  },
+  "translating": {
+    "ko": "번역 중...",
+    "en": "Translating...",
+    "vi": "Đang dịch...",
+    "zh": "翻译中...",
+    "ja": "翻訳中...",
+    "th": "กำลังแปล...",
+    "fil": "Nagsasalin..."
+  },
+  "showOriginal": {
+    "ko": "원문 보기",
+    "en": "Show Original",
+    "vi": "Xem bản gốc",
+    "zh": "查看原文",
+    "ja": "原文を見る",
+    "th": "ดูต้นฉบับ",
+    "fil": "Ipakita ang Orihinal"
   }
 }

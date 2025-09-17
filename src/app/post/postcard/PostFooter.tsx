@@ -6,20 +6,24 @@ import styles from './postcard.module.css';
 interface PostFooterProps {
   isLiked: boolean;
   likesCount: number;
+  commentsCount?: number;
   isLoading?: boolean;
   showShareMenu: boolean;
   onToggleLike: () => void;
   onToggleShare: () => void;
+  onToggleComment?: () => void;
   onShare: (type: 'copy' | 'facebook' | 'twitter' | 'whatsapp') => void;
 }
 
 export const PostFooter: React.FC<PostFooterProps> = ({
   isLiked,
   likesCount,
+  commentsCount = 0,
   isLoading = false,
   showShareMenu,
   onToggleLike,
   onToggleShare,
+  onToggleComment,
   onShare
 }) => {
   return (
@@ -39,6 +43,21 @@ export const PostFooter: React.FC<PostFooterProps> = ({
             />
           </span>
           <span className={styles.actionCount}>{likesCount}</span>
+        </button>
+
+        <button 
+          className={styles.actionBtn}
+          onClick={onToggleComment}
+        >
+          <span className={styles.actionIcon}>
+            <img 
+              src="/icons/comment.svg" 
+              alt="댓글"
+              width="20"
+              height="20"
+            />
+          </span>
+          <span className={styles.actionCount}>{commentsCount}</span>
         </button>
 
         <button 

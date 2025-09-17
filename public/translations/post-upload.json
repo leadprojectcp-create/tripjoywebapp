@@ -54,13 +54,13 @@
     "fil": "Ang lapad ng larawan ay dapat na hindi bababa sa 300px"
   },
   "imageUploadHint": {
-    "ko": "사진은 최소 3장 이상 업로드해야 등록할 수 있어요. (가로 300px 이상, 최대 10장)",
-    "en": "You must upload at least 3 photos to register. (At least 300px wide, maximum 10 photos)",
-    "vi": "Bạn phải tải lên ít nhất 3 ảnh để đăng ký. (Ít nhất 300px rộng, tối đa 10 ảnh)",
-    "zh": "您必须上传至少3张照片才能注册。(至少300px宽，最多10张照片)",
-    "ja": "登録するには最低3枚の写真をアップロードする必要があります。(幅300px以上、最大10枚)",
-    "th": "คุณต้องอัปโหลดรูปภาพอย่างน้อย 3 รูปเพื่อลงทะเบียน (กว้างอย่างน้อย 300px สูงสุด 10 รูป)",
-    "fil": "Dapat kang mag-upload ng hindi bababa sa 3 larawan upang makapag-register. (Hindi bababa sa 300px ang lapad, hanggang 10 larawan)"
+    "ko": "사진은 최소 4장 이상 업로드해야 등록할 수 있어요. (가로 300px 이상, 최대 10장)",
+    "en": "You must upload at least 4 photos to register. (At least 300px wide, maximum 10 photos)",
+    "vi": "Bạn phải tải lên ít nhất 4 ảnh để đăng ký. (Ít nhất 300px rộng, tối đa 10 ảnh)",
+    "zh": "您必须上传至少4张照片才能注册。(至少300px宽，最多10张照片)",
+    "ja": "登録するには最低4枚の写真をアップロードする必要があります。(幅300px以上、最大10枚)",
+    "th": "คุณต้องอัปโหลดรูปภาพอย่างน้อย 4 รูปเพื่อลงทะเบียน (กว้างอย่างน้อย 300px สูงสุด 10 รูป)",
+    "fil": "Dapat kang mag-upload ng hindi bababa sa 4 larawan upang makapag-register. (Hindi bababa sa 300px ang lapad, hanggang 10 larawan)"
   },
   "addImage": {
     "ko": "사진 추가",

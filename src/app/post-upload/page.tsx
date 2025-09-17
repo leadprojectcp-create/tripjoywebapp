@@ -508,8 +508,8 @@ const PostUploadContent: React.FC = () => {
 
     // 최소 3장 이상 이미지 검증
     const totalImages = postData.images.length + previewImages.length;
-    if (totalImages < 3) {
-      alert('사진은 최소 3장 이상 업로드해야 등록할 수 있어요.');
+    if (totalImages < 4) {
+      alert('사진은 최소 4장 이상 업로드해야 등록할 수 있어요.');
       return;
     }
 
