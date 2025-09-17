@@ -44,8 +44,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   // States
   const [countries, setCountries] = useState<Country[]>([]);
   const [cities, setCities] = useState<City[]>([]);
-  const [loadingCountries, setLoadingCountries] = useState(true);
-  const [loadingCities, setLoadingCities] = useState(false);
   const [currentCountry, setCurrentCountry] = useState(selectedCountry);
   const [currentCity, setCurrentCity] = useState(selectedCity);
 
@@ -92,8 +90,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   const [tempSelectedCity, setTempSelectedCity] = useState(selectedCity);
   const [modalCountries, setModalCountries] = useState<Country[]>([]);
   const [modalCities, setModalCities] = useState<City[]>([]);
-  const [loadingModalCountries, setLoadingModalCountries] = useState(false);
-  const [loadingModalCities, setLoadingModalCities] = useState(false);
 
   // 모바일 감지
   useEffect(() => {
@@ -116,8 +112,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
         setCountries(data.countries || []);
       } catch (error) {
         console.error('❌ 국가 데이터 로드 실패:', error);
-      } finally {
-        setLoadingCountries(false);
       }
     };
 
@@ -132,7 +126,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
         return;
       }
 
-      setLoadingCities(true);
       try {
         // Map country names to file names
         const countryFileMap: Record<string, string> = {
@@ -158,8 +151,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
       } catch (error) {
         console.error('❌ 도시 데이터 로드 실패:', error);
         setCities([]);
-      } finally {
-        setLoadingCities(false);
       }
     };
 
@@ -259,15 +250,12 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
 
 
   const loadModalCountries = async () => {
-    setLoadingModalCountries(true);
     try {
       const response = await fetch('/data/countries.json');
       const data = await response.json();
       setModalCountries(data.countries || []);
     } catch (error) {
       console.error('❌ Modal 국가 데이터 로드 실패:', error);
-    } finally {
-      setLoadingModalCountries(false);
     }
   };
 
@@ -277,7 +265,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
       return;
     }
 
-    setLoadingModalCities(true);
     try {
       const selectedCountryData = modalCountries.find(c => c.code === countryCode);
       if (!selectedCountryData) return;
@@ -296,8 +283,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
     } catch (error) {
       console.error('❌ Modal 도시 데이터 로드 실패:', error);
       setModalCities([]);
-    } finally {
-      setLoadingModalCities(false);
     }
   };
 
@@ -414,35 +399,31 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
               <div className={styles['modal-section']}>
                 <h4 className={styles['modal-section-title']}>{t('allCountries')}</h4>
                 <div className={styles['modal-list']}>
-                  {loadingModalCountries ? (
-                    <div className={styles['modal-loading']}>{t('loading')}</div>
-                  ) : (
-                    <>
+                  <>
+                    <button
+                      className={`${styles['modal-list-item']} ${tempSelectedCountry === '' ? styles['selected'] : ''}`}
+                      onClick={() => handleTempCountrySelect('')}
+                    >
+                      <div className={styles['modal-list-item-content']}>
+                        <span className={styles['modal-list-left']}>전체</span>
+                      </div>
+                      <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
+                    </button>
+                    {modalCountries.map((country) => (
                       <button
-                        className={`${styles['modal-list-item']} ${tempSelectedCountry === '' ? styles['selected'] : ''}`}
-                        onClick={() => handleTempCountrySelect('')}
+                        key={country.code}
+                        className={`${styles['modal-list-item']} ${tempSelectedCountry === country.code ? styles['selected'] : ''}`}
+                        onClick={() => handleTempCountrySelect(country.code)}
                       >
                         <div className={styles['modal-list-item-content']}>
-                          <span className={styles['modal-list-left']}>전체</span>
+                          <span className={styles['modal-list-left']}>
+                            {getCountryFlag(country.code)} {country.names[currentLanguage] || country.names['en']}
+                          </span>
                         </div>
                         <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
                       </button>
-                      {modalCountries.map((country) => (
-                        <button
-                          key={country.code}
-                          className={`${styles['modal-list-item']} ${tempSelectedCountry === country.code ? styles['selected'] : ''}`}
-                          onClick={() => handleTempCountrySelect(country.code)}
-                        >
-                          <div className={styles['modal-list-item-content']}>
-                            <span className={styles['modal-list-left']}>
-                              {getCountryFlag(country.code)} {country.names[currentLanguage] || country.names['en']}
-                            </span>
-                          </div>
-                          <img src="/icons/check.svg" alt="selected" width={24} height={24} className={styles['check-icon']}/>
-                        </button>
-                      ))}
-                    </>
-                  )}
+                    ))}
+                  </>
                 </div>
               </div>
               
@@ -451,8 +432,6 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
                 <div className={styles['modal-list']}>
                   {!tempSelectedCountry ? (
                     <div className={styles['modal-placeholder']}>{t('selectCountryFirst')}</div>
-                  ) : loadingModalCities ? (
-                    <div className={styles['modal-loading']}>{t('loading')}</div>
                   ) : (
                     <>
                       <button

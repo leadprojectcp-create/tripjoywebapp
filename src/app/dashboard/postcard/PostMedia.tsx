@@ -109,7 +109,7 @@ export const PostMedia: React.FC<PostMediaProps> = ({
           onClick={() => handleScroll('left')}
           style={{
             position: 'absolute',
-            left: '0',
+            left: '-15px',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 2,
@@ -135,7 +135,7 @@ export const PostMedia: React.FC<PostMediaProps> = ({
           onClick={() => handleScroll('right')}
           style={{
             position: 'absolute',
-            right: '0',
+            right: '-15px',
             top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 2,

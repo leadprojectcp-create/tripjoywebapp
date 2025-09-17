@@ -160,7 +160,7 @@ export default function FAQPage() {
                 {loading ? (
                   <div className="faq-loading">
                     <div className="loading-spinner"></div>
-                    <p>{t('loading')}</p>
+                    <p>{t('loadingFaq')}</p>
                   </div>
                 ) : faqs.length === 0 ? (
                   <div className="faq-empty">
