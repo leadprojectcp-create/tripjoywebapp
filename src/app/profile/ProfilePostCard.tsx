@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { PostData } from '../services/postService';
 import { useTranslationContext } from '../contexts/TranslationContext';
 import { useAuthContext } from '../contexts/AuthContext';
-import { toggleLike, checkLikeStatus } from './post-hooks/usePostInteractions';
+import { toggleLike, checkLikeStatus } from '../components/post-hooks/usePostInteractions';
 import { bunnyService } from '../services/bunnyService';
 import styles from './ProfilePostCard.module.css';
 import { PostHeader } from '../dashboard/postcard/PostHeader';
 import { PostMedia } from '../dashboard/postcard/PostMedia';
-import { PostFooter } from '../dashboard/postcard/PostFooter';
-import { usePostLocationTranslations, buildImageUrls, formatPostDate } from './post-hooks/usePostData';
+import { PostFooter } from '../post/postcard/PostFooter';
+import { usePostLocationTranslations, buildImageUrls, formatPostDate } from '../components/post-hooks/usePostData';
 
 interface ProfilePostCardProps {
   post: PostData;
@@ -31,6 +31,7 @@ interface ProfilePostCardProps {
   showSettings?: boolean; // 설정 메뉴 표시 여부
   onEdit?: (postId: string) => void; // 수정 콜백
   onDelete?: (postId: string) => void; // 삭제 콜백
+  onCommentClick?: (postId: string) => void; // 댓글 클릭 콜백
 }
 
 export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({ 
@@ -41,7 +42,8 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   onInteractionChange,
   showSettings = false,
   onEdit,
-  onDelete
+  onDelete,
+  onCommentClick
 }) => {
   const { t, currentLanguage } = useTranslationContext();
   const { user } = useAuthContext();
@@ -50,9 +52,9 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   // (슬라이더 상태는 공통 미디어 섹션으로 위임)
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likeCount || 0);
+  const [commentsCount, setCommentsCount] = useState(post.comments || 0);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const isMountedRef = useRef(true);
@@ -252,7 +254,6 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
       // 컴포넌트 언마운트 시 상태 초기화
       isMountedRef.current = false;
       setShowShareMenu(false);
-      setShowSettingsMenu(false);
     };
   }, []);
 
@@ -306,6 +307,13 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
   const handleShareToggle = useCallback(() => {
     setShowShareMenu(!showShareMenu);
   }, [showShareMenu]);
+
+  // 댓글 팝업 토글 핸들러
+  const handleCommentToggle = useCallback(() => {
+    if (onCommentClick) {
+      onCommentClick(post.id || '');
+    }
+  }, [onCommentClick, post.id]);
 
   // 공유하기 핸들러
   const handleShare = useCallback(async (type: 'copy' | 'facebook' | 'twitter' | 'whatsapp') => {
@@ -401,109 +409,40 @@ export const ProfilePostCard: React.FC<ProfilePostCardProps> = ({
     return date.toLocaleDateString();
   };
 
-  // 설정 메뉴 토글 핸들러
-  const handleSettingsToggle = useCallback(() => {
-    setShowSettingsMenu(!showSettingsMenu);
-  }, [showSettingsMenu]);
-
-  // 수정 핸들러
-  const handleEditClick = useCallback(() => {
-    setShowSettingsMenu(false);
-    if (onEdit && post.id) {
-      onEdit(post.id);
-    }
-  }, [onEdit, post.id]);
-
-  // 삭제 핸들러
-  const handleDeleteClick = useCallback(() => {
-    setShowSettingsMenu(false);
-    if (onDelete && post.id) {
-      onDelete(post.id);
-    }
-  }, [onDelete, post.id]);
 
   const mediaImages = useMemo(() => imageUrls.map(url => ({ url })), [imageUrls]);
 
   return (
     <div className={styles[cardClassName] || styles.contentCard}>
-      {/* 카드 헤더 */}
-      <div className={styles.cardHeader}>
-        {showUserInfo && (
-          <div className={styles.userInfo} onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
-            <div className={styles.userAvatar}>
-              {userInfo.photoUrl || userInfo.profileImage ? (
-                <img src={userInfo.photoUrl || userInfo.profileImage} alt={userInfo.name} />
-              ) : (
-                <span>{userInfo.name.charAt(0)}</span>
-              )}
-            </div>
-            <div className={styles.userDetails}>
-              <div className={styles.userName}>{userInfo.name}</div>
-              {translatePostLocation(post.location) && (
-                <div className={styles.userLocation}>
-                  <img src="/icons/location_pin.svg" alt="위치" className={styles.locationIcon} />
-                  <span className={styles.locationText}>
-                    {translatePostLocation(post.location)}
-                  </span>
-                </div>
-              )}
-            </div>
-            
-          </div>
-        )}
-        
-        {/* user-info가 숨겨졌을 때 place-name을 상단에 표시 */}
-        {!showUserInfo && post.location && (
-          <div className={styles.headerPlaceName}>
-            <img src="/assets/location.svg" alt="위치" className={styles.locationIcon} />
-            {post.location.name}
-          </div>
-        )}
-
-
-
-        {/* 설정 메뉴 (본인 게시물인 경우에만 표시) */}
-        {showSettings && (
-          <div className={styles.settingsMenuContainer}>
-            <button 
-              className={styles.settingsBtn}
-              onClick={handleSettingsToggle}
-              title="설정"
-            >
-              ⋯
-            </button>
-            
-            {showSettingsMenu && (
-              <div className={styles.settingsDropdown}>
-                <button className={styles.settingsOption} onClick={handleEditClick}>
-                  수정하기
-                </button>
-                <button className={`${styles.settingsOption} ${styles.delete}`} onClick={handleDeleteClick}>
-                  삭제하기
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <PostHeader
+        post={post}
+        userInfo={userInfo}
+        showUserInfo={showUserInfo}
+        showSettings={showSettings}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onProfileClick={handleProfileClick}
+        translatePostLocation={() => translatePostLocation(post.location)}
+      />
 
       <PostMedia 
-        styles={styles}
         images={mediaImages}
         onClickImage={handleImageClick}
+        aboveTheFold={false}
+        gridCount={4}
       />
 
       {/* 카드 푸터 */}
       <PostFooter 
-        styles={styles}
         isLiked={isLiked}
         likesCount={likesCount}
+        commentsCount={commentsCount}
         isLoading={isLoading}
         showShareMenu={showShareMenu}
         onToggleLike={handleLikeToggle}
         onToggleShare={handleShareToggle}
+        onToggleComment={handleCommentToggle}
         onShare={handleShare}
-        dateText={formatPostDate(post.createdAt, t)}
       />
 
     </div>

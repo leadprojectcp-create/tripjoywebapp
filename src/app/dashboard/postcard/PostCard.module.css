@@ -1,6 +1,6 @@
 /* PostCard 전용 대시보드 스타일 */
 
-/* 미디어 컨테이너 (4칸 그리드) */
+/* 미디어 컨테이너 (4칸 그리드) - PC 기본 스타일 */
 .mediaGrid {
   width: 630px;
   display: grid;
@@ -8,6 +8,7 @@
   gap: 4px;
 }
 
+/* PC에서 미디어 슬롯 기본 스타일 */
 .mediaSlot {
   width: 154px;
   height: 205px;
@@ -36,24 +37,127 @@
   display: block;
 }
 
+/* 미디어 이미지에도 border-radius 적용 */
+.mediaSlot:first-child .mediaImage {
+  border-radius: 8px 0 0 8px;
+}
+
+.mediaSlot:last-child .mediaImage {
+  border-radius: 0 8px 8px 0;
+}
+
+/* 추가적인 border-radius 적용 */
+.mediaSlot:first-child img {
+  border-radius: 8px 0 0 8px;
+}
+
+.mediaSlot:last-child img {
+  border-radius: 0 8px 8px 0;
+}
+
+/* PC 기본 카드 스타일 */
+.contentCard {
+  width: 630px;
+  max-width: 630px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* 기존 단일/슬라이더 컨테이너 폭만 고정 */
-.cardImage.singleImage { width: 630px; height: auto; position: relative; }
-.cardImage.imageSlider { width: 630px; height: auto; }
+.cardImage.singleImage { 
+  width: 630px; 
+  height: auto; 
+  position: relative; 
+}
+
+.cardImage.imageSlider { 
+  width: 630px; 
+  height: auto; 
+}
 
 /* ===== 헤더 영역 (사용자 정보) ===== */
-.cardHeader { display: flex; justify-content: space-between; align-items: center; padding: 0 0 8px 0; }
-.userInfo { display: flex; align-items: center; gap: 10px; }
-.userAvatar { width: 40px; height: 40px; border-radius: 50%; background: #f1f3f5; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-.userAvatar img { width: 100%; height: 100%; object-fit: cover; }
-.userDetails { display: flex; flex-direction: column; }
-.userName { font-size: 16px; font-weight: 700; color: #1B1C1F; line-height: 1.2; }
-.userLocation { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
-.locationIcon { width: 12px; height: 12px; }
-.locationText { font-size: 12px; color: #4E5968; font-weight: 600; }
-.headerPlaceName { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; font-weight: 600; }
+.cardHeader { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 0 0 8px 0; 
+}
+
+.userInfo { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+}
+
+.userAvatar { 
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%; 
+  background: #f1f3f5; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  overflow: hidden; 
+  flex-shrink: 0; 
+}
+
+.userAvatar img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.userDetails { 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.userName { 
+  font-size: 16px; 
+  font-weight: 700; 
+  color: #1B1C1F; 
+  line-height: 1.2; 
+}
+
+.userLocation { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  margin-top: 2px; 
+}
+
+.locationIcon { 
+  width: 12px; 
+  height: 12px; 
+  flex-shrink: 0;
+}
+
+.locationText { 
+  font-size: 12px; 
+  color: #4E5968; 
+  font-weight: 600; 
+}
+
+.headerPlaceName { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  font-size: 14px; 
+  color: #333; 
+  font-weight: 600; 
+}
 
 /* 헤더 오른쪽 영역 */
-.headerRight { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.headerRight { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  margin-left: auto; 
+}
+
 .postType { 
   font-size: 13px; 
   font-weight: 600; 
@@ -79,76 +183,267 @@
 .travelerType {
   color: #4E5968;
 }
-.settingsMenuContainer { position: relative; }
-.settingsBtn { background: none; border: none; font-size: 20px; font-weight: bold; cursor: pointer; padding: 6px; border-radius: 50%; color: #657786; }
-.settingsBtn:hover { background: rgba(0,0,0,0.06); color: #14171a; }
-.settingsDropdown { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e1e8ed; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 120px; overflow: hidden; }
-.settingsOption { display: block; width: 100%; padding: 10px 14px; background: none; border: none; text-align: left; cursor: pointer; font-size: 14px; color: #14171a; }
-.settingsOption:hover { background: #f7f9fa; }
-.settingsOption.delete { color: #e0245e; }
-.settingsOption.delete:hover { background: #ffeef2; }
+
+.settingsMenuContainer { 
+  position: relative; 
+}
+
+.settingsBtn { 
+  background: none; 
+  border: none; 
+  font-size: 20px; 
+  font-weight: bold; 
+  cursor: pointer; 
+  padding: 6px; 
+  border-radius: 50%; 
+  color: #657786; 
+}
+
+.settingsBtn:hover { 
+  background: rgba(0,0,0,0.06); 
+  color: #14171a; 
+}
+
+.settingsDropdown { 
+  position: absolute; 
+  top: 100%; 
+  right: 0; 
+  background: white; 
+  border: 1px solid #e1e8ed; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+  z-index: 1000; 
+  min-width: 120px; 
+  overflow: hidden; 
+}
+
+.settingsOption { 
+  display: block; 
+  width: 100%; 
+  padding: 10px 14px; 
+  background: none; 
+  border: none; 
+  text-align: left; 
+  cursor: pointer; 
+  font-size: 14px; 
+  color: #14171a; 
+}
+
+.settingsOption:hover { 
+  background: #f7f9fa; 
+}
+
+.settingsOption.delete { 
+  color: #e0245e; 
+}
+
+.settingsOption.delete:hover { 
+  background: #ffeef2; 
+}
 
 /* ===== 푸터 영역 (좋아요, 공유 등) ===== */
-.cardFooter { padding: 12px 0 0 0; }
-.actionButtonsRow { display: flex; align-items: center; gap: 16px; }
-.actionBtn { display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: background-color 0.2s; }
-.actionBtn:hover { background: rgba(0,0,0,0.05); }
-.actionBtn.liked { color: #e0245e; }
-.actionIcon { display: flex; align-items: center; }
-.actionCount { font-size: 14px; font-weight: 600; color: #333; }
-.shareBtn { margin-left: auto; }
-.shareMenu { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e1e8ed; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; min-width: 140px; overflow: hidden; margin-top: 4px; }
-.shareOption { display: block; width: 100%; padding: 10px 14px; background: none; border: none; text-align: left; cursor: pointer; font-size: 14px; color: #14171a; }
-.shareOption:hover { background: #f7f9fa; }
-.dateContainer { margin-top: 8px; }
-.dateBadge { font-size: 12px; color: #657786; background: #f7f9fa; padding: 4px 8px; border-radius: 12px; }
+.cardFooter { 
+  padding: 12px 0 0 0; 
+}
+
+.actionButtonsRow { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  margin-top: 10px;
+}
+
+.actionBtn { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  padding: 4px; 
+  border-radius: 4px; 
+  transition: background-color 0.2s; 
+}
+
+.actionBtn:hover { 
+  background: rgba(0,0,0,0.05); 
+}
+
+.actionBtn.liked { 
+  color: #e0245e; 
+}
+
+.actionIcon { 
+  display: flex; 
+  align-items: center; 
+}
+
+.actionCount { 
+  font-size: 14px; 
+  font-weight: 600; 
+  color: #333; 
+}
+
+.shareBtn { 
+  margin-left: auto; 
+}
+
+.shareMenu { 
+  position: absolute; 
+  top: 100%; 
+  right: 0; 
+  background: white; 
+  border: 1px solid #e1e8ed; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+  z-index: 1000; 
+  min-width: 140px; 
+  overflow: hidden; 
+  margin-top: 4px; 
+}
+
+.shareOption { 
+  display: block; 
+  width: 100%; 
+  padding: 10px 14px; 
+  background: none; 
+  border: none; 
+  text-align: left; 
+  cursor: pointer; 
+  font-size: 14px; 
+  color: #14171a; 
+}
+
+.shareOption:hover { 
+  background: #f7f9fa; 
+}
+
+.dateContainer { 
+  margin-top: 8px; 
+}
+
+.dateBadge { 
+  font-size: 12px; 
+  color: #657786; 
+  background: #f7f9fa; 
+  padding: 4px 8px; 
+  border-radius: 12px; 
+}
 
 /* ===== 모바일 반응형 스타일 ===== */
 @media (max-width: 768px) {
+  /* 미디어 그리드 모바일 반응형 */
+  .mediaGrid {
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  
+  .mediaSlot {
+    width: 100%;
+    height: 150px;
+    border-radius: 0 !important;
+  }
+  
+  .mediaSlot:first-child,
+  .mediaSlot:last-child {
+    border-radius: 0 !important;
+  }
+  
+  .mediaSlot:first-child .mediaImage,
+  .mediaSlot:last-child .mediaImage {
+    border-radius: 0 !important;
+  }
+  
+  .mediaSlot:first-child img,
+  .mediaSlot:last-child img {
+    border-radius: 0 !important;
+  }
+
+  /* 카드 스타일 모바일 반응형 */
+  .contentCard {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .cardImage.singleImage { 
+    width: 100%; 
+    height: auto; 
+    position: relative; 
+  }
+  
+  .cardImage.imageSlider { 
+    width: 100%; 
+    height: auto; 
+  }
+
   /* 헤더 영역 모바일 최적화 */
   .cardHeader { 
     padding: 0 0 6px 0; 
-    gap: 8px;
   }
   
   .userInfo { 
     gap: 8px; 
     flex: 1;
-    min-width: 0; /* flex item이 줄어들 수 있도록 */
+    min-width: 0;
   }
-  
   
   .userLocation { 
     margin-top: 1px; 
   }
   
-  /* 헤더 오른쪽 영역 모바일 최적화 */
+  .locationIcon {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .locationText {
+    font-size: 11px;
+  }
+  
+  .headerPlaceName {
+    font-size: 13px;
+  }
+  
   .headerRight { 
     gap: 6px; 
     flex-shrink: 0;
   }
   
-  
   .settingsBtn { 
     font-size: 18px; 
     padding: 4px; 
   }
+  
+  .postType { 
+    font-size: 12px; 
+  }
+  
+  .postTypeIcon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  /* 푸터 영역 모바일 최적화 */
+  .actionButtonsRow { 
+    gap: 12px; 
+  }
+  
+  .actionBtn { 
+    padding: 6px 4px; 
+  }
+  
+  .actionCount { 
+    font-size: 13px; 
+  }
 }
 
+/* 모바일에서 슬라이더 마지막 이미지 여백 */
 @media (max-width: 480px) {
-  /* 더 작은 화면에서 추가 최적화 */
-  .cardHeader { 
-    padding: 1px 0 12px 0; 
-    gap: 6px;
+  .cardImage.imageSlider .imageItem:last-child {
+    margin-right: 10px;
   }
-  
-  .userInfo { 
-    gap: 6px; 
-  }
-  
-  .headerRight { 
-    gap: 4px; 
-  }
-  
-  
 }

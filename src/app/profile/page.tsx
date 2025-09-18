@@ -11,10 +11,12 @@ import { useTranslationContext } from "../contexts/TranslationContext";
 import { useUnreadMessageCount } from "../hooks/useUnreadMessageCount";
 import { db } from "../services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import ProfilePostCard from "../components/ProfilePostCard";
+import ProfilePostCard from "./ProfilePostCard";
 import { getPosts, PostData, deletePost } from "../services/postService";
 import { followUser, unfollowUser, isFollowing, getFollowStats, getFollowersList, getFollowingList, UserInfo } from "../services/followService";
 import ClientStyleProvider from "../components/ClientStyleProvider";
+import { CommentPopup } from "../components/comments/CommentPopup";
+import { getCommentCount } from "../services/commentService";
 import styles from "./style.module.css";
 
 // useSearchParams를 사용하는 컴포넌트를 별도로 분리
@@ -51,6 +53,7 @@ function ProfileContent() {
     followingCount: 0,
     postCount: 0
   });
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   // 편집용 임시 데이터
   const [editData, setEditData] = useState({
@@ -60,7 +63,12 @@ function ProfileContent() {
 
   // 사용자 게시물 데이터
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
-  const [postsLoading, setPostsLoading] = useState(false);
+  const [postsLoading, setPostsLoading] = useState(true); // 초기값을 true로 변경
+  
+  // 댓글 팝업 상태
+  const [showCommentPopup, setShowCommentPopup] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [commentsCount, setCommentsCount] = useState<{[key: string]: number}>({});
 
   // 현재 로그인한 사용자의 프로필인지 확인
   const isOwnProfile = !profileUserId || profileUserId === user?.uid;
@@ -254,7 +262,7 @@ function ProfileContent() {
       await unfollowUser(user.uid, targetUserId);
       
       // 목록에서 제거
-      setFollowList(prev => prev.filter(item => item.id !== targetUserId));
+      setFollowList(prev => prev.filter(item => item.uid !== targetUserId));
       
       // 실제 데이터를 다시 로드해서 정확한 카운트 반영
       window.location.reload();
@@ -323,19 +331,25 @@ function ProfileContent() {
     setIsMounted(true);
   }, []);
 
-  // Firebase에서 사용자 데이터 가져오기
+  // Firebase에서 사용자 데이터와 게시물을 병렬로 가져오기
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchAllData = async () => {
       try {
         setIsLoading(true);
+        setPostsLoading(true);
         const targetUserId = profileUserId || user?.uid;
         
         if (!targetUserId) {
           setIsLoading(false);
+          setPostsLoading(false);
           return;
         }
 
-        const userDoc = await getDoc(doc(db, 'users', targetUserId));
+        // 프로필 데이터와 게시물을 병렬로 가져오기
+        const [userDoc, posts] = await Promise.all([
+          getDoc(doc(db, 'users', targetUserId)),
+          getPosts(1000, targetUserId)
+        ]);
         
         if (userDoc.exists()) {
           const userData = userDoc.data();
@@ -356,9 +370,9 @@ function ProfileContent() {
             location: userData.location || '',
             gender: userData.gender || '',
             birthDate: userData.birthDate || '',
-            followerCount: (userData.followers && Array.isArray(userData.followers)) ? userData.followers.length : 0,
-            followingCount: (userData.following && Array.isArray(userData.following)) ? userData.following.length : 0,
-            postCount: userData.postCount || 0
+            followerCount: 0, // 임시값, 아래에서 실제 값 로드
+            followingCount: 0, // 임시값, 아래에서 실제 값 로드
+            postCount: posts.length // 실제 게시물 수로 업데이트
           };
           
           setProfileData(profile);
@@ -366,6 +380,14 @@ function ProfileContent() {
             name: profile.name,
             introduction: profile.introduction
           });
+
+          // 팔로우 통계 가져오기
+          const followStats = await getFollowStats(targetUserId);
+          setProfileData(prev => ({
+            ...prev,
+            followerCount: followStats.followerCount,
+            followingCount: followStats.followingCount
+          }));
 
           // 다른 사용자의 프로필인 경우 팔로우 상태 확인
           if (targetUserId !== user?.uid && user?.uid) {
@@ -376,18 +398,19 @@ function ProfileContent() {
           console.error('사용자 데이터를 찾을 수 없습니다.');
         }
 
-        // 프로필 데이터 로드 후 게시물도 가져오기
-        if (targetUserId) {
-          await fetchUserPosts(targetUserId);
-        }
+        // 게시물 설정
+        setUserPosts(posts);
+        setDataLoaded(true);
+        
       } catch (error) {
-        console.error('프로필 데이터 로드 실패:', error);
+        console.error('데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
+        setPostsLoading(false);
       }
     };
 
-    fetchUserProfile();
+    fetchAllData();
   }, [profileUserId, user?.uid]);
 
   const handleFollow = async () => {
@@ -442,24 +465,22 @@ function ProfileContent() {
     router.push('/post-upload');
   };
 
-  // 사용자 게시물 가져오기
-  const fetchUserPosts = async (userId: string) => {
-    try {
-      setPostsLoading(true);
-      const posts = await getPosts(1000, userId); // 모든 게시물 가져오기 (userId로 필터링)
-      setUserPosts(posts);
-      
-      // 게시물 수 업데이트
-      setProfileData(prev => ({
+  // 댓글 버튼 클릭 핸들러
+  const handleCommentClick = (postId: string) => {
+    setSelectedPostId(postId);
+    setShowCommentPopup(true);
+  };
+
+  // 댓글 수 업데이트 핸들러
+  const handleCommentCountUpdate = (count: number) => {
+    if (selectedPostId) {
+      setCommentsCount(prev => ({
         ...prev,
-        postCount: posts.length
+        [selectedPostId]: count
       }));
-    } catch (error) {
-      console.error('사용자 게시물 로드 실패:', error);
-    } finally {
-      setPostsLoading(false);
     }
   };
+
 
   // 마운트되지 않은 경우 최소한의 로딩 표시
   if (!isMounted) {
@@ -504,7 +525,7 @@ function ProfileContent() {
 
               {/* Main Content */}
               <div className={styles.profileMainContent}>
-                {isLoading ? (
+                {!dataLoaded ? (
                 <div className={styles.profileLoading}>
                   <div className={styles.profileLoadingSpinner}>로딩 중...</div>
                 </div>
@@ -641,33 +662,24 @@ function ProfileContent() {
                       </>
                     )}
                   </div>
-                </>
-              )}
-
-
-              {/* Posts Section - 로딩 완료 후에만 표시 */}
-              {!isLoading && (
-                <div className={styles.profilePostsSection}>
+                  
+                  {/* Posts Section */}
+                  <div className={styles.profilePostsSection}>
                   
                   <div className={styles.profileContentGrid}>
-                    {postsLoading ? (
-                      <div className={styles.profileLoading}>
-                        <div className={styles.profileLoadingSpinner}>🔄</div>
-                        <span>로딩 중...</span>
-                      </div>
-                    ) : userPosts.length === 0 ? (
+                    {userPosts.length === 0 ? (
                       <div className={styles.noPosts}>
                         <h3>아직 게시물이 없습니다</h3>
                         <p>첫 번째 게시물을 작성해보세요!</p>
                       </div>
                     ) : (
                       userPosts.map((post) => (
-                        <ProfilePostCard 
-                          key={post.id} 
-                          post={post}
-                          userInfo={{
-                            name: profileData.name,
-                            location: profileData.location,
+                        <div className={styles.profilePostCard} key={post.id}>
+                          <ProfilePostCard 
+                            post={post}
+                            userInfo={{
+                              name: profileData.name,
+                              location: profileData.location,
                             profileImage: profileData.photoUrl,
                             photoUrl: profileData.photoUrl,
                             gender: profileData.gender,
@@ -675,13 +687,16 @@ function ProfileContent() {
                           }}
                           showUserInfo={false}
                           showSettings={isOwnProfile}
-                          onEdit={handleEditPost}
-                          onDelete={handleDeletePost}
-                        />
+                            onEdit={handleEditPost}
+                            onDelete={handleDeletePost}
+                            onCommentClick={handleCommentClick}
+                          />
+                        </div>
                       ))
                     )}
                   </div>
                 </div>
+                </>
               )}
             </div>
 
@@ -691,6 +706,14 @@ function ProfileContent() {
           
           {/* Mobile Bottom Navigator */}
           <BottomNavigator />
+          
+          {/* Comment Popup */}
+          <CommentPopup
+            postId={selectedPostId}
+            isOpen={showCommentPopup}
+            onClose={() => setShowCommentPopup(false)}
+            onCommentCountUpdate={handleCommentCountUpdate}
+          />
         </ClientStyleProvider>
 
         {/* 이미지 모달 */}
@@ -732,7 +755,7 @@ function ProfileContent() {
                 ) : (
                   <div className={styles.followList}>
                     {followList.map((userInfo) => (
-                      <div key={userInfo.id} className={styles.followItem}>
+                      <div key={userInfo.uid} className={styles.followItem}>
                         <div className={styles.followUserInfo}>
                           <div className={styles.followUserAvatar}>
                             {userInfo.photoUrl ? (
@@ -750,7 +773,7 @@ function ProfileContent() {
                         {followModalType === 'following' && isOwnProfile && (
                           <button 
                             className={styles.unfollowBtn}
-                            onClick={() => handleUnfollow(userInfo.id)}
+                            onClick={() => handleUnfollow(userInfo.uid)}
                           >
                             취소
                           </button>

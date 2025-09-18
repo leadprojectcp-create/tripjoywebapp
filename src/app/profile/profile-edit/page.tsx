@@ -209,10 +209,10 @@ function ProfileEditContent() {
         <ClientStyleProvider>
           <div className="profile-edit-container">
             {/* Top AppBar */}
-            <AppBar 
-              showBackButton={false}
-              showLogo={true}
-              
+            <AppBar
+              title={t('title')}
+              showBackButton={true}
+              showLogo={false}
             />
             
             {/* Body Content */}
@@ -222,11 +222,7 @@ function ProfileEditContent() {
 
               {/* Main Content */}
               <div className="profile-edit-main-content">
-                <div className="profile-edit-header">
-                  <h1 className="profile-edit-title">{t('title')}</h1>
-                </div>
-
-      <div className="profile-edit-content">
+                <div className="profile-edit-content">
         {/* 프로필 이미지 섹션 */}
         <div className="profile-image-section">
           <h3>{t('profileImage')}</h3>

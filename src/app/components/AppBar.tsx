@@ -228,7 +228,7 @@ export const AppBar = ({
             </div>
 
             {/* PC에서만 위치 선택기 */}
-            {pathname === '/' && (
+            {(pathname === '/' || pathname === '/dashboard') && (
               <div className="app-bar-center">
                 <CountryAndCitySelector
                   variant="pc"
@@ -398,7 +398,7 @@ export const AppBar = ({
             </div>
 
             {/* 두 번째 줄: 위치 선택기 */}
-            {pathname === '/' && (
+            {(pathname === '/' || pathname === '/dashboard') && (
               <div className="mobile-app-bar-row-2">
                 <CountryAndCitySelector
                   variant="mobile"

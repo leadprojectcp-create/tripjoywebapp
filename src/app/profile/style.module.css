@@ -15,7 +15,7 @@
 .profileMainContent {
   width: 100%;
   max-width: 1280px;
-  padding: 20px 16px 0 16px; /* PC에서만 위쪽 20px 여백 */
+  padding: 20px 0; /* PC에서만 위쪽 20px 여백 */
   margin: 75px auto 0;
   min-height: calc(100vh - 75px);
   display: flex;
@@ -463,12 +463,19 @@
 /* Profile Content Grid - 고유 클래스명 */
 .profileContentGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
   align-items: flex-start;
+  justify-items: start; /* 카드들을 왼쪽 정렬 */
+  width: 100%;
+  max-width: 1280px; /* 최대 너비 제한 */
 }
 
 /* PostCard는 components/PostCard.css를 사용 */
+.profilePostCard {
+  width: 630px;
+  box-sizing: border-box;
+}
 
 .noPosts {
   text-align: center;
@@ -528,8 +535,13 @@
 /* 태블릿 반응형 */
 @media (max-width: 1024px) {
   .profileContentGrid {
-    grid-template-columns: repeat(3, 1fr); /* 태블릿에서는 3개씩 */
+    grid-template-columns: repeat(2, 1fr); /* 태블릿에서도 2개씩 */
     gap: 20px;
+  }
+  
+  .profilePostCard {
+    width: 100%;
+    max-width: 630px;
   }
 }
 
@@ -635,7 +647,7 @@
   .profileMainContent {
     width: 100%;
     max-width: 600px; /* 소형 모바일에서도 최대 600px */
-    padding: 0 16px; /* 모바일에서는 위쪽 패딩 제거 */
+    padding: 12px 10px; /* 모바일에서는 위쪽 패딩 제거 */
     margin: 60px auto 0;
     padding-bottom: 80px;
     align-items: center;
@@ -682,9 +694,15 @@
   }
 
   .profileContentGrid {
-    grid-template-columns: repeat(2, 1fr); /* 모바일에서는 2개씩 */
+    grid-template-columns: 1fr; /* 모바일에서는 1개씩 */
     gap: 16px; /* 모바일에서는 간격 줄임 */
     width: 100%; /* 전체 너비 */
+    justify-items: stretch; /* 모바일에서는 전체 너비 사용 */
+  }
+  
+  .profilePostCard {
+    width: 100%; /* 모바일에서는 전체 너비 */
+    max-width: none;
   }
   
 

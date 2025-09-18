@@ -5,7 +5,8 @@ import { AppBar } from "../components/AppBar";
 import { BottomNavigator } from "../components/BottomNavigator";
 import { useAuthContext } from "../contexts/AuthContext";
 import { AuthGuard } from "../components/AuthGuard";
-import { PostCard } from "../dashboard/postcard/PostCard";
+import ProfilePostCard from "../profile/ProfilePostCard";
+import { CommentPopup } from "../components/comments/CommentPopup";
 import { useTranslationContext } from "../contexts/TranslationContext";
 import { getUserLikedPosts } from "../components/post-hooks/usePostInteractions";
 import { PostData } from "../services/postService";
@@ -22,6 +23,11 @@ export default function Wishlist() {
   const [wishedCountries, setWishedCountries] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string>('전체');
   const [userInfoMap, setUserInfoMap] = useState<{ [userId: string]: any }>({});
+  
+  // 댓글 팝업 상태
+  const [showCommentPopup, setShowCommentPopup] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [commentsCount, setCommentsCount] = useState<{[key: string]: number}>({});
 
   // 찜한 게시물 가져오기
   useEffect(() => {
@@ -103,6 +109,22 @@ export default function Wishlist() {
 
   const filteredPosts = getFilteredPosts();
 
+  // 댓글 버튼 클릭 핸들러
+  const handleCommentClick = (postId: string) => {
+    setSelectedPostId(postId);
+    setShowCommentPopup(true);
+  };
+
+  // 댓글 수 업데이트 핸들러
+  const handleCommentCountUpdate = (count: number) => {
+    if (selectedPostId) {
+      setCommentsCount(prev => ({
+        ...prev,
+        [selectedPostId]: count
+      }));
+    }
+  };
+
   return (
     <AuthGuard>
       <div className={styles.container}>
@@ -155,12 +177,14 @@ export default function Wishlist() {
                   {filteredPosts.map((post) => {
                     const userInfo = userInfoMap[post.userId] || { name: '사용자', location: '위치 미상' };
                     return (
-                      <PostCard 
-                        key={post.id} 
-                        post={post} 
-                        userInfo={userInfo}
-                        showUserInfo={true}
-                      />
+                      <div className={styles.postCardWrapper} key={post.id}>
+                        <ProfilePostCard 
+                          post={post} 
+                          userInfo={userInfo}
+                          showUserInfo={true}
+                          onCommentClick={handleCommentClick}
+                        />
+                      </div>
                     );
                   })}
                 </div>
@@ -180,6 +204,14 @@ export default function Wishlist() {
         </div>
 
         <BottomNavigator />
+        
+        {/* Comment Popup */}
+        <CommentPopup
+          postId={selectedPostId}
+          isOpen={showCommentPopup}
+          onClose={() => setShowCommentPopup(false)}
+          onCommentCountUpdate={handleCommentCountUpdate}
+        />
       </div>
     </AuthGuard>
   );

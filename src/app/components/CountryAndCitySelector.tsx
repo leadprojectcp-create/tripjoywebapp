@@ -58,22 +58,87 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
     if (typeof window !== 'undefined') {
       const savedCountry = localStorage.getItem('dashboard_selectedCountry');
       const savedCity = localStorage.getItem('dashboard_selectedCity');
-      
+
       console.log('CountryAndCitySelector 로컬 스토리지에서 불러온 값들:', {
         savedCountry,
-        savedCity
+        savedCity,
+        currentSelectedCountry: selectedCountry,
+        currentSelectedCity: selectedCity
       });
-      
-      if (savedCountry && !selectedCountry) {
-        setCurrentCountry(savedCountry);
+
+      // 로컬 스토리지 값이 있고 props로 전달된 값이 없는 경우에만 설정
+      if (savedCountry !== null && !selectedCountry) {
+        setCurrentCountry(savedCountry); // 빈 문자열('')도 허용
         console.log('CountryAndCitySelector currentCountry 설정됨:', savedCountry);
       }
-      if (savedCity && !selectedCity) {
-        setCurrentCity(savedCity);
+      if (savedCity !== null && !selectedCity) {
+        setCurrentCity(savedCity); // 빈 문자열('')도 허용
         console.log('CountryAndCitySelector currentCity 설정됨:', savedCity);
       }
     }
   }, [selectedCountry, selectedCity]);
+
+  // 로컬 스토리지 변경 감지 (다른 컴포넌트에서 변경된 경우)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedCountry = localStorage.getItem('dashboard_selectedCountry');
+      const savedCity = localStorage.getItem('dashboard_selectedCity');
+
+      console.log('CountryAndCitySelector 스토리지 변경 감지:', {
+        savedCountry,
+        savedCity,
+        currentCountry,
+        currentCity
+      });
+
+      // null 체크 후 업데이트 (빈 문자열도 유효한 값으로 처리)
+      if (savedCountry !== null && savedCountry !== currentCountry) {
+        setCurrentCountry(savedCountry);
+      }
+      if (savedCity !== null && savedCity !== currentCity) {
+        setCurrentCity(savedCity);
+      }
+    };
+
+    // storage 이벤트 리스닝 (다른 탭에서의 변경)
+    window.addEventListener('storage', handleStorageChange);
+
+    // 커스텀 이벤트 리스닝 (같은 페이지 내에서의 변경)
+    const handleLocationChange = (event: CustomEvent) => {
+      const { countryCode, cityCode } = event.detail;
+      console.log('CountryAndCitySelector 커스텀 이벤트 받음:', {
+        countryCode,
+        cityCode,
+        currentCountry,
+        currentCity
+      });
+
+      // 빈 문자열도 유효한 값으로 처리
+      const newCountryCode = countryCode || '';
+      const newCityCode = cityCode || '';
+
+      if (newCountryCode !== currentCountry) {
+        setCurrentCountry(newCountryCode);
+        console.log('CountryAndCitySelector currentCountry 업데이트:', newCountryCode);
+      }
+      if (newCityCode !== currentCity) {
+        setCurrentCity(newCityCode);
+        console.log('CountryAndCitySelector currentCity 업데이트:', newCityCode);
+      }
+
+      // 부모 컴포넌트의 onSelectionChange도 호출하여 완전 동기화
+      if (newCountryCode !== currentCountry || newCityCode !== currentCity) {
+        onSelectionChange(newCountryCode, newCityCode);
+      }
+    };
+
+    window.addEventListener('locationSelectionChanged', handleLocationChange as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('locationSelectionChanged', handleLocationChange as EventListener);
+    };
+  }, [currentCountry, currentCity]);
   
   // 커스텀 드롭다운 상태
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -84,24 +149,13 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   const cityDropdownRef = useRef<HTMLDivElement>(null);
   
   // 모바일 모달 상태
-  const [isMobile, setIsMobile] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [tempSelectedCountry, setTempSelectedCountry] = useState(selectedCountry);
   const [tempSelectedCity, setTempSelectedCity] = useState(selectedCity);
   const [modalCountries, setModalCountries] = useState<Country[]>([]);
   const [modalCities, setModalCities] = useState<City[]>([]);
 
-  // 모바일 감지
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 480);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  // CSS 미디어 쿼리로 반응형 처리
 
   // Load countries on component mount
   useEffect(() => {
@@ -304,6 +358,20 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   const handleApplySelection = () => {
     setCurrentCountry(tempSelectedCountry);
     setCurrentCity(tempSelectedCity);
+
+    // 로컬 스토리지에 즉시 저장 (전체 선택 시 빈 문자열로 저장)
+    localStorage.setItem('dashboard_selectedCountry', tempSelectedCountry || '');
+    localStorage.setItem('dashboard_selectedCity', tempSelectedCity || '');
+
+    console.log('CountryAndCitySelector 적용:', {
+      tempSelectedCountry,
+      tempSelectedCity,
+      saved: {
+        country: localStorage.getItem('dashboard_selectedCountry'),
+        city: localStorage.getItem('dashboard_selectedCity')
+      }
+    });
+
     onSelectionChange(tempSelectedCountry, tempSelectedCity);
     setIsLocationModalOpen(false);
   };
@@ -354,9 +422,11 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   // 선택이 변경될 때마다 dashboard로 location text 전달
   useEffect(() => {
     if (onLocationTextChange) {
-      onLocationTextChange(getSelectedLocationText());
+      const locationText = getSelectedLocationText();
+      console.log('CountryAndCitySelector - location text 업데이트:', locationText);
+      onLocationTextChange(locationText);
     }
-  }, [currentCountry, currentCity, countries, cities, currentLanguage, t]);
+  }, [currentCountry, currentCity, countries, cities, currentLanguage, t, onLocationTextChange]);
 
   // 외부에서 모달을 열 수 있도록 ref 노출
   useImperativeHandle(ref, () => ({

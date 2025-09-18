@@ -350,7 +350,9 @@ export default function LoginPage(): React.JSX.Element {
       <div className="login-page page-with-appbar">
         <div className="login-container">
         <div className="login-header">
-          <h1 className="brand-name">TRIPJOY</h1>
+          <div className="brand-logo-container">
+            <img src="/logo.png" alt="TRIPJOY" className="brand-logo" />
+          </div>
           <p className="brand-subtitle">{t('brandSubtitle')}</p>
           <p className="brand-description">{t('brandDescription')}</p>
         </div>

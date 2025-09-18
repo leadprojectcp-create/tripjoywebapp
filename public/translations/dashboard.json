@@ -704,5 +704,23 @@
     "ja": "原文を見る",
     "th": "ดูต้นฉบับ",
     "fil": "Ipakita ang Orihinal"
+  },
+  "loadingPopularAreas": {
+    "ko": "인기 지역을 불러오는 중...",
+    "en": "Loading popular areas...",
+    "vi": "Đang tải khu vực phổ biến...",
+    "zh": "正在加载热门地区...",
+    "ja": "人気エリアを読み込み中...",
+    "th": "กำลังโหลดพื้นที่ยอดนิยม...",
+    "fil": "Naglo-load ng mga sikat na lugar..."
+  },
+  "noPopularAreas": {
+    "ko": "표시할 인기 지역이 없습니다.",
+    "en": "No popular areas to display.",
+    "vi": "Không có khu vực phổ biến để hiển thị.",
+    "zh": "没有热门地区可显示。",
+    "ja": "表示する人気エリアがありません。",
+    "th": "ไม่มีพื้นที่ยอดนิยมให้แสดง",
+    "fil": "Walang sikat na lugar na ipapakita."
   }
 }

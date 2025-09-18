@@ -44,9 +44,6 @@ export interface UserData {
     thirdParty: boolean;
   };
   
-  // 좋아요/북마크한 게시물들 (postId -> timestamp)
-  likedPosts?: { [postId: string]: any }; // serverTimestamp
-  bookmarkedPosts?: { [postId: string]: any }; // serverTimestamp
   
   // 채팅방 ID 목록
   chatIds?: string[]; // 참여 중인 채팅방 ID 배열

@@ -79,9 +79,14 @@
 
 .postsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   justify-items: center;
+}
+
+.postCardWrapper {
+  width: 630px;
+  max-width: 100%;
 }
 
 .emptyState {
@@ -113,6 +118,10 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
+  
+  .postCardWrapper {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -122,8 +131,12 @@
   }
   
   .postsGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
+  }
+  
+  .postCardWrapper {
+    width: 100%;
   }
   
   .tabButton,

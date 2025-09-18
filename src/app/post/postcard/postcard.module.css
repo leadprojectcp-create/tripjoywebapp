@@ -303,7 +303,7 @@
 .settingsOption.delete:hover { background: #ffeef2; }
 
 /* ===== 푸터 영역 (좋아요, 공유 등) ===== */
-.actionButtonsRow { display: flex; align-items: center; gap: 16px; }
+.actionButtonsRow { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
 .actionBtn { display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; border-radius: 4px; }
 .actionBtn.liked { color: #e0245e; }
 .actionBtn.active { color: #1da1f2; }

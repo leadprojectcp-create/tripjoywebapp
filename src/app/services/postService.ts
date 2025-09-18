@@ -66,12 +66,8 @@ export interface PostData {
   createdAt?: any;
   updatedAt?: any;
   likes?: number; // deprecated - 기존 데이터 호환성을 위해 optional
-  likeCount: number; // 좋아요 수
-  bookmarkCount?: number; // 북마크 수
-  // 좋아요한 사용자들 맵 (userId -> timestamp)
-  likedBy?: { [userId: string]: any }; // serverTimestamp
-  // 북마크한 사용자들 맵 (userId -> timestamp)  
-  bookmarkedBy?: { [userId: string]: any }; // serverTimestamp
+  likeCount: number; // 좋아요 수 (실시간 계산)
+  bookmarkCount?: number; // 북마크 수 (실시간 계산)
   comments: number;
   isVisible: boolean;
   // 🚀 현재 사용자 상태 (서버에서 미리 계산)
@@ -204,9 +200,7 @@ export const createPost = async (
       createdAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       updatedAt: serverTimestamp(), // Firestore 서버 타임스탬프 사용
       likeCount: 0, // 좋아요 카운트
-      bookmarkCount: 0, // 새로운 북마크 카운트
-      likedBy: {}, // 좋아요한 사용자들 맵 초기화
-      bookmarkedBy: {}, // 북마크한 사용자들 맵 초기화
+      bookmarkCount: 0, // 북마크 카운트
       comments: 0,
       isVisible: true,
     };
@@ -353,14 +347,10 @@ export const getPosts = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
-        // 🚀 좋아요/북마크 정보 포함!
-        likedBy: data.likedBy || {},
-        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
         isVisible: data.isVisible,
-        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
-        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
-        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
+        isLikedByCurrentUser: false,
+        isBookmarkedByCurrentUser: false
       } as PostData);
     });
 
@@ -409,9 +399,6 @@ export const searchPostsByHashtag = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
-        // 🚀 좋아요/북마크 정보 포함!
-        likedBy: data.likedBy || {},
-        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
         isVisible: data.isVisible
       } as PostData);
@@ -458,9 +445,6 @@ export const searchPostsByLocation = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
-        // 🚀 좋아요/북마크 정보 포함!
-        likedBy: data.likedBy || {},
-        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
         isVisible: data.isVisible
       } as PostData);
@@ -506,14 +490,10 @@ export const getPostsByCountry = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
-        // 🚀 좋아요/북마크 정보 포함!
-        likedBy: data.likedBy || {},
-        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
         isVisible: data.isVisible,
-        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
-        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
-        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
+        isLikedByCurrentUser: false,
+        isBookmarkedByCurrentUser: false
       } as PostData);
     });
 
@@ -563,8 +543,6 @@ export const getPostsByLocation = async (
           createdAt: data.createdAt,
           likeCount: data.likeCount || 0,
           bookmarkCount: data.bookmarkCount || 0,
-          likedBy: data.likedBy || {},
-          bookmarkedBy: data.bookmarkedBy || {},
           comments: data.comments || 0,
           isVisible: data.isVisible,
           isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
@@ -618,14 +596,10 @@ export const getPostsByCity = async (
         createdAt: data.createdAt,
         likeCount: data.likeCount || 0,
         bookmarkCount: data.bookmarkCount || 0,
-        // 🚀 좋아요/북마크 정보 포함!
-        likedBy: data.likedBy || {},
-        bookmarkedBy: data.bookmarkedBy || {},
         comments: data.comments || 0,
         isVisible: data.isVisible,
-        // 🚀 현재 사용자 좋아요/북마크 상태 미리 계산!
-        isLikedByCurrentUser: currentUserId ? !!(data.likedBy?.[currentUserId]) : false,
-        isBookmarkedByCurrentUser: currentUserId ? !!(data.bookmarkedBy?.[currentUserId]) : false
+        isLikedByCurrentUser: false,
+        isBookmarkedByCurrentUser: false
       } as PostData);
     });
 

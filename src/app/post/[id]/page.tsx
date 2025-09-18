@@ -26,7 +26,7 @@ import { PostMedia } from '../postcard/PostMedia';
 import { PostFooter } from '../postcard/PostFooter';
 import { SameLocationPosts } from '../same-location/SameLocationPosts';
 import { NearbyRestaurants } from '../nearby-restaurants/NearbyRestaurants';
-import { CommentPopup } from '../comments/CommentPopup';
+import { CommentPopup } from '../../components/comments/CommentPopup';
 import { getCommentCount } from '../../services/commentService';
 
 import styles from './page.module.css';
