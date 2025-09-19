@@ -82,7 +82,7 @@ const BannerSlider: React.FC = () => {
       return `${originalUrl}${separator}width=${contentWidth}&height=${mobileHeight}&fit=fill&quality=100`;
     } else {
       // PC: 절반 너비 + 180px 높이 (2개씩 나오므로)
-      const pcWidth = 500; // PC에서 배너 하나당 크기
+      const pcWidth = 620; // PC에서 배너 하나당 크기
       const pcHeight = 180;
       console.log('💻 PC 이미지 쿼리:', {
         width: pcWidth,

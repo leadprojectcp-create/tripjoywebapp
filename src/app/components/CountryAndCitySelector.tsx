@@ -117,18 +117,11 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
       const newCountryCode = countryCode || '';
       const newCityCode = cityCode || '';
 
-      if (newCountryCode !== currentCountry) {
-        setCurrentCountry(newCountryCode);
-        console.log('CountryAndCitySelector currentCountry 업데이트:', newCountryCode);
-      }
-      if (newCityCode !== currentCity) {
-        setCurrentCity(newCityCode);
-        console.log('CountryAndCitySelector currentCity 업데이트:', newCityCode);
-      }
-
-      // 부모 컴포넌트의 onSelectionChange도 호출하여 완전 동기화
       if (newCountryCode !== currentCountry || newCityCode !== currentCity) {
-        onSelectionChange(newCountryCode, newCityCode);
+        setCurrentCountry(newCountryCode);
+        setCurrentCity(newCityCode);
+        console.log('CountryAndCitySelector 상태 업데이트:', { newCountryCode, newCityCode });
+        // onSelectionChange는 별도 useEffect에서 처리
       }
     };
 
@@ -138,8 +131,22 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('locationSelectionChanged', handleLocationChange as EventListener);
     };
-  }, [currentCountry, currentCity]);
-  
+  }, []); // 의존성 배열에서 currentCountry, currentCity 제거
+
+  // 상태 변경 시 부모 컴포넌트에 알림 (debounce 효과)
+  useEffect(() => {
+    // props 초기값과 다를 때만 부모에게 알림
+    if (currentCountry !== selectedCountry || currentCity !== selectedCity) {
+      console.log('CountryAndCitySelector 상태 변경으로 부모에게 알림:', {
+        currentCountry,
+        currentCity,
+        selectedCountry,
+        selectedCity
+      });
+      onSelectionChange(currentCountry, currentCity);
+    }
+  }, [currentCountry, currentCity]); // selectedCountry, selectedCity는 의존성에서 제외
+
   // 커스텀 드롭다운 상태
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
@@ -222,17 +229,13 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   const handleCountryChange = (countryCode: string) => {
     setCurrentCountry(countryCode);
     setCurrentCity(''); // Reset city selection when country changes
-    
-    onSelectionChange(countryCode, '');
+    // onSelectionChange는 useEffect에서 호출됨
   };
 
   // Handle city selection change
   const handleCityChange = (cityCode: string) => {
     setCurrentCity(cityCode);
-    
-    if (currentCountry) {
-      onSelectionChange(currentCountry, cityCode);
-    }
+    // onSelectionChange는 useEffect에서 호출됨
   };
 
   // 외부 클릭 시 드롭다운 닫기
@@ -356,23 +359,25 @@ const CountryAndCitySelector = forwardRef<CountryAndCitySelectorRef, CountryAndC
   };
 
   const handleApplySelection = () => {
-    setCurrentCountry(tempSelectedCountry);
-    setCurrentCity(tempSelectedCity);
+    const newCountry = tempSelectedCountry || '';
+    const newCity = tempSelectedCity || '';
 
     // 로컬 스토리지에 즉시 저장 (전체 선택 시 빈 문자열로 저장)
-    localStorage.setItem('dashboard_selectedCountry', tempSelectedCountry || '');
-    localStorage.setItem('dashboard_selectedCity', tempSelectedCity || '');
+    localStorage.setItem('dashboard_selectedCountry', newCountry);
+    localStorage.setItem('dashboard_selectedCity', newCity);
 
     console.log('CountryAndCitySelector 적용:', {
-      tempSelectedCountry,
-      tempSelectedCity,
+      tempSelectedCountry: newCountry,
+      tempSelectedCity: newCity,
       saved: {
         country: localStorage.getItem('dashboard_selectedCountry'),
         city: localStorage.getItem('dashboard_selectedCity')
       }
     });
 
-    onSelectionChange(tempSelectedCountry, tempSelectedCity);
+    // 상태 업데이트 (useEffect에서 onSelectionChange 호출됨)
+    setCurrentCountry(newCountry);
+    setCurrentCity(newCity);
     setIsLocationModalOpen(false);
   };
 
