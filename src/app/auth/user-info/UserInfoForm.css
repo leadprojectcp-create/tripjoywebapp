@@ -3,19 +3,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
 
 .userinfo-container {
-  border-radius: 20px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 450px;
-  min-height: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 500px;
+  background: white;
+  border: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  animation: pageSlideIn 0.3s ease-out;
+  overflow: hidden;
 }
 
 @keyframes pageSlideIn {
@@ -29,31 +27,10 @@
   }
 }
 
-.userinfo-header {
-  padding: 20px 20px 0 20px;
-  flex-shrink: 0;
-  text-align: center;
-}
-
-.userinfo-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  text-align: center;
-  padding-top: 20px;
-}
-
-.userinfo-subtitle {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-  line-height: 1.5;
-}
 
 .userinfo-form {
   flex: 1;
-  padding: 20px;
+  padding: 45px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -66,9 +43,11 @@
 }
 
 .form-label {
+  color: #4E5968;
   font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  line-height: 150%; /* 21px */
+  letter-spacing: -0.28px;
 }
 
 .form-input {
@@ -123,8 +102,6 @@
   border-color: #ff4757;
   background: #fff5f5;
 }
-
-
 
 .gender-tabs {
   display: flex;
@@ -227,6 +204,13 @@
   border-color: #ff4757;
   background: #fff5f5;
 }
+.birth-dropdown-button  span {
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 150%; /* 19.5px */
+  letter-spacing: -0.26px;
+}
 
 .birth-dropdown-list {
   position: absolute;
@@ -289,6 +273,16 @@
 
 .referral-input-group .form-input {
   flex: 1;
+}
+
+.referral-input-group .form-input::placeholder {
+  color: #999;
+  font-family: Pretendard;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 19.5px */
+  letter-spacing: -0.26px;
 }
 
 .referral-check-button {
@@ -665,14 +659,14 @@
 }
 
 @media (max-width: 480px) {
-  .userinfo-modal {
-    margin: 20px;
+  .userinfo-container {
     max-width: calc(100vw - 40px);
-    min-height: 500px;
+    border: none;
   }
-  
+
+
   .userinfo-form {
-    padding: 16px;
+    padding: 0;
   }
   
 
@@ -683,12 +677,13 @@
   }
   
   .referral-input-group {
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
   }
-  
+
   .verify-button {
-    width: 100%;
+    white-space: nowrap;
+    min-width: auto;
   }
 
   /* 모바일에서 휴대폰 입력 */

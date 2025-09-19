@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import "./TermsAgreement.css";
-import { AppBar } from "../../components/AppBar";
+import { AppBar, AppBarProps } from "../../components/AppBar";
 import { SignupMethod } from "../email/types";
+import { useTranslationContext } from "../../contexts/TranslationContext";
 
 interface TermsAgreementProps {
   onAgree?: () => void;
@@ -20,6 +22,7 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
   const [method, setMethod] = useState<SignupMethod>(propMethod || 'email');
   const [uid, setUid] = useState<string>('');
   const router = useRouter();
+  const { t } = useTranslationContext();
 
   // URL 파라미터에서 method와 uid 확인
   useEffect(() => {
@@ -64,7 +67,7 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
 
   const handleAgree = () => {
     if (!consents.termsOfService || !consents.personalInfo) {
-      alert('필수 약관에 동의해야 합니다.');
+      alert(t('requiredTermsAlert'));
       return;
     }
     
@@ -83,109 +86,120 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
     }
   };
 
-  const getMethodText = () => {
-    switch (method) {
-      case 'kakao': return '카카오톡';
-      case 'google': return '구글';
-      case 'apple': return '애플';
-      default: return '이메일';
-    }
-  };
 
   return (
     <>
-      <AppBar showBackButton={true} showLogo={false} />
+      {/* 약관동의 페이지 - 메뉴 숨김 */}
+      <AppBar
+        {...({
+          showBackButton: true,
+          showLogo: false,
+          title: t('termsAgreement'),
+          showActions: false
+        } as AppBarProps)}
+      />
       <div className="terms-page page-with-appbar">
         <div className="terms-container">
           <div className="terms-header">
-            <h2 className="terms-title">약관 동의</h2>
-            <p className="terms-subtitle">{getMethodText()} 계정으로 가입하기 위해 약관에 동의해주세요.</p>
+            <h2 className="terms-title">{t('termsTitle')}</h2>
+            <p className="terms-subtitle">{t('termsSubtitle')}</p>
           </div>
 
                     <div className="terms-content">
             <div className="select-all-section">
               <div className="select-all-checkbox" onClick={handleSelectAll}>
-                <input
-                  type="checkbox"
-                  checked={allConsentsSelected}
-                  readOnly
+                <Image
+                  src={allConsentsSelected ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                  alt="checkbox"
+                  width={24}
+                  height={24}
                 />
-                <span className="select-all-label">모두 동의하기</span>
+                <span className="select-all-label">{t('selectAllTerms')}</span>
               </div>
             </div>
             
             <div className="terms-list">
               <div className="term-item">
-                <div className="term-checkbox">
-                  <input
-                    type="checkbox"
-                    id="termsOfService"
-                    checked={consents.termsOfService}
-                    onChange={() => handleConsentChange('termsOfService')}
-                  />
-                  <label htmlFor="termsOfService" className="term-label">
-                    <span className="required">[필수] 서비스 이용약관</span>
-                  </label>
+                <div className="term-checkbox" onClick={() => handleConsentChange('termsOfService')}>
+                  <div className="custom-checkbox">
+                    <Image
+                      src={consents.termsOfService ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                      alt="checkbox"
+                      width={24}
+                      height={24}
+                    />
+                    <span className="term-label">
+                      <span className="required">{t('termsOfService')}</span>
+                    </span>
+                  </div>
                   <span className="term-arrow">&gt;</span>
                 </div>
               </div>
 
               <div className="term-item">
-                <div className="term-checkbox">
-                  <input
-                    type="checkbox"
-                    id="personalInfo"
-                    checked={consents.personalInfo}
-                    onChange={() => handleConsentChange('personalInfo')}
-                  />
-                  <label htmlFor="personalInfo" className="term-label">
-                    <span className="required">[필수] 개인정보수집/이용동의</span>
-                  </label>
+                <div className="term-checkbox" onClick={() => handleConsentChange('personalInfo')}>
+                  <div className="custom-checkbox">
+                    <Image
+                      src={consents.personalInfo ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                      alt="checkbox"
+                      width={24}
+                      height={24}
+                    />
+                    <span className="term-label">
+                      <span className="required">{t('personalInfo')}</span>
+                    </span>
+                  </div>
                   <span className="term-arrow">&gt;</span>
                 </div>
               </div>
 
               <div className="term-item">
-                <div className="term-checkbox">
-                  <input
-                    type="checkbox"
-                    id="thirdParty"
-                    checked={consents.thirdParty}
-                    onChange={() => handleConsentChange('thirdParty')}
-                  />
-                  <label htmlFor="thirdParty" className="term-label">
-                    <span className="required">[필수] 개인정보 제3자 정보제공 동의</span>
-                  </label>
+                <div className="term-checkbox" onClick={() => handleConsentChange('thirdParty')}>
+                  <div className="custom-checkbox">
+                    <Image
+                      src={consents.thirdParty ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                      alt="checkbox"
+                      width={24}
+                      height={24}
+                    />
+                    <span className="term-label">
+                      <span className="required">{t('thirdPartyInfo')}</span>
+                    </span>
+                  </div>
                   <span className="term-arrow">&gt;</span>
                 </div>
               </div>
 
               <div className="term-item">
-                <div className="term-checkbox">
-                  <input
-                    type="checkbox"
-                    id="locationInfo"
-                    checked={consents.locationInfo}
-                    onChange={() => handleConsentChange('locationInfo')}
-                  />
-                  <label htmlFor="locationInfo" className="term-label">
-                    <span className="required">[필수] 위치기반 서비스 이용약관 동의</span>
-                  </label>
+                <div className="term-checkbox" onClick={() => handleConsentChange('locationInfo')}>
+                  <div className="custom-checkbox">
+                    <Image
+                      src={consents.locationInfo ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                      alt="checkbox"
+                      width={24}
+                      height={24}
+                    />
+                    <span className="term-label">
+                      <span className="required">{t('locationService')}</span>
+                    </span>
+                  </div>
                   <span className="term-arrow">&gt;</span>
                 </div>
               </div>
               
               <div className="term-item">
-                <div className="term-checkbox">
-                  <input
-                    type="checkbox"
-                    id="marketing"
-                    checked={consents.marketing}
-                    onChange={() => handleConsentChange('marketing')}
-                  />
-                  <label htmlFor="marketing" className="term-label">
-                    <span className="optional">[선택] 마케팅 활용 동의</span>
-                  </label>
+                <div className="term-checkbox" onClick={() => handleConsentChange('marketing')}>
+                  <div className="custom-checkbox">
+                    <Image
+                      src={consents.marketing ? "/icons/auth-check-active.png" : "/icons/auth-check.png"}
+                      alt="checkbox"
+                      width={24}
+                      height={24}
+                    />
+                    <span className="term-label">
+                      <span className="optional">{t('marketingConsent')}</span>
+                    </span>
+                  </div>
                   <span className="term-arrow">&gt;</span>
                 </div>
               </div>
@@ -199,7 +213,7 @@ export const TermsAgreement: React.FC<TermsAgreementProps> = ({
               disabled={!consents.termsOfService || !consents.personalInfo}
               onClick={handleAgree}
             >
-              동의하고 계속하기
+              {t('agreeAndContinue')}
             </button>
           </div>
         </div>

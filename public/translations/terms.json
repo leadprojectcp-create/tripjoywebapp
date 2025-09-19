@@ -1,21 +1,21 @@
 {
   "termsTitle": {
-    "ko": "약관 동의",
-    "en": "Terms Agreement",
-    "vi": "Đồng ý điều khoản",
-    "zh": "条款同意",
-    "ja": "利用規約同意",
-    "th": "ข้อตกลงเงื่อนไข",
-    "fil": "Kasunduan sa mga Tuntunin"
+    "ko": "서비스 이용을 위해\n이용약관 동의가 필요합니다",
+    "en": "Terms Agreement Required\nfor Service Use",
+    "vi": "Cần đồng ý điều khoản\nđể sử dụng dịch vụ",
+    "zh": "使用服务需要\n同意使用条款",
+    "ja": "サービス利用のため\n利用規약同意が必要です",
+    "th": "จำเป็นต้องยอมรับเงื่อนไข\nเพื่อใช้บริการ",
+    "fil": "Kailangan ang pagpayag sa mga kondisyon\npara sa paggamit ng serbisyo"
   },
   "termsSubtitle": {
-    "ko": "서비스 이용을 위해 다음 약관에 동의해주세요",
-    "en": "Please agree to the following terms to use the service",
-    "vi": "Vui lòng đồng ý với các điều khoản sau để sử dụng dịch vụ",
-    "zh": "请同意以下条款以使用服务",
-    "ja": "サービス利用のため、以下の利用規約に同意してください",
-    "th": "กรุณายอมรับเงื่อนไขต่อไปนี้เพื่อใช้บริการ",
-    "fil": "Mangyaring sumang-ayon sa mga sumusunod na tuntunin upang magamit ang serbisyo"
+    "ko": "서비스 시작 및 가입을 위해 먼저\n가입 및 정보 제공에 동의해주세요.",
+    "en": "Please agree to the terms and\nprovide your information to start using the service.",
+    "vi": "Vui lòng đồng ý với các điều khoản và\ncung cấp thông tin để bắt đầu sử dụng dịch vụ.",
+    "zh": "请先同意条款并\n提供信息以开始使用服务。",
+    "ja": "サービス開始のため、まず\n利用規約同意と情報提供をお願いします。",
+    "th": "โปรดยอมรับเงื่อนไขและ\nให้ข้อมูลเพื่อเริ่มใช้บริการ",
+    "fil": "Mangyaring sumang-ayon sa mga kondisyon at\nmagbigay ng impormasyon upang magsimulang gamitin ang serbisyo."
   },
   "agreeAll": {
     "ko": "모두 동의하기",

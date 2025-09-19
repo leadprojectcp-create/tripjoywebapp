@@ -10,16 +10,18 @@ import { useAuthContext } from "../contexts/AuthContext";
 import CountryAndCitySelector from "./CountryAndCitySelector";
 import "./AppBar.css";
 
-interface AppBarProps {
+export interface AppBarProps {
   title?: string;
   showBackButton?: boolean;
   showLogo?: boolean;
+  showActions?: boolean;
 }
 
-export const AppBar = ({ 
-  title = "TRIPJOY", 
-  showBackButton = false, 
-  showLogo = true
+export const AppBar = ({
+  title = "TRIPJOY",
+  showBackButton = false,
+  showLogo = true,
+  showActions = true
 }: AppBarProps): React.JSX.Element => {
   const router = useRouter();
   const pathname = usePathname();
@@ -27,8 +29,8 @@ export const AppBar = ({
   const { logout, isAuthenticated, user } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   // 위치 선택 관련 상태
   const [locationText, setLocationText] = useState('');
@@ -55,10 +57,23 @@ export const AppBar = ({
       setLocationText(event.detail.text);
     };
 
+    const handleLocationSelectionUpdate = (event: CustomEvent) => {
+      const { countryCode, cityCode } = event.detail;
+      console.log('AppBar에서 대시보드 위치 선택 이벤트 수신:', { countryCode, cityCode });
+      setSelectedCountry(countryCode);
+      setSelectedCity(cityCode);
+      
+      // 로컬 스토리지에도 저장
+      localStorage.setItem('dashboard_selectedCountry', countryCode);
+      localStorage.setItem('dashboard_selectedCity', cityCode);
+    };
+
     window.addEventListener('locationTextChanged', handleLocationTextUpdate as EventListener);
+    window.addEventListener('dashboardLocationSelected', handleLocationSelectionUpdate as EventListener);
     
     return () => {
       window.removeEventListener('locationTextChanged', handleLocationTextUpdate as EventListener);
+      window.removeEventListener('dashboardLocationSelected', handleLocationSelectionUpdate as EventListener);
     };
   }, []);
 
@@ -84,17 +99,17 @@ export const AppBar = ({
 
   useEffect(() => {
     setMounted(true);
-    
-    // 모바일 감지
-    const checkIsMobile = () => {
+
+    // 모바일 화면 크기 체크
+    const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     return () => {
-      window.removeEventListener('resize', checkIsMobile);
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
@@ -115,8 +130,11 @@ export const AppBar = ({
   // 드롭다운 메뉴 외부 클릭으로 닫기 (PC에서만)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // 모바일에서는 이 이벤트를 무시
+      if (isMobile) return;
+
       const target = event.target as Element;
-      if (isMenuOpen && !isMobile && !target.closest('.menu-dropdown-container')) {
+      if (isMenuOpen && !target.closest('.menu-dropdown-container') && !target.closest('.mobile-menu')) {
         setIsMenuOpen(false);
       }
     };
@@ -132,7 +150,7 @@ export const AppBar = ({
 
   // 모바일 메뉴가 열렸을 때 배경 스크롤 방지
   useEffect(() => {
-    if (isMenuOpen && isMobile) {
+    if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -142,9 +160,10 @@ export const AppBar = ({
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isMenuOpen, isMobile]);
+  }, [isMenuOpen]);
 
   const handleMenuItemClick = (url: string) => {
+    console.log('메뉴 클릭:', url);
     setIsMenuOpen(false);
     router.push(url);
   };
@@ -152,7 +171,7 @@ export const AppBar = ({
 
 
   // 로그아웃 처리 (PC 사이드바와 동일한 로직)
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     try {
       console.log('🔄 로그아웃 시작');
       await logout(); // useAuth의 logout 함수가 이미 모든 처리를 담당
@@ -178,28 +197,13 @@ export const AppBar = ({
     setShowLogoutModal(false);
   };
 
-  const handleSettingsItemClick = (itemId: string) => {
-    setIsMenuOpen(false);
-    
-    if (itemId === 'notifications') {
-      router.push('/settings/alert');
-    } else if (itemId === 'notice') {
-      router.push('/settings/notice');
-    } else if (itemId === 'faq') {
-      router.push('/settings/faq');
-    } else {
-      // TODO: 각 설정 항목별 기능 구현
-      console.log('설정 항목 클릭:', itemId);
-    }
-  };
 
   return (
     <>
     <div className="app-bar">
       <div className="app-bar-container">
         {/* PC용 AppBar - 한 줄 구조 */}
-        {!isMobile && (
-          <div className="pc-app-bar">
+        <div className="pc-app-bar">
             <div className="app-bar-left">
               {showBackButton && (
                 <button className="back-button" onClick={handleBackClick}>
@@ -228,7 +232,7 @@ export const AppBar = ({
             </div>
 
             {/* PC에서만 위치 선택기 */}
-            {(pathname === '/' || pathname === '/dashboard') && (
+            {pathname === '/' && (
               <div className="app-bar-center">
                 <CountryAndCitySelector
                   variant="pc"
@@ -242,11 +246,14 @@ export const AppBar = ({
                       detail: { countryCode, cityCode }
                     }));
                   }}
-                  onLocationTextChange={setLocationText}
+                  onLocationTextChange={(text) => {
+                    setLocationText(text);
+                  }}
                 />
               </div>
             )}
 
+            {showActions && (
             <div className="app-bar-right">
               <div className="desktop-menu">
                 <button className={`desktop-menu-item ${isActive('/trip-tour') ? 'active' : ''}`} onClick={() => handleAuthRequiredMenuClick('/trip-tour')}>
@@ -317,22 +324,39 @@ export const AppBar = ({
                         
                         <div className="settings-divider"></div>
                         <div className="pc-settings-section">
-                          <button onClick={() => handleSettingsItemClick('notifications')}>
+                          <button onClick={() => {
+                            setIsMenuOpen(false);
+                            router.push('/settings/alert');
+                          }}>
                             {t('notifications')}
                           </button>
-                          <button onClick={() => handleSettingsItemClick('customer-service')}>
+                          <button onClick={() => {
+                            setIsMenuOpen(false);
+                            console.log('고객서비스 클릭');
+                          }}>
                             {t('customerService')}
                           </button>
-                          <button onClick={() => handleSettingsItemClick('faq')}>
+                          <button onClick={() => {
+                            setIsMenuOpen(false);
+                            router.push('/settings/faq');
+                          }}>
                             {t('faq')}
                           </button>
-                          <button onClick={() => handleSettingsItemClick('notice')}>
+                          <button onClick={() => {
+                            setIsMenuOpen(false);
+                            router.push('/settings/notice');
+                          }}>
                             {t('notice')}
                           </button>
-                          <button onClick={() => handleSettingsItemClick('settings')}>
+                          <button onClick={() => {
+                            setIsMenuOpen(false);
+                            console.log('설정 클릭');
+                          }}>
                             {t('settings')}
                           </button>
-                          <button onClick={() => handleSettingsItemClick('version')}>
+                          <button onClick={() => {
+                            console.log('버전 클릭');
+                          }}>
                             <span>{t('version')}</span>
                             <span>V. 0.1.0</span>
                           </button>
@@ -349,29 +373,40 @@ export const AppBar = ({
                 </div>
               </div>
             </div>
+            )}
           </div>
-        )}
 
         {/* 모바일용 AppBar - 두 줄 구조 */}
-        {isMobile && (
-          <>
-            {/* 첫 번째 줄: 로고와 메뉴 */}
+        <div className="mobile-app-bar">
+            {/* 첫 번째 줄: 알림, 로고, 메뉴 */}
             <div className="mobile-app-bar-row-1">
               <div className="app-bar-left">
-                {showBackButton && (
+                {showBackButton ? (
                   <button className="back-button" onClick={handleBackClick}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
+                ) : (
+                  <button className="notification-button">
+                    <Image
+                      src="/icons/bell.png"
+                      alt="Notifications"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
                 )}
+              </div>
+
+              <div className="app-bar-center-mobile">
                 {showLogo && (
                   <div className="logo-container" onClick={handleLogoClick}>
-                    <Image 
-                      src="/logo.png" 
-                      alt="TRIPJOY Logo" 
-                      width={100} 
-                      height={32} 
+                    <Image
+                      src="/logo.png"
+                      alt="TRIPJOY Logo"
+                      width={100}
+                      height={32}
                       priority
                       className="logo-image"
                     />
@@ -384,21 +419,23 @@ export const AppBar = ({
                 )}
               </div>
 
+              {showActions && (
               <div className="app-bar-right">
                 <button className="mobile-menu-button" onClick={handleMenuClick}>
-                  <Image 
-                    src="/icons/menu.png" 
-                    alt="Menu" 
-                    width={26} 
+                  <Image
+                    src="/icons/menu.png"
+                    alt="Menu"
+                    width={26}
                     height={26}
                   />
                   <span className="menu-text">{t('menu')}</span>
                 </button>
               </div>
+              )}
             </div>
 
             {/* 두 번째 줄: 위치 선택기 */}
-            {(pathname === '/' || pathname === '/dashboard') && (
+            {pathname === '/' && (
               <div className="mobile-app-bar-row-2">
                 <CountryAndCitySelector
                   variant="mobile"
@@ -412,19 +449,24 @@ export const AppBar = ({
                       detail: { countryCode, cityCode }
                     }));
                   }}
-                  onLocationTextChange={setLocationText}
+                  onLocationTextChange={(text) => {
+                    setLocationText(text);
+                  }}
                 />
               </div>
             )}
-          </>
-        )}
+        </div>
       </div>
     </div>
       
       {/* 모바일 사이드 드로우 메뉴 */}
-      {mounted && isMobile && isMenuOpen && createPortal(
-        <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
-          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+      {mounted && isMenuOpen && isMobile && createPortal(
+        <div className="mobile-menu-overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsMenuOpen(false);
+          }
+        }}>
+          <div className="mobile-menu">
             <div className="mobile-menu-header">
               <button className="mobile-menu-close" onClick={() => setIsMenuOpen(false)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -436,7 +478,7 @@ export const AppBar = ({
               {/* 사용자 정보 섹션 */}
               {isAuthenticated && user && (
                 <div className="user-info-section">
-                  <div className="user-name-row" onClick={() => { setIsMenuOpen(false); router.push('/profile'); }}>
+                  <div className="user-name-row" onClick={() => handleMenuItemClick('/profile')}>
                     <span className="user-name">{user.name}</span>
                     <svg className="arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/>
@@ -452,22 +494,30 @@ export const AppBar = ({
               {/* 설정 항목들 */}
               <div className="settings-divider"></div>
               <div className="mobile-settings-section">
-                <button onClick={() => handleSettingsItemClick('notifications')}>
+                <button onClick={() => handleMenuItemClick('/settings/alert')}>
                   {t('notifications')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('customer-service')}>
+                <button onClick={() => {
+                  setIsMenuOpen(false);
+                  console.log('고객서비스 클릭');
+                }}>
                   {t('customerService')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('faq')}>
+                <button onClick={() => handleMenuItemClick('/settings/faq')}>
                   {t('faq')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('notice')}>
+                <button onClick={() => handleMenuItemClick('/settings/notice')}>
                   {t('notice')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('settings')}>
+                <button onClick={() => {
+                  setIsMenuOpen(false);
+                  console.log('설정 클릭');
+                }}>
                   {t('settings')}
                 </button>
-                <button onClick={() => handleSettingsItemClick('version')}>
+                <button onClick={() => {
+                  console.log('버전 클릭');
+                }}>
                   <span>{t('version')}</span>
                   <span>V. 0.1.0</span>
                 </button>
@@ -478,7 +528,7 @@ export const AppBar = ({
               {isAuthenticated ? (
                 <button onClick={handleLogoutClick}>{t('logout')}</button>
               ) : (
-                <button onClick={() => { setIsMenuOpen(false); router.push('/auth/login'); }}>{t('login')}</button>
+                <button onClick={() => handleMenuItemClick('/auth/login')}>{t('login')}</button>
               )}
             </div>
           </div>

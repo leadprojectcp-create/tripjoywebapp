@@ -22,6 +22,7 @@ export interface KakaoAuthResult {
   error?: string;
   isNewUser?: boolean;
   uid?: string;
+  needsAdditionalInfo?: boolean; // 추가 정보 입력이 필요한지 여부
 }
 
 /**

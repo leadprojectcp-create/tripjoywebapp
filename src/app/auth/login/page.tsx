@@ -5,7 +5,7 @@ import "./page.css";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useTranslationContext } from "../../contexts/TranslationContext";
-import { AppBar } from "../../components/AppBar";
+// import { AppBar } from "../../components/AppBar"; // 로그인 페이지에서는 앱바 불필요
 import { signInWithKakao } from "../../services/kakaoAuthService";
 import { signInWithGoogle } from "../../services/googleAuthService";
 import { signInWithApple } from "../../services/appleAuthService";
@@ -276,16 +276,19 @@ export default function LoginPage(): React.JSX.Element {
           return;
         }
         
-        // 카카오 로그인 성공 - isNewUser 확인
-        if (result.isNewUser) {
-          console.log('🆕 새 사용자 발견 - 약관동의 페이지로 이동');
-          // localStorage에 새 사용자 플래그 설정 (onAuthStateChanged 리다이렉션 방지)
-          localStorage.setItem('kakao_new_user', 'true');
-          // 약관동의 페이지로 이동 (uid와 함께)
-          router.push(`/auth/signup?method=kakao&uid=${result.uid}`);
+        // 카카오 로그인 성공 - 사용자 상태 확인
+        if (result.isNewUser || result.needsAdditionalInfo) {
+          // 새 사용자이거나 추가 정보가 필요한 기존 사용자
+          console.log('🔄 사용자 정보 입력 필요:', {
+            isNewUser: result.isNewUser,
+            needsAdditionalInfo: result.needsAdditionalInfo
+          });
+          localStorage.setItem('kakao_user_setup', 'true');
+          router.push(`/auth/terms?method=kakao&uid=${result.uid}`);
         } else {
-          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
-          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
+          console.log('✅ 완전한 기존 사용자 - 메인 페이지로 이동');
+          setIsLoading(false);
+          router.push('/');
         }
         
       } catch (error: any) {
@@ -300,16 +303,21 @@ export default function LoginPage(): React.JSX.Element {
         
         const result = await signInWithGoogle();
         
-        if (result.success && result.isNewUser) {
-          console.log('🆕 구글 새 사용자 - 약관동의 페이지로 이동');
-          localStorage.setItem('google_new_user', 'true');
-          router.push(`/auth/signup?method=google&uid=${result.user?.uid}`);
-        } else if (!result.success) {
+        if (!result.success) {
           setError(result.error || "구글 로그인에 실패했습니다.");
           setIsLoading(false);
+        } else if (result.isNewUser || result.needsAdditionalInfo) {
+          // 새 사용자이거나 추가 정보가 필요한 기존 사용자
+          console.log('🔄 사용자 정보 입력 필요:', {
+            isNewUser: result.isNewUser,
+            needsAdditionalInfo: result.needsAdditionalInfo
+          });
+          localStorage.setItem('google_user_setup', 'true');
+          router.push(`/auth/terms?method=google&uid=${result.user?.uid}`);
         } else {
-          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
-          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
+          console.log('✅ 완전한 기존 사용자 - 메인 페이지로 이동');
+          setIsLoading(false);
+          router.push('/');
         }
         
       } catch (error: any) {
@@ -324,16 +332,21 @@ export default function LoginPage(): React.JSX.Element {
         
         const result = await signInWithApple();
         
-        if (result.success && result.isNewUser) {
-          console.log('🆕 애플 새 사용자 - 약관동의 페이지로 이동');
-          localStorage.setItem('apple_new_user', 'true');
-          router.push(`/auth/signup?method=apple&uid=${result.user?.uid}`);
-        } else if (!result.success) {
+        if (!result.success) {
           setError(result.error || "애플 로그인에 실패했습니다.");
           setIsLoading(false);
+        } else if (result.isNewUser || result.needsAdditionalInfo) {
+          // 새 사용자이거나 추가 정보가 필요한 기존 사용자
+          console.log('🔄 사용자 정보 입력 필요:', {
+            isNewUser: result.isNewUser,
+            needsAdditionalInfo: result.needsAdditionalInfo
+          });
+          localStorage.setItem('apple_user_setup', 'true');
+          router.push(`/auth/terms?method=apple&uid=${result.user?.uid}`);
         } else {
-          console.log('✅ 기존 사용자 - 메인 페이지로 이동');
-          // 기존 사용자는 onAuthStateChanged에서 자동으로 메인으로 이동
+          console.log('✅ 완전한 기존 사용자 - 메인 페이지로 이동');
+          setIsLoading(false);
+          router.push('/');
         }
         
       } catch (error: any) {
@@ -346,8 +359,7 @@ export default function LoginPage(): React.JSX.Element {
 
   return (
     <>
-      <AppBar showBackButton={false} />
-      <div className="login-page page-with-appbar">
+      <div className="login-page">
         <div className="login-container">
         <div className="login-header">
           <div className="brand-logo-container">

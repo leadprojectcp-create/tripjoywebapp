@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { AppBar } from '../../components/AppBar';
+import { AppBar, AppBarProps } from '../../components/AppBar';
 import { UserInfo } from '../email/types';
 import { useTranslationContext } from '../../contexts/TranslationContext';
 import './UserInfoForm.css';
@@ -182,13 +182,16 @@ export const UserInfoForm: React.FC<UserInfoFormProps> = ({
 
   return (
     <>
-      <AppBar showBackButton={true} showLogo={false} />
+      <AppBar
+        {...({
+          showBackButton: true,
+          showLogo: false,
+          title: t('userInfoTitle'),
+          showActions: false
+        } as AppBarProps)}
+      />
       <div className="userinfo-page page-with-appbar">
         <div className="userinfo-container">
-          <div className="userinfo-header">
-            <h2 className="userinfo-title">{t('userInfoTitle')}</h2>
-          </div>
-
           <form onSubmit={handleSubmit} className="userinfo-form">
             <div className="form-group">
               <label htmlFor="name" className="form-label">{t('name')}</label>

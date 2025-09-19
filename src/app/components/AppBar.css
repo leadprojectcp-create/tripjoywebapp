@@ -360,6 +360,12 @@
   font-weight: 500;
   color: #1B1C1F;
   transition: background-color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  width: 100%;
+  touch-action: manipulation;
 }
 
 .mobile-settings-section button:hover {
@@ -483,11 +489,24 @@
 }
 
 /* 모바일용 AppBar */
+.mobile-app-bar {
+  display: none;
+}
+
 .mobile-app-bar-row-1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  position: relative;
+}
+
+.app-bar-center-mobile {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
 }
 
 .mobile-app-bar-row-2 {
@@ -516,6 +535,22 @@
   display: flex;
 }
 
+.notification-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.notification-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 @media (max-width: 480px) {
   .app-bar {
     height: auto; /* 자동 높이 */
@@ -531,6 +566,8 @@
     align-items: flex-start;
     max-width: none; /* 모바일에서는 최대 넓이 제한 해제 */
     margin: 0; /* 모바일에서는 중앙 정렬 해제 */
+    padding: 0; /* 모바일에서 패딩 제거 */
+    width: 100%;
   }
   
   /* PC용 AppBar 숨김 */
@@ -539,6 +576,11 @@
   }
 
   /* 모바일용 AppBar 표시 */
+  .mobile-app-bar {
+    width: 100%;
+    display: block;
+  }
+
   .mobile-app-bar-row-1 {
     display: flex;
     justify-content: space-between;
@@ -546,16 +588,15 @@
   }
 
   .mobile-app-bar-row-1 .app-bar-left {
-    gap: 12px;
+    flex: 1;
+    display: flex;
     justify-content: flex-start;
-    flex-wrap: nowrap !important;
-    flex: 0 0 auto;
   }
 
   .mobile-app-bar-row-1 .app-bar-right {
+    flex: 1;
+    display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    flex: 0 0 auto;
   }
 
   .mobile-app-bar-row-2 {

@@ -22,6 +22,7 @@ export interface AppleAuthResult {
   user?: User;
   error?: string;
   isNewUser?: boolean;
+  needsAdditionalInfo?: boolean; // 추가 정보 입력이 필요한지 여부
 }
 
 /**
